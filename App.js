@@ -7,12 +7,13 @@
  */
 
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, Button } from 'react-native';
 import { LoginButton, AccessToken } from "react-native-fbsdk";
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from "react-native-action-button";
 import { Agenda } from "react-native-calendars";
 import { GiftedChat } from 'react-native-gifted-chat';
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 export default class App extends Component {
   state = {
@@ -33,6 +34,7 @@ export default class App extends Component {
           },
         },
       ],
+      isDateTimePickerVisible: false,
     })
   }
 
@@ -42,10 +44,30 @@ export default class App extends Component {
     }))
   }
 
+  showDateTimePicker = () => {
+    this.setState({ isDateTimePickerVisible: true });
+  };
+
+  hideDateTimePicker = () => {
+    this.setState({ isDateTimePickerVisible: false });
+  };
+
+  handleDatePicked = date => {
+    console.log("A date has been picked: ", date);
+    this.hideDateTimePicker();
+  };
+
   render() {
     return (
       <View style={styles.container}>
         <Text>Hoşgeldiniz</Text>
+        <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
+        <DateTimePicker
+          mode="datetime"
+          isVisible={this.state.isDateTimePickerVisible}
+          onConfirm={this.handleDatePicked}
+          onCancel={this.hideDateTimePicker}
+        />
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
