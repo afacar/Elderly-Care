@@ -6,8 +6,9 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import React, { Component } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { LoginButton, AccessToken } from "react-native-fbsdk";
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -20,9 +21,27 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <LoginButton
+          onLoginFinished={
+            (error, result) => {
+              if (error) {
+                this.props.handleLogin({ errorMessage: error.message });
+              } else if (result.isCancelled) {
+                this.props.handleLogin({ errorMessage: "Giriş iptal edildi!" });
+              } else {
+                AccessToken.getCurrentAccessToken().then(
+                  async (data) => {
+                    /** 
+                     *  If there is no userRole parameter from parent,
+                     *  FB Login will be caregiver Login by default!
+                     */
+                    console.log("!Facebook Login Successful data", data);
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => console.log("FB logout.")} />
       </View>
     );
   }

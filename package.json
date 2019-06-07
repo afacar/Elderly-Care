@@ -9,6 +9,7 @@
   "dependencies": {
     "react": "16.8.3",
     "react-native": "0.59.9",
+    "react-native-fbsdk": "^0.8.0",
     "react-native-firebase": "^5.4.2"
   },
   "devDependencies": {

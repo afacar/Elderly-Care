@@ -102,7 +102,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.evdebakim"
+        applicationId "com.afacar.evdebakim"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -138,6 +138,10 @@ android {
 }
 
 dependencies {
+    // fbsdk
+    implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
+    implementation project(':react-native-fbsdk')
+    // Firebase core
     implementation project(':react-native-firebase')
     // Firebase dependencies
     implementation "com.google.android.gms:play-services-base:16.1.0"

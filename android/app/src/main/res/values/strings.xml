@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Evde Bakım</string>
+    <string name="facebook_app_id">249982225599592</string>
+    <string name="fb_login_protocol_scheme">fb249982225599592</string>
 </resources>
