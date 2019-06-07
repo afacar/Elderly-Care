@@ -9,6 +9,7 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { LoginButton, AccessToken } from "react-native-fbsdk";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -21,6 +22,7 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Icon name="rocket" size={30} color="#900" />
         <LoginButton
           onLoginFinished={
             (error, result) => {
