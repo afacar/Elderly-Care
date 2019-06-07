@@ -14,7 +14,7 @@ import ActionButton from "react-native-action-button";
 import { Agenda } from "react-native-calendars";
 import { GiftedChat } from 'react-native-gifted-chat';
 import DateTimePicker from "react-native-modal-datetime-picker";
-import Toast, { DURATION } from 'react-native-easy-toast'
+import Toast, { DURATION } from 'react-native-easy-toast';
 
 export default class App extends Component {
   state = {
@@ -71,6 +71,23 @@ export default class App extends Component {
           onConfirm={this.handleDatePicked}
           onCancel={this.hideDateTimePicker}
         />
+        <LoginButton
+          onLoginFinished={
+            (error, result) => {
+              if (error) {
+                console.log("login has error: " + result.error);
+              } else if (result.isCancelled) {
+                console.log("login is cancelled.");
+              } else {
+                AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    console.log(data.accessToken.toString())
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => console.log("logout.")}/>
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
