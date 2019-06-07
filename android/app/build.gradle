@@ -138,6 +138,22 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-firebase')
+    // Firebase dependencies
+    implementation "com.google.android.gms:play-services-base:16.1.0"
+    implementation "com.google.firebase:firebase-core:16.0.9"
+    // Firebase Auth
+    implementation "com.google.firebase:firebase-auth:17.0.0"
+    // Firebase Functions
+    implementation "com.google.firebase:firebase-functions:17.0.0"
+    // Firebase Messaging
+    implementation "com.google.firebase:firebase-messaging:18.0.0"
+    implementation 'me.leolin:ShortcutBadger:1.1.21@aar' // <-- Add this line if you wish to use badge on Android
+    // Firebase Database
+    implementation "com.google.firebase:firebase-database:17.0.0"
+    // Firebase Storage
+    implementation "com.google.firebase:firebase-storage:17.0.0"
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
@@ -149,3 +165,6 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
+// Firebase installation: To apply the plugin to your project, add the following to the VERY BOTTOM of your app android/app/build.gradle file
+//apply plugin: 'com.google.gms.google-services'
