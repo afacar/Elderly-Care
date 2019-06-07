@@ -14,6 +14,7 @@ import ActionButton from "react-native-action-button";
 import { Agenda } from "react-native-calendars";
 import { GiftedChat } from 'react-native-gifted-chat';
 import DateTimePicker from "react-native-modal-datetime-picker";
+import Toast, { DURATION } from 'react-native-easy-toast'
 
 export default class App extends Component {
   state = {
@@ -60,6 +61,8 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Toast ref="toast" />
+        <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!') } />
         <Text>Hoşgeldiniz</Text>
         <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
         <DateTimePicker

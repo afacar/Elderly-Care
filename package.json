@@ -13,6 +13,7 @@
     "react-native": "0.59.9",
     "react-native-action-button": "^2.8.5",
     "react-native-calendars": "^1.185.0",
+    "react-native-easy-toast": "^1.2.0",
     "react-native-elements": "^1.1.0",
     "react-native-fbsdk": "^0.8.0",
     "react-native-firebase": "^5.4.2",
