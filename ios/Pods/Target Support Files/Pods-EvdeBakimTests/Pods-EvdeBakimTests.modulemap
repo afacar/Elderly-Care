@@ -1,0 +1,6 @@
+framework module Pods_EvdeBakimTests {
+  umbrella header "Pods-EvdeBakimTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,10 +1,24 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+// import React, { Component } from 'react';
+// import { Platform, StyleSheet, Text, View, Button } from 'react-native';
+
+// export default class App extends Component{
+//   render(){
+//     return (
+//       <View style={{marginTop:100}}>
+//         <Text>i am working</Text>
+//       </View>
+//     )
+//   }
+// }
+
+
+// /**
+//  * Sample React Native App
+//  * https://github.com/facebook/react-native
+//  *
+//  * @format
+//  * @flow
+//  */
 
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, Button } from 'react-native';
@@ -106,6 +120,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'purple',
     backgroundColor: '#F5FCFF',
+    marginTop:100,
+    marginBottom:30
   },
   welcome: {
     fontSize: 20,
