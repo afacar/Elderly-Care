@@ -19,6 +19,8 @@ pod 'Firebase/Storage', '~> 5.20.1'
   target 'EvdeBakim-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
+    pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
   end
 
   target 'EvdeBakimTests' do
