@@ -84,6 +84,8 @@ export default class App extends Component {
           isVisible={this.state.isDateTimePickerVisible}
           onConfirm={this.handleDatePicked}
           onCancel={this.hideDateTimePicker}
+          datePickerModeAndroid="spinner"
+          timePickerModeAndroid="spinner"
         />
         <LoginButton
           onLoginFinished={
