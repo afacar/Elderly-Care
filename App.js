@@ -29,6 +29,7 @@ import { Agenda } from "react-native-calendars";
 import { GiftedChat } from 'react-native-gifted-chat';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Toast, { DURATION } from 'react-native-easy-toast';
+import Voice from 'react-native-voice';
 
 export default class App extends Component {
   state = {
