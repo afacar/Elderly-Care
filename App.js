@@ -29,6 +29,9 @@ import { Agenda } from "react-native-calendars";
 import { GiftedChat } from 'react-native-gifted-chat';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import Toast, { DURATION } from 'react-native-easy-toast';
+import Voice from 'react-native-voice';
+import { VictoryBar } from "victory-native";
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default class App extends Component {
   state = {
@@ -75,42 +78,45 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Toast ref="toast" />
-        <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!') } />
-        <Text>Hoşgeldiniz</Text>
-        <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
-        <DateTimePicker
-          mode="datetime"
-          isVisible={this.state.isDateTimePickerVisible}
-          onConfirm={this.handleDatePicked}
-          onCancel={this.hideDateTimePicker}
-          datePickerModeAndroid="spinner"
-          timePickerModeAndroid="spinner"
-        />
-        <LoginButton
-          onLoginFinished={
-            (error, result) => {
-              if (error) {
-                console.log("login has error: " + result.error);
-              } else if (result.isCancelled) {
-                console.log("login is cancelled.");
-              } else {
-                AccessToken.getCurrentAccessToken().then(
-                  (data) => {
-                    console.log(data.accessToken.toString())
-                  }
-                )
+        <ScrollView>
+          <Toast ref="toast" />
+          <VictoryBar />
+          <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!')} />
+          <Text>Hoşgeldiniz</Text>
+          <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
+          <DateTimePicker
+            mode="datetime"
+            isVisible={this.state.isDateTimePickerVisible}
+            onConfirm={this.handleDatePicked}
+            onCancel={this.hideDateTimePicker}
+            datePickerModeAndroid="spinner"
+            timePickerModeAndroid="spinner"
+          />
+          <GiftedChat
+            messages={this.state.messages}
+            onSend={messages => this.onSend(messages)}
+            user={{
+              _id: 1,
+            }}
+          />
+          <LoginButton
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  console.log("login has error: " + result.error);
+                } else if (result.isCancelled) {
+                  console.log("login is cancelled.");
+                } else {
+                  AccessToken.getCurrentAccessToken().then(
+                    (data) => {
+                      console.log(data.accessToken.toString())
+                    }
+                  )
+                }
               }
             }
-          }
-          onLogoutFinished={() => console.log("logout.")}/>
-        <GiftedChat
-          messages={this.state.messages}
-          onSend={messages => this.onSend(messages)}
-          user={{
-            _id: 1,
-          }}
-        />
+            onLogoutFinished={() => console.log("logout.")} />
+        </ScrollView>
       </View>
     );
   }
@@ -122,8 +128,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'purple',
     backgroundColor: '#F5FCFF',
-    marginTop:100,
-    marginBottom:30
+    marginTop: Platform.OS == 'ios' ? 20 : 0,
+    marginBottom: Platform.OS == 'ios' ? 10 : 0
   },
   welcome: {
     fontSize: 20,

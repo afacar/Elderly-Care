@@ -21,6 +21,10 @@ pod 'Firebase/Storage', '~> 5.20.1'
     # Pods for testing
     pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
 
+    pod 'react-native-voice', :path => '../node_modules/react-native-voice'
+
+    pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
   end
 
   target 'EvdeBakimTests' do
