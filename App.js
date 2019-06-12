@@ -80,9 +80,9 @@ export default class App extends Component {
       <View style={styles.container}>
         <ScrollView>
           <Toast ref="toast" />
-          <VictoryBar />
           <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!')} />
           <Text>Hoşgeldiniz</Text>
+          <VictoryBar />
           <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
           <DateTimePicker
             mode="datetime"

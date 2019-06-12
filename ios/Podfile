@@ -19,9 +19,8 @@ pod 'Firebase/Storage', '~> 5.20.1'
   target 'EvdeBakim-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
-    pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
 
-    pod 'react-native-voice', :path => '../node_modules/react-native-voice'
+    pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
 
     pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
