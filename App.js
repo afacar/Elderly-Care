@@ -1,24 +1,10 @@
-// import React, { Component } from 'react';
-// import { Platform, StyleSheet, Text, View, Button } from 'react-native';
-
-// export default class App extends Component{
-//   render(){
-//     return (
-//       <View style={{marginTop:100}}>
-//         <Text>i am working</Text>
-//       </View>
-//     )
-//   }
-// }
-
-
-// /**
-//  * Sample React Native App
-//  * https://github.com/facebook/react-native
-//  *
-//  * @format
-//  * @flow
-//  */
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow
+ */
 
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, Button } from 'react-native';
@@ -32,26 +18,24 @@ import Toast, { DURATION } from 'react-native-easy-toast';
 import Voice from 'react-native-voice';
 import { VictoryBar } from "victory-native";
 import { ScrollView } from 'react-native-gesture-handler';
+import { createAppContainer, createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 export default class App extends Component {
+
+  render() {
+    return (
+      <AppContainer />
+    );
+  }
+}
+
+class Home extends Component {
   state = {
     messages: [],
   }
 
   componentWillMount() {
     this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: 'Hello developer',
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placeimg.com/140/140/any',
-          },
-        },
-      ],
       isDateTimePickerVisible: false,
     })
   }
@@ -78,49 +62,94 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView>
-          <Toast ref="toast" />
-          <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!')} />
-          <Text>Hoşgeldiniz</Text>
-          <VictoryBar />
-          <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
-          <DateTimePicker
-            mode="datetime"
-            isVisible={this.state.isDateTimePickerVisible}
-            onConfirm={this.handleDatePicked}
-            onCancel={this.hideDateTimePicker}
-            datePickerModeAndroid="spinner"
-            timePickerModeAndroid="spinner"
-          />
-          <GiftedChat
-            messages={this.state.messages}
-            onSend={messages => this.onSend(messages)}
-            user={{
-              _id: 1,
-            }}
-          />
-          <LoginButton
-            onLoginFinished={
-              (error, result) => {
-                if (error) {
-                  console.log("login has error: " + result.error);
-                } else if (result.isCancelled) {
-                  console.log("login is cancelled.");
-                } else {
-                  AccessToken.getCurrentAccessToken().then(
-                    (data) => {
-                      console.log(data.accessToken.toString())
-                    }
-                  )
-                }
+        <Toast ref="toast" />
+        <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!')} />
+        <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
+        <DateTimePicker
+          mode="datetime"
+          isVisible={this.state.isDateTimePickerVisible}
+          onConfirm={this.handleDatePicked}
+          onCancel={this.hideDateTimePicker}
+          datePickerModeAndroid="spinner"
+          timePickerModeAndroid="spinner"
+        />
+        <LoginButton
+          onLoginFinished={
+            (error, result) => {
+              if (error) {
+                console.log("login has error: " + result.error);
+              } else if (result.isCancelled) {
+                console.log("login is cancelled.");
+              } else {
+                AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    console.log(data.accessToken.toString())
+                  }
+                )
               }
             }
-            onLogoutFinished={() => console.log("logout.")} />
-        </ScrollView>
+          }
+          onLogoutFinished={() => console.log("logout.")} />
+        <Button title="Go to chat" onPress={() => this.props.navigation.navigate('Chat')} />
+        <Button title="Go to chart" onPress={() => this.props.navigation.navigate('Chart')} />
       </View>
     );
   }
 }
+
+class Chat extends Component {
+  state = {
+    messages: [],
+  };
+
+  componentDidMount() {
+    this.setState({
+      messages: [
+        {
+          _id: 1,
+          text: 'Hello developer',
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://placeimg.com/140/140/any',
+          },
+        },
+      ]
+    });
+  }
+
+  render() {
+    return (
+      <GiftedChat
+        messages={this.state.messages}
+        onSend={messages => this.onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+      />
+    );
+  }
+}
+
+class Chart extends Component {
+
+  render() {
+    return (
+      <View pointerEvents="none">
+        <VictoryBar />
+      </View>
+    );
+  }
+}
+
+const AppNavigator = createMaterialTopTabNavigator({
+  Home: Home,
+  Chat: Chat,
+  Chart: Chart,
+});
+
+const AppContainer = createAppContainer(AppNavigator);
 
 const styles = StyleSheet.create({
   container: {
