@@ -24,7 +24,9 @@ export default class App extends Component {
 
   render() {
     return (
+      <View style={styles.container}>
       <AppContainer />
+      </View>
     );
   }
 }
@@ -61,7 +63,7 @@ class Home extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View>
         <Toast ref="toast" />
         <Button title="Show Toaster" onPress={() => this.refs.toast.show('hello world!')} />
         <Button title="Show DatePicker" onPress={this.showDateTimePicker} />
@@ -157,8 +159,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'purple',
     backgroundColor: '#F5FCFF',
-    marginTop: Platform.OS == 'ios' ? 20 : 0,
-    marginBottom: Platform.OS == 'ios' ? 10 : 0
+    marginTop: Platform.OS === 'ios' ? 50 : 0,
+    marginBottom: Platform.OS === 'ios' ? 10 : 0
   },
   welcome: {
     fontSize: 20,
