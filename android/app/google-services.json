@@ -49,6 +49,50 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342129083929:android:e531c6c6b0acad05",
+        "android_client_info": {
+          "package_name": "com.afacar.evdebakim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "342129083929-3smua86h6tidajoqkr1rcu3a684dpdin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afacar.evdebakim",
+            "certificate_hash": "3c4f294d715e1d964eb5d71079c83708036f4f86"
+          }
+        },
+        {
+          "client_id": "342129083929-rbq9ebbkk3shouroe0gljqed6jr6t5jo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFlxCCwZRAnCWv0oTBHq80dGB04Si2GyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "342129083929-rbq9ebbkk3shouroe0gljqed6jr6t5jo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "342129083929-1rmdacta27tpr38mh9aqr0k4t9pafs8e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.afacar.ebakim"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

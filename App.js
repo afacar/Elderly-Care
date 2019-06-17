@@ -61,6 +61,7 @@ class Home extends Component {
     console.log("A date has been picked: ", date);
     this.hideDateTimePicker();
   };
+  
   signIn = async () => {
   try {
     await GoogleSignin.hasPlayServices();
@@ -114,7 +115,7 @@ class Home extends Component {
           style={{ width: 192, height: 48 }}
           size={GoogleSigninButton.Size.Wide}
           color={GoogleSigninButton.Color.Dark}
-          onPress={this._signIn}
+          onPress={this.signIn}
           disabled={this.state.isSigninInProgress} />
         <Button title="Go to chat" onPress={() => this.props.navigation.navigate('Chat')} />
         <Button title="Go to chart" onPress={() => this.props.navigation.navigate('Chart')} />
