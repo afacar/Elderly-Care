@@ -8,50 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:342129083929:android:4120d4091724f8d4",
-        "android_client_info": {
-          "package_name": "com.afacar.eBakim"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "342129083929-3epkd2bo5hlj06gpeckarqfjbo7juifn.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.afacar.eBakim",
-            "certificate_hash": "4feb91c6d57cb04998959a43d394677ddb2eb676"
-          }
-        },
-        {
-          "client_id": "342129083929-rbq9ebbkk3shouroe0gljqed6jr6t5jo.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAFlxCCwZRAnCWv0oTBHq80dGB04Si2GyQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "342129083929-rbq9ebbkk3shouroe0gljqed6jr6t5jo.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "342129083929-1rmdacta27tpr38mh9aqr0k4t9pafs8e.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.afacar.ebakim"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:342129083929:android:e531c6c6b0acad05",
         "android_client_info": {
           "package_name": "com.afacar.evdebakim"
