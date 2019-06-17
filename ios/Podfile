@@ -12,29 +12,9 @@ pod 'Firebase/Functions', '~> 5.20.1'
 pod 'Firebase/Messaging', '~> 5.20.1'
 pod 'Firebase/Database', '~> 5.20.1'
 pod 'Firebase/Storage', '~> 5.20.1'
+pod 'GoogleSignIn', '~> 4.4.0'
 
   # Pods for EvdeBakim
   # Required by RNFirebase
-
-  target 'EvdeBakim-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-
-    pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
-
-    pod 'RNSVG', :path => '../node_modules/react-native-svg'
-
-  end
-
-  target 'EvdeBakimTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
-end
-
-target 'EvdeBakim-tvOS' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
 
 end

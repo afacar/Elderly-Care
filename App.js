@@ -19,13 +19,14 @@ import Voice from 'react-native-voice';
 import { VictoryBar } from "victory-native";
 import { ScrollView } from 'react-native-gesture-handler';
 import { createAppContainer, createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
+import { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
 
 export default class App extends Component {
 
   render() {
     return (
       <View style={styles.container}>
-      <AppContainer />
+        <AppContainer />
       </View>
     );
   }
@@ -60,6 +61,23 @@ class Home extends Component {
     console.log("A date has been picked: ", date);
     this.hideDateTimePicker();
   };
+  signIn = async () => {
+  try {
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+    this.setState({ userInfo });
+  } catch (error) {
+    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      // user cancelled the login flow
+    } else if (error.code === statusCodes.IN_PROGRESS) {
+      // operation (f.e. sign in) is in progress already
+    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      // play services not available or outdated
+    } else {
+      // some other error happened
+    }
+  }
+};
 
   render() {
     return (
@@ -92,6 +110,12 @@ class Home extends Component {
             }
           }
           onLogoutFinished={() => console.log("logout.")} />
+        <GoogleSigninButton
+          style={{ width: 192, height: 48 }}
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={this._signIn}
+          disabled={this.state.isSigninInProgress} />
         <Button title="Go to chat" onPress={() => this.props.navigation.navigate('Chat')} />
         <Button title="Go to chart" onPress={() => this.props.navigation.navigate('Chart')} />
       </View>
