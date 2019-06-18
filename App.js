@@ -8,7 +8,8 @@ import store from './appstate/store';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    YellowBox.ignoreWarnings(['Setting a timer', 'Remote debugger', 'Require cycle:']);
+    YellowBox.ignoreWarnings(['Setting a timer', 'Remote debugger', 'Require cycle:','Async Storage has been extracted from react-native core and will be removed in a future release.']);
+    
   }
 
   render() {
