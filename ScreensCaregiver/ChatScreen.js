@@ -19,7 +19,7 @@ class ChatScreen extends React.Component {
       <TouchableHighlight onPress={() => navigation.navigate('ProviderListScreen')}>
         <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Image
-            style={{ width: 40, height: 40 }}
+            style={{ width: 25, height: 25 }}
             source={require('../assets/images/doctor.png')}
           />
           <Text style={{ fontWeight: 'bold' }}>Uzman Ekle</Text>
