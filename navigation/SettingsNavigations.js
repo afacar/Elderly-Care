@@ -15,7 +15,7 @@ export default SettingsStack = createStackNavigator({
     tabBarIcon: ({ focused }) => (
       <TabBarIcon
         focused={focused}
-        name={Platform.OS === 'ios' ? `settings${focused ? '' : '-outline'}` : 'settings'}
+        name={'settings'}
       />
     ),
   };

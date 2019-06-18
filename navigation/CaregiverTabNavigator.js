@@ -21,11 +21,7 @@ HomeStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-home${focused ? '' : '-outline'}`
-          : 'home'
-      }
+      name={'home'}
     />
   ),
 };
@@ -42,11 +38,7 @@ PatientStack.navigationOptions = {
     <TabBarIcon
       focused={focused}
       type='font-awesome'
-      name={
-        Platform.OS === 'ios'
-          ? `line-chart${focused ? '' : '-outline'}`
-          : 'line-chart'
-      }
+      name={'line-chart'}
     />
   ),
 };
@@ -68,7 +60,7 @@ SupportStack.navigationOptions = {
       <View>
         <TabBarIcon
           focused={focused}
-          name={Platform.OS === 'ios' ? `chat${focused ? '' : '-outline'}` : 'chat'}
+          name={'chat'}
         />
 {/*         <Badge
           value="12"
