@@ -3,6 +3,7 @@ import { ScrollView, Text, NetInfo, ActivityIndicator, Image, View } from 'react
 import { Card, Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 import Toast, { DURATION } from 'react-native-easy-toast';
+import { SafeAreaView } from 'react-navigation';
 
 import * as actions from '../appstate/actions';
 import FacebookLoginButton from './FacebookLogin';
@@ -53,19 +54,21 @@ class LoginScreen extends Component {
     const { navigate } = this.props.navigation;
     return (
       <ScrollView style={{ backgroundColor: 'white' }}>
+        <SafeAreaView>
         <CardItem style={[styles.cardItemStyle, { marginTop: 15 }]}>
           <Image
             style={styles.stretch}
             source={require('../assets/images/akilli_ajanda_logo.png')}
           />
         </CardItem>
+        </SafeAreaView>
         <Card title="Bakıcı Girişi" titleStyle={{ fontSize: 23 }} style={styles.loginContainer}>
           <Toast ref="toast" position='top' />
           <Text style={styles.labelStyle}>{this.state.errorMessage}</Text>
           <CardItem style={styles.cardItemStyle}>
             <Image
               style={{ width: 70, height: 70 }}
-              source={require('../assets/images/family.png')}
+              source={require('../assets/images/family2.png')}
             />
           </CardItem>
           <CardItem style={styles.cardItemStyle}>
@@ -77,6 +80,7 @@ class LoginScreen extends Component {
           </CardItem>
           <CardItem style={styles.cardItemStyle}>
             <GoogleLoginButton
+              //style={{ width: 192, height: 48 }}
               disabled={!this.state.isConnected}
               handleLogin={this.handleLogin}
               navigate={navigate}
@@ -88,7 +92,7 @@ class LoginScreen extends Component {
           <CardItem style={styles.cardItemStyle}>
             <Image
               style={{ width: 70, height: 70 }}
-              source={require('../assets/images/doctor.png')}
+              source={require('../assets/images/doctor2.png')}
             />
           </CardItem>
           <CardItem style={styles.cardItemStyle}>
@@ -100,6 +104,7 @@ class LoginScreen extends Component {
                 color: 'white'
               }}
               disabled={!this.state.isConnected}
+              buttonStyle={{width:192, height:40, backgroundColor:'#074684'}}
               name='phone' title='Sms ile Giriş'
               onPress={() => navigate('ProviderLoginScreen')} />
           </CardItem>

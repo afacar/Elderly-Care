@@ -9,11 +9,13 @@ import { Overlay } from 'react-native-elements';
 import { connect } from 'react-redux';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
 
 import Agenda from '../components/views/Agenda';
 import * as actions from '../appstate/actions';
 import ReminderForm from '../components/forms/ReminderForm';
 import MeasurementForm from '../components/forms/MeasurementForm';
+
 
 class HomeScreen extends React.Component {
   static navigationOptions = { header: null };
@@ -37,10 +39,10 @@ class HomeScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.container} >
+      <SafeAreaView style={styles.container} >
         <KeyboardAvoidingView style={{ flex: 1 }} >
           <Agenda
-            style={{ flex: 1 }}
+            style={{ flex: 1,  }}
             openModal={this._openModal}
           />
           <ActionButton buttonColor="rgba(231,76,60,1)">
@@ -87,7 +89,7 @@ class HomeScreen extends React.Component {
             />
           </Overlay>
         </KeyboardAvoidingView>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -108,7 +110,7 @@ class HomeScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+   flex: 1
   },
   actionButtonIcon: {
     fontSize: 20,

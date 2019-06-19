@@ -151,7 +151,7 @@ class ProviderLogin extends Component {
         <Input
           autoFocus
           keyboardType='phone-pad'
-          style={{ height: 40, marginTop: 15, marginBottom: 15 }}
+          style={{height: 40, marginTop: 15, marginBottom: 15 }}
           onChangeText={value => this._isMounted && this.setState({ codeInput: value })}
           placeholder={'Kod ... '}
           value={codeInput}

@@ -63,9 +63,9 @@ class GoogleSignin extends Component {
     return (
       <View>
         <GoogleSigninButton
-          style={{ width: 230, height: 48 }}
-          size={GoogleSigninButton.Size.Standard}
-          color={GoogleSigninButton.Color.Dark}
+          style={{ width: 200, height: 45 }}
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Light}
           onPress={this._onPress}
           disabled={this.props.disabled} />
       </View>

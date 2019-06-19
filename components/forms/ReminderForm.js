@@ -4,6 +4,7 @@ import { Card, Text, ButtonGroup, Input, Button, Icon } from 'react-native-eleme
 import { ScrollView, View, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { SafeAreaView } from 'react-navigation';
 
 import { save_reminder, delete_reminder } from '../../appstate/actions';
 import {
@@ -55,7 +56,8 @@ class ReminderForm extends Component {
 
   render() {
     return (
-      <ScrollView style={{ flex: 1 }}  keyboardShouldPersistTaps="handled">
+      <ScrollView contentInsetAdjustmentBehavior="automatic"> 
+          <SafeAreaView>
         <Text h3 style={{ textAlign: 'center' }}>Hatırlatma Ekle</Text>
         <CardItem>
           <Text style={{ fontSize: 18, paddingLeft: 10, fontWeight: 'bold', color: '#3e464e' }}>Türü </Text>
@@ -146,6 +148,7 @@ class ReminderForm extends Component {
             loading={this.state.saveLoading}
           />
         </View>
+        </SafeAreaView>
       </ScrollView>
     );
   }

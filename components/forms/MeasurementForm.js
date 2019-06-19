@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { KeyboardAvoidingView, ScrollView, Alert, View } from 'react-native';
 import { connect } from 'react-redux';
+import { SafeAreaView } from 'react-navigation';
 
 import { RadioButtons, MoodButtons, HungerConditionButtons, VitalInput, NoteInput, RowItem, Label, H3, MicIcon, ErrorLabel } from "../common";
 import withSpeech from '../common/withSpeech';
@@ -178,13 +179,14 @@ class MeasurementForm extends Component {
   handleHungerCondition = (hungerIndex) => {
     this.setState({ hungerIndex, hungerCondition: HUNGER_CONDITION[hungerIndex] })
   }
-
+  // keyboardShouldPersistTaps="handled" deleted
   render() {
     return (
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <ScrollView contentInsetAdjustmentBehavior="automatic"> 
+          <SafeAreaView>
         <KeyboardAvoidingView behavior="padding" enabled>
-          <View style={{ flex: 1 }}>
-            <H3>Ölçüm Ekle</H3>
+          
+              <H3>Ölçüm Ekle</H3>
             <Label>Bir ölçüm seçiniz</Label>
             <CardItem>
               <RadioButtons
@@ -235,8 +237,8 @@ class MeasurementForm extends Component {
                 loading={this.state.saveLoading}
               />
             </CardItem>
-          </View>
         </KeyboardAvoidingView>
+        </SafeAreaView>
       </ScrollView>
     );
   }
