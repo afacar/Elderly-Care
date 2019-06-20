@@ -8,7 +8,9 @@ import PatientView from '../components/views/PatientView';
 class PatientScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: `Hasta Bilgileri`,
+    headerForceInset: {vercical: 'never'},
     headerRight: (
+      <View>
       <TouchableHighlight onPress={() => navigation.navigate('ChartScreen', {
         userid: navigation.getParam('userid', '')
       })}
@@ -21,6 +23,7 @@ class PatientScreen extends React.Component {
           <Text style={{ fontWeight: 'bold' }}>Ölçümler</Text>
         </View>
       </TouchableHighlight>
+      </View>
     )
   });
 
@@ -28,7 +31,7 @@ class PatientScreen extends React.Component {
 
   render() {
     return (
-      <ScrollView>
+      <ScrollView  keyboardShouldPersistTaps="handled">
         <PatientView userid={this.props.navigation.getParam('userid', '')} />
       </ScrollView>
     );

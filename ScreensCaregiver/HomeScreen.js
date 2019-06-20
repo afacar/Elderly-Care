@@ -39,7 +39,7 @@ class HomeScreen extends React.Component {
 
   render() {
     return (
-      <SafeAreaView style={styles.container} >
+      <View style={styles.container} >
         <KeyboardAvoidingView style={{ flex: 1 }} >
           <Agenda
             style={{ flex: 1,  }}
@@ -89,7 +89,7 @@ class HomeScreen extends React.Component {
             />
           </Overlay>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 

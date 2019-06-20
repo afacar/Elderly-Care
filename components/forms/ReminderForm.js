@@ -56,9 +56,8 @@ class ReminderForm extends Component {
 
   render() {
     return (
-      <ScrollView contentInsetAdjustmentBehavior="automatic"> 
-          <SafeAreaView>
-        <Text h3 style={{ textAlign: 'center' }}>Hatırlatma Ekle</Text>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled"> 
+        <Text  style={{ textAlign: 'center', fontSize:25, fontWeight: "400", fontFamily:'Verdana'  }}>Hatırlatma Ekle</Text>
         <CardItem>
           <Text style={{ fontSize: 18, paddingLeft: 10, fontWeight: 'bold', color: '#3e464e' }}>Türü </Text>
         </CardItem>
@@ -148,7 +147,6 @@ class ReminderForm extends Component {
             loading={this.state.saveLoading}
           />
         </View>
-        </SafeAreaView>
       </ScrollView>
     );
   }

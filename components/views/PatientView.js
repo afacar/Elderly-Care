@@ -50,7 +50,7 @@ class PatientView extends Component {
     const title = name || ' ';
     console.log('Rendering patient and title', patient, title);
     return (
-      <ScrollView>
+      <ScrollView >
         <Card title={title}
           containerStyle={styles.containerStyle}
           titleStyle={{ fontSize: 25 }}
@@ -62,7 +62,7 @@ class PatientView extends Component {
           isVisible={this.state.isVisible}
           onRequestClose={() => this._closeModal()}
         >
-          <ScrollView>
+          <ScrollView  keyboardShouldPersistTaps="handled">
             <KeyboardAvoidingView>
               <PatientForm
                 data={this.state.selectedItem}
@@ -89,7 +89,7 @@ class PatientView extends Component {
 const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
-    margin: 5,
+    //margin: 5,
     //alignItems: 'flex-start',
     padding: 0,
   },
