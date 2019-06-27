@@ -56,7 +56,7 @@ class ReminderForm extends Component {
 
   render() {
     return (
-      <ScrollView contentInsetAdjustmentBehavior="automatic"> 
+      <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled"> 
           <SafeAreaView>
         <Text h3 style={{ textAlign: 'center' }}>Hatırlatma Ekle</Text>
         <CardItem>

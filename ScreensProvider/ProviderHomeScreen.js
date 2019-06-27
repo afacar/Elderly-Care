@@ -57,6 +57,7 @@ class ProviderHome extends React.Component {
   }
 
   async componentDidMount() {
+    console.log('ProviderHomeScreen Mounted!');
     this._isMounted = true;
     // Load the chatRooms with lastMessages
     await this.props.loadProviderChats(this._fetchChatRooms);
@@ -92,7 +93,7 @@ class ProviderHome extends React.Component {
         userName = (lastMessage.user._id === firebase.auth().currentUser._user.uid) ? 'Siz:' : '';
       }
       subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
-      if (theChat.unread > 0) badge = { value: theChat.unread, status: 'primary', textStyle: { fontSize: 18 } }
+      if (unread > 0) badge = { value: unread, status: 'primary', textStyle: { fontSize: 18 } }
     } else {
       subtitle = "Mesaj yok! İlk mesajı siz yazın."
     }
@@ -141,6 +142,7 @@ class ProviderHome extends React.Component {
   }
 
   componentWillUnmount() {
+    console.log('ProviderHomeScreen UNMounted!');
     this._isMounted = false;
   }
 

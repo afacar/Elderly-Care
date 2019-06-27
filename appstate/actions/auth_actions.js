@@ -15,14 +15,11 @@ import { Translations } from '../../constants/Translations';
   return dispatch({ type: LOGIN, payload: user });
 } */
 
-export const loginWithGoogle = (callback) => async (dispatch) => {
+export const loginWithGoogle = () => async (dispatch) => {
   let isConnected = await NetInfo.isConnected.fetch();
   if (!isConnected) throw new Error("İnternet bağlantısı yok!");
 
-  let isNewUser = '';
-
   try {
-    console.log('google hasplayservices?')
     //await GoogleSignin.hasPlayServices();
     // Add any configuration settings here:
     console.log('googlesignin.configure()?')
@@ -37,7 +34,6 @@ export const loginWithGoogle = (callback) => async (dispatch) => {
     console.log('credential?', credential)
     let currentUser = await firebase.auth().signInWithCredential(credential);
     console.log('currentUser?', currentUser)
-    isNewUser = currentUser.additionalUserInfo.isNewUser;
 
     //console.info("curretUser info from firebase.auth()", JSON.stringify(currentUser.user.toJSON()));
     //dispatch({ type: LOGIN, payload: currentUser });

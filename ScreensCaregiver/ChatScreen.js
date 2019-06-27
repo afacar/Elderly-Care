@@ -58,6 +58,7 @@ class ChatScreen extends React.Component {
 
   async componentDidMount() {
     // Load the chatRooms with lastMessages
+    console.log('ChatScreen Mounted!');
     await this.props.loadCaregiverChats(this._setChatRooms);
   }
 
@@ -104,6 +105,10 @@ class ChatScreen extends React.Component {
         />
       </ScrollView>
     );
+  }
+
+  componentWillUnmount() {
+    console.log('ChatScreen UNMounted!');
   }
 
 }
