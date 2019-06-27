@@ -1,0 +1,11 @@
+{
+    "configure": {
+        "scopes": ["https://www.googleapis.com/auth/drive.readonly"],
+      "webClientId": "342129083929-rbq9ebbkk3shouroe0gljqed6jr6t5jo.apps.googleusercontent.com", 
+      "offlineAccess": true, 
+      "hostedDomain": "",
+      "loginHint": "",
+      "forceConsentPrompt": true,
+      "accountName": ""
+    }
+}

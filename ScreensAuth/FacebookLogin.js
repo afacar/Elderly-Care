@@ -15,12 +15,14 @@ class FacebookLogin extends Component {
           onLoginFinished={
             (error, result) => {
               if (error) {
+                console.log(error);
                 this.props.handleLogin({ errorMessage: error.message });
               } else if (result.isCancelled) {
                 this.props.handleLogin({ errorMessage: "Giriş iptal edildi!" });
               } else {
                 AccessToken.getCurrentAccessToken().then(
                   async (data) => {
+                  console.log("Başarılı")
                     /** 
                      *  If there is no userRole parameter from parent,
                      *  FB Login will be caregiver Login by default!
@@ -70,6 +72,8 @@ class FacebookLogin extends Component {
                     console.log("And now navigating from FacebookLogin to SplashScreen");
                     this.props.navigate('SplashScreen', { isNewUser, role: userRole });
                   }
+                ).catch(
+                  error => console.log(error.message)
                 )
               }
             }
