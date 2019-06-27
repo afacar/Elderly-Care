@@ -22,13 +22,9 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
     chatUrl = `commonchat/messages`;
   } else if (userRole === 'c') {
     chatUrl = `providerchat/${chatId}/${uid}/messages`;
-    await firebase.database().ref(`caregivers/${uid}/chats/${chatId}/unread`)
-      .set(0);
   }
   else if (userRole === 'p') {
     chatUrl = `providerchat/${uid}/${chatId}/messages`;
-    await firebase.database().ref(`providers/${uid}/chats/${chatId}/unread`)
-      .set(0);
   }
   // fet
   try {
@@ -47,6 +43,12 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
             avatar: message.user.avatar,
           },
         };
+        if (userRole === 'c') {
+          firebase.database().ref(`caregivers/${uid}/chats/${chatId}/unread`).set(0);
+        }
+        else if (userRole === 'p') {
+          firebase.database().ref(`providers/${uid}/chats/${chatId}/unread`).set(0);
+        }
         callback(newMessage, isNewMessage = true);
       }
     });
@@ -87,7 +89,7 @@ export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
 }
 
 // close the connection to the Backend
-export const closeChat = (chatId, userRole) => () => {
+export const closeChat = (chatId, userRole) => async () => {
   const uid = firebase.auth().currentUser.uid;
   let url = ``;
   if (chatId === 'commonchat') {
@@ -143,54 +145,54 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
           callback({ chatId, title, lastMessage, status, avatar, unread });
         });
       }
-  });
+    });
   });
 }
 
 // load chat rooms for the current Provider
 export const loadProviderChats = (callback) => async (dispatch) => {
-    const uid = firebase.auth().currentUser.uid;
+  const uid = firebase.auth().currentUser.uid;
 
-    await firebase.database().ref(`providers/${uid}/chats/`).on('value', async (snapshot) => {
-      console.log('loadProviderChats snapshot', snapshot.val());
-      snapshot.forEach(async (snap) => {
-        const chatId = snap.key;
-        const { status, unread } = snap.val();
-        console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
+  await firebase.database().ref(`providers/${uid}/chats/`).on('value', async (snapshot) => {
+    console.log('loadProviderChats snapshot', snapshot.val());
+    snapshot.forEach(async (snap) => {
+      const chatId = snap.key;
+      const { status, unread } = snap.val();
+      console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
 
-        let url = 'commonchat/lastMessage';
-        let title = 'Alzheimer grubu';
-        let avatar = require('../../assets/images/family.png');
+      let url = 'commonchat/lastMessage';
+      let title = 'Alzheimer grubu';
+      let avatar = require('../../assets/images/family.png');
 
-        if (chatId && status !== 'pending') {
-          if (chatId !== 'commonchat') {
-            url = `providerchat/${uid}/${chatId}/lastMessage`;
-            try {
-              // chatId is a caregiver id, so fetch the displayName as title
-              await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
-                const profile = snapshot.val();
-                const { photoURL, displayName } = profile;
-                title = displayName || 'İsimsiz Uzman';
-                avatar = photoURL ? { uri: photoURL } : require('../../assets/images/user.png');
-              });
-            } catch (error) {
-              console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
-            }
-          }
-
+      if (chatId && status !== 'pending') {
+        if (chatId !== 'commonchat') {
+          url = `providerchat/${uid}/${chatId}/lastMessage`;
           try {
-            await firebase.database().ref(url).on('value', (snapshot) => {
-              console.log('last common message changed', snapshot.val());
-              const lastMessage = snapshot.val() || '';
-              callback({ chatId, title, lastMessage, status, unread, avatar });
+            // chatId is a caregiver id, so fetch the displayName as title
+            await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
+              const profile = snapshot.val();
+              const { photoURL, displayName } = profile;
+              title = displayName || 'İsimsiz Uzman';
+              avatar = photoURL ? { uri: photoURL } : require('../../assets/images/user.png');
             });
           } catch (error) {
-            console.error('Chat son mesajı okunurken hata oldu', error.message);
+            console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
           }
-
         }
 
-      });
-    });
+        try {
+          await firebase.database().ref(url).on('value', (snapshot) => {
+            console.log('last common message changed', snapshot.val());
+            const lastMessage = snapshot.val() || '';
+            callback({ chatId, title, lastMessage, status, unread, avatar });
+          });
+        } catch (error) {
+          console.error('Chat son mesajı okunurken hata oldu', error.message);
+        }
 
-  }
+      }
+
+    });
+  });
+
+}

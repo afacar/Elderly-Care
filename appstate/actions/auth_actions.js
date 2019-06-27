@@ -11,29 +11,32 @@ import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 
 import { Translations } from '../../constants/Translations';
 
+
+const configuration = require('../../android/app/google-sign_in-configure.json');
+
 /* export const autoLogin = (user) => (dispatch) => {
   return dispatch({ type: LOGIN, payload: user });
 } */
 
-export const loginWithGoogle = (callback) => async (dispatch) => {
+export const loginWithGoogle = () => async (dispatch) => {
   let isConnected = await NetInfo.isConnected.fetch();
   if (!isConnected) throw new Error("İnternet bağlantısı yok!");
 
-  let isNewUser = '';
-
   try {
-    // await GoogleSignin.hasPlayServices();
+    //await GoogleSignin.hasPlayServices();
     // Add any configuration settings here:
-    await GoogleSignin.configure();
-
+    console.log('googlesignin.configure()?')
+    GoogleSignin.configure(configuration.configure);    
+    console.log('google.signin()?')
     const data = await GoogleSignin.signIn();
     // console.log("data from GoogleSignin", data);
     // create a new firebase credential with the token
+    console.log('data?', data)
     const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken)
     // login with credential
+    console.log('credential?', credential)
     let currentUser = await firebase.auth().signInWithCredential(credential);
-
-    isNewUser = currentUser.additionalUserInfo.isNewUser;
+    console.log('currentUser?', currentUser)
 
     //console.info("curretUser info from firebase.auth()", JSON.stringify(currentUser.user.toJSON()));
     //dispatch({ type: LOGIN, payload: currentUser });
