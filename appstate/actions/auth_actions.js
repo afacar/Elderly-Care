@@ -11,6 +11,9 @@ import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 
 import { Translations } from '../../constants/Translations';
 
+
+const configuration = require('../../android/app/google-sign_in-configure.json');
+
 /* export const autoLogin = (user) => (dispatch) => {
   return dispatch({ type: LOGIN, payload: user });
 } */
@@ -23,7 +26,7 @@ export const loginWithGoogle = () => async (dispatch) => {
     //await GoogleSignin.hasPlayServices();
     // Add any configuration settings here:
     console.log('googlesignin.configure()?')
-    await GoogleSignin.configure();
+    GoogleSignin.configure(configuration.configure);    
     console.log('google.signin()?')
     const data = await GoogleSignin.signIn();
     // console.log("data from GoogleSignin", data);
