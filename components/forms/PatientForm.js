@@ -52,7 +52,8 @@ class _PatientForm extends Component {
 
   render() {
     return (
-      <ScrollView keyboardShouldPersistTaps="handled" > 
+      
+      <ScrollView keyboardShouldPersistTaps="handled"  > 
         <Card 
           title="Hasta Bilgileri"
           titleStyle={{ fontSize: 19 }}

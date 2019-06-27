@@ -59,26 +59,26 @@ class _ProfileForm extends Component {
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
         <Image
           style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-          source={{ uri: this.state.profile.photoURL }}
+          //source={{ uri: this.state.profile.photoURL }}
         />
         <CardItem>
           <TextInput
             label="Ad soyad"
-            value={this.state.profile.displayName}
+           // value={this.state.profile.displayName}
             placeholder="Ör. Ahmet Yılmaz"
-            onChangeText={displayName => this.handleState({ displayName })}
+            //onChangeText={displayName => this.handleState({ displayName })}
           />
         </CardItem>
         <CardItem>
           <EmailInput
-            value={this.state.profile.email}
-            onChangeText={email => this.handleState({ email })}
+            //value={this.state.profile.email}
+            //onChangeText={email => this.handleState({ email })}
           />
         </CardItem>
         <CardItem>
           <PhoneInput
-            value={this.state.profile.phoneNumber}
-            onChangeText={phoneNumber => this.handleState({ phoneNumber })}
+            //value={this.state.profile.phoneNumber}
+            //onChangeText={phoneNumber => this.handleState({ phoneNumber })}
           />
         </CardItem>
         <CardItem>
@@ -87,24 +87,24 @@ class _ProfileForm extends Component {
             label="Doğum Tarihi"
             containerStyle={{ flexDirection: 'row' }}
             textContainerStyle={{ borderBottomWidth: 1 }}
-            selectedDate={this.state.profile.birthdate}
-            onDateChange={(birthdate) => this.handleState({ birthdate })}
+            //selectedDate={this.state.profile.birthdate}
+            //onDateChange={(birthdate) => this.handleState({ birthdate })}
           />
         </CardItem>
         <CardItem>
           <ListPicker
             label='Cinsiyet'
-            selectedValue={this.state.profile.gender}
-            onValueChange={(gender, itemIndex) => this.handleState({ gender })}
+            //selectedValue={this.state.profile.gender}
+            //onValueChange={(gender, itemIndex) => this.handleState({ gender })}
             options={['Erkek', 'Kadın']}
           />
         </CardItem>
         <CardItem>
           <NoteInput
             label='Adres'
-            value={this.state.profile.address}
+            //value={this.state.profile.address}
             placeholder="Adres..."
-            onChangeText={address => this.handleState({ address })}
+            //onChangeText={address => this.handleState({ address })}
           />
         </CardItem>
         <SaveButton

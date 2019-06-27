@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Image, View, StyleSheet, TouchableHighlight } from 'react-native';
+import { ScrollView, Image, View, StyleSheet, TouchableHighlight,Modal, Text } from 'react-native';
 import { connect } from 'react-redux';
 
 import * as actions from '../appstate/actions';
@@ -70,14 +70,15 @@ class ChartScreen extends React.Component {
   renderDatePicker = () => {
     return (
       <CardItem>
-        {/* <ListPicker
+
+        <ListPicker
           options={['2019', '2020']}
           onValueChange={(selectedYear) => this.setState({ selectedYear })}
           selectedValue={this.state.selectedYear} />
         <ListPicker
           options={MONTHS.TR}
           onValueChange={(selectedMonth) => this.setState({ selectedMonth })}
-          selectedValue={this.state.selectedMonth} /> */}
+          selectedValue={this.state.selectedMonth} />
         <FilterIcon onPress={this.handleDateChange} />
       </CardItem>
     );

@@ -32,6 +32,7 @@ class PatientScreen extends React.Component {
   render() {
     return (
       <ScrollView  keyboardShouldPersistTaps="handled">
+        
         <PatientView userid={this.props.navigation.getParam('userid', '')} />
       </ScrollView>
     );
