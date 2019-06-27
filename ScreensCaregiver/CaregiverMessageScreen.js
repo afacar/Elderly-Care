@@ -12,6 +12,7 @@ class CaregiverMessageScreen extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
+    headerForceInset: {vercical: 'never'},
   });
 
   _isMounted = null;

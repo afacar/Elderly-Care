@@ -13,6 +13,7 @@ import { Button, Icon } from 'react-native-elements';
 class ChartScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: `Ölçümler`,
+    headerForceInset: {vercical: 'never'},
   });
 
   isMounted = false;
@@ -69,14 +70,14 @@ class ChartScreen extends React.Component {
   renderDatePicker = () => {
     return (
       <CardItem>
-        <ListPicker
+        {/* <ListPicker
           options={['2019', '2020']}
           onValueChange={(selectedYear) => this.setState({ selectedYear })}
           selectedValue={this.state.selectedYear} />
         <ListPicker
           options={MONTHS.TR}
           onValueChange={(selectedMonth) => this.setState({ selectedMonth })}
-          selectedValue={this.state.selectedMonth} />
+          selectedValue={this.state.selectedMonth} /> */}
         <FilterIcon onPress={this.handleDateChange} />
       </CardItem>
     );
