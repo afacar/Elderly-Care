@@ -22,17 +22,21 @@ export const loginWithGoogle = (callback) => async (dispatch) => {
   let isNewUser = '';
 
   try {
-    // await GoogleSignin.hasPlayServices();
+    console.log('google hasplayservices?')
+    //await GoogleSignin.hasPlayServices();
     // Add any configuration settings here:
+    console.log('googlesignin.configure()?')
     await GoogleSignin.configure();
-
+    console.log('google.signin()?')
     const data = await GoogleSignin.signIn();
     // console.log("data from GoogleSignin", data);
     // create a new firebase credential with the token
+    console.log('data?', data)
     const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken)
     // login with credential
+    console.log('credential?', credential)
     let currentUser = await firebase.auth().signInWithCredential(credential);
-
+    console.log('currentUser?', currentUser)
     isNewUser = currentUser.additionalUserInfo.isNewUser;
 
     //console.info("curretUser info from firebase.auth()", JSON.stringify(currentUser.user.toJSON()));

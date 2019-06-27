@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "342129083929-m1cbhpucd36rkp8qsk7212qfn5su67ld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afacar.evdebakim",
+            "certificate_hash": "4feb91c6d57cb04998959a43d394677ddb2eb676"
+          }
+        },
+        {
           "client_id": "342129083929-3smua86h6tidajoqkr1rcu3a684dpdin.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -40,10 +48,10 @@
               "client_type": 3
             },
             {
-              "client_id": "342129083929-1rmdacta27tpr38mh9aqr0k4t9pafs8e.apps.googleusercontent.com",
+              "client_id": "342129083929-tce52cfh08foutp5b4r72701j47pu2ru.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.afacar.ebakim"
+                "bundle_id": "com.afacar.evdebakim"
               }
             }
           ]
