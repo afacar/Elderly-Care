@@ -22,7 +22,7 @@ export class EmailInput extends Component {
 
     return (
       <Input
-        label={label || 'Eposta'}
+        label={label || 'E-posta'}
         labelStyle={styles.labelStyle}
         keyboardType='email-address'
         placeholder={placeholder || 'ornek@mail.com'}

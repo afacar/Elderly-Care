@@ -210,3 +210,16 @@ export const MicIcon = (props) => {
     />
   );
 }
+
+export const GalleryIcon = (props) => {
+  return (
+    <Icon
+      name='perm-media'
+      type='material'
+      onPress={props.onPress || null}
+      color={'blue'}
+      size={30}
+      onPress={props.onPress}
+    />
+  );
+}
