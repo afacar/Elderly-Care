@@ -45,6 +45,7 @@ export class TimePicker extends Component {
           </TouchableOpacity>
           <DateTimePicker
             mode="time"
+            timePickerModeAndroid="spinner"
             isVisible={this.state.isTimePickerVisible}
             onConfirm={this._handleTimePicked}
             onCancel={this._hideTimePicker}
@@ -134,6 +135,7 @@ export class DatePicker extends Component {
           </TouchableOpacity>
           <DateTimePicker
             mode="date"
+            datePickerModeAndroid="spinner"
             isVisible={this.state.isDatePickerVisible}
             onConfirm={this._handleDatePicked}
             onCancel={this._hideDatePicker}
