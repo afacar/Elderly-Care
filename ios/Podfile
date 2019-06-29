@@ -17,4 +17,8 @@ pod 'GoogleSignIn', '~> 4.4.0'
   # Pods for EvdeBakim
   # Required by RNFirebase
 
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
+  pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
+
 end
