@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { TouchableHighlight } from "react-native";
 import { Button, ButtonGroup } from 'react-native-elements';
-import { LogoutIcon, CancelIcon, DeleteIcon, SaveIcon, EditIcon } from "./Icons";
+import { GalleryIcon, LogoutIcon, CancelIcon, DeleteIcon, SaveIcon, EditIcon } from "./Icons";
 
 export class SaveButton extends Component {
   render() {
@@ -143,6 +143,20 @@ export class HungerConditionButtons extends Component {
         textStyle={{ fontWeight: "bold", fontSize: 17 }}
       />
     );
+  }
+}
+
+export class ImageButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        icon={<GalleryIcon />}
+        containerStyle={styles.buttonStyle}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    )
   }
 }
 

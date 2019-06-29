@@ -52,12 +52,12 @@ class _PatientForm extends Component {
 
   render() {
     return (
-      <ScrollView contentInsetAdjustmentBehavior="automatic"> 
-          <SafeAreaView>
-        <Card
+      
+      <ScrollView keyboardShouldPersistTaps="handled"  > 
+        <Card 
           title="Hasta Bilgileri"
           titleStyle={{ fontSize: 19 }}
-          containerStyle={{ margin: 1, padding: 0 }}
+          containerStyle={{ marginTop: 30, padding: 0 }}
         >
           
           <CardItem>
@@ -127,7 +127,6 @@ class _PatientForm extends Component {
             />
           </CardItem>
         </Card>
-        </SafeAreaView>
         </ScrollView>
       
     );

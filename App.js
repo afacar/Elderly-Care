@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View, YellowBox, AsyncStorage, Alert } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View, YellowBox, AsyncStorage, Alert, ScrollView } from 'react-native';
 import AppNavigator from './navigation/AppNavigator';
 import { Provider } from 'react-redux';
 import { SafeAreaView } from 'react-navigation';
@@ -20,12 +20,14 @@ export default class App extends React.Component {
 
   render() {
     return (
+
+
       <Provider store={store} >
-        <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        <SafeAreaView style={styles.container} forceInset={{bottom: 'never'}}>
           <AppNavigator />
-        </View>
+        </SafeAreaView>
       </Provider>
+
     );
   }
 
@@ -34,6 +36,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'yellow',
   },
 });

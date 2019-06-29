@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { KeyboardAvoidingView, ScrollView, Alert, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, Alert, View,Text } from 'react-native';
 import { connect } from 'react-redux';
 import { SafeAreaView } from 'react-navigation';
 
@@ -182,12 +182,12 @@ class MeasurementForm extends Component {
   // keyboardShouldPersistTaps="handled" deleted
   render() {
     return (
-      <ScrollView contentInsetAdjustmentBehavior="automatic"> 
-          <SafeAreaView>
+      <ScrollView  contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled"> 
         <KeyboardAvoidingView behavior="padding" enabled>
-          
-              <H3>Ölçüm Ekle</H3>
-            <Label>Bir ölçüm seçiniz</Label>
+        <Text style={{ textAlign: 'center', fontSize:25, fontWeight: "400", fontFamily:'Verdana' }}>Ölçüm Ekle</Text>
+        <CardItem>
+          <Text style={{ fontSize: 18, paddingLeft: 10, fontWeight: 'bold', color: '#3e464e' }}>Bir ölçüm seçiniz </Text>
+        </CardItem>
             <CardItem>
               <RadioButtons
                 onPress={this.handleMeasurementType}
@@ -200,7 +200,7 @@ class MeasurementForm extends Component {
               {this._renderInputComponent()}
             </CardItem>
             <View>
-              <Label>Tarih ve Saat</Label>
+            <Text style={{ fontSize: 18, paddingLeft: 10, fontWeight: 'bold', color: '#3e464e' }}>Tarih ve Saat </Text>
               <CardItem>
                 <DatePicker
                   selectedDate={this.state.selectedDate}
@@ -237,8 +237,9 @@ class MeasurementForm extends Component {
                 loading={this.state.saveLoading}
               />
             </CardItem>
+            
         </KeyboardAvoidingView>
-        </SafeAreaView>
+
       </ScrollView>
     );
   }

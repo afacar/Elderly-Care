@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Image, View, StyleSheet, TouchableHighlight } from 'react-native';
+import { ScrollView, Image, View, StyleSheet, TouchableHighlight,Modal, Text } from 'react-native';
 import { connect } from 'react-redux';
 
 import * as actions from '../appstate/actions';
@@ -13,6 +13,7 @@ import { Button, Icon } from 'react-native-elements';
 class ChartScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: `Ölçümler`,
+    headerForceInset: {vercical: 'never'},
   });
 
   isMounted = false;
@@ -69,6 +70,7 @@ class ChartScreen extends React.Component {
   renderDatePicker = () => {
     return (
       <CardItem>
+
         <ListPicker
           options={['2019', '2020']}
           onValueChange={(selectedYear) => this.setState({ selectedYear })}

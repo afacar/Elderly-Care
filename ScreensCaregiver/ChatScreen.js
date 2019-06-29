@@ -7,6 +7,7 @@ import "moment/locale/tr";
 import TabBarIcon from "../components/TabBarIcon";
 import * as actions from '../appstate/actions';
 import { ErrorLabel, ChatItem } from '../components/common';
+import { SafeAreaView } from 'react-navigation';
 
 class ChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -15,12 +16,14 @@ class ChatScreen extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
+    headerForceInset: {vercical: 'never'},
     headerRight: (
+     
       <TouchableHighlight onPress={() => navigation.navigate('ProviderListScreen')}>
         <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Image
             style={{ width: 25, height: 25 }}
-            source={require('../assets/images/doctor.png')}
+            source={require('../assets/images/doctor2.png')}
           />
           <Text style={{ fontWeight: 'bold' }}>Uzman Ekle</Text>
         </View>
@@ -96,7 +99,7 @@ class ChatScreen extends React.Component {
   render() {
     /** 2 return cases: loading and, chat list */
     return (
-      <ScrollView style={styles.containerStyle}>
+      <ScrollView  style={styles.containerStyle}>
         <FlatList
           data={Object.keys(this.state.chats)}
           renderItem={this._renderItem}
@@ -121,7 +124,7 @@ export default connect(null, actions)(ChatScreen);
 
 const styles = StyleSheet.create({
   containerStyle: {
-    flex: 1,
+    //flex: 1,
     paddingTop: 15,
     backgroundColor: '#fff',
   },
