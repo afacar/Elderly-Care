@@ -7,7 +7,7 @@ import "moment/locale/tr";
 
 import { ImageButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
-import RNFetchBlob from 'react-native-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob';
 import firebase from 'react-native-firebase';
 
 
@@ -33,6 +33,7 @@ window.fetch = new Fetch({
     'foo/',
   ]
 }).build()
+
 class CaregiverMessageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: `${navigation.getParam('title', '')}`,
@@ -87,6 +88,7 @@ class CaregiverMessageScreen extends React.Component {
       </View>
     );
   }
+
   _renderSend = (props) => {
     return (
       <Send {...props} containerStyle={{ justifyContent: "center", flex: 2 }}>
@@ -105,6 +107,7 @@ class CaregiverMessageScreen extends React.Component {
         path: 'images',
       },
     };
+
     ImagePicker.showImagePicker(options, (response) => {
       console.log('Response = ', response);
 
@@ -122,44 +125,62 @@ class CaregiverMessageScreen extends React.Component {
         this.setState({
           imageMessageSrc: source
         });
-        console.log(this.state.imageMessageSrc)
-        const imageRef = firebase.storage().ref("posts/image");
-        imageRef.putFile(this.state.imageMessageSrc)
-        // this.uploadImage(this.state.imageMessageSrc);
+        console.log('SOURCE:', source);
+        console.log(this.state.imageMessageSrc);
+        //const imageRef = firebase.storage().ref("posts/image");
+        //imageRef.putFile(this.state.imageMessageSrc)
+        this.uploadImage(this.state.imageMessageSrc);
       }
     });
 
   }
 
-
-  uploadImage(uri, mime = 'image/jpeg') {
+  uploadImage(uri, mime = 'application/octet-stream') {
     return new Promise((resolve, reject) => {
-      console.log("here");
       const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
       let uploadBlob = null
 
-      const imageRef = firebase.storage().ref().child("posts").child("image1");
+      const imageRef = firebase.storage().ref('images').child('image_001')
+      console.log('imageRef', imageRef);
+      console.log('uploadUri', uploadUri);
 
-      console.log(uploadUri)
-      imageRef.putFile()
-      fs.readStream(uploadUri, 'base64')
-        .then(data => {
-          return Blob.build(data, { type: `${mime};BASE64` });
+      imageRef.putFile(uploadUri.uri, { contentType: mime })
+      .then(() => {
+        console.log('getDownloadURL ', imageRef.getDownloadURL());
+        return imageRef.getDownloadURL()
+      })
+      .then((url) => {
+        console.log('resolve url ', url);
+        resolve(url)
+      })
+      .catch((error) => {
+        console.error(error);
+        reject(error)
+      });
+
+/*       fs.readFile(uploadUri.uri, 'base64')
+        .then((data) => {
+          console.log('data', data);
+          return Blob.build(data, { type: `${mime};BASE64` })
         })
-        .then(blob => {
-          uploadBlob = blob;
-          return imageRef.putFile(blob, { contentType: mime });
+        .then((blob) => {
+          console.log('blob', blob);
+          uploadBlob = blob
+          return imageRef.putFile(uploadUri.uri, { contentType: mime })
         })
         .then(() => {
           uploadBlob.close()
-          return imageRef.getDownloadURL();
+          console.log('getDownloadURL ', imageRef.getDownloadURL());
+          return imageRef.getDownloadURL()
         })
-        .then(url => {
-          resolve(url);
+        .then((url) => {
+          console.log('resolve url ', url);
+          resolve(url)
         })
-        .catch(error => {
+        .catch((error) => {
+          console.error(error);
           reject(error)
-        })
+        }) */
     })
   }
 
@@ -169,6 +190,7 @@ class CaregiverMessageScreen extends React.Component {
     };
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
   }
+
   async componentDidMount() {
     this._isMounted = true;
 
