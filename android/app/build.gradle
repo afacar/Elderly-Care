@@ -149,6 +149,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-fetch-blob')
+    implementation project(':react-native-image-picker')
     implementation project(':react-native-google-signin')
     implementation project(':react-native-svg')
     implementation project(':react-native-voice')

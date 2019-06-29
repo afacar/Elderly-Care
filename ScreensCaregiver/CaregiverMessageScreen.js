@@ -1,10 +1,38 @@
 import React from 'react';
-import { AsyncStorage, TouchableHighlight, Text, View, Image } from 'react-native';
-import { GiftedChat, Actions, SystemMessage, Send } from 'react-native-gifted-chat';
+import { AsyncStorage, TouchableHighlight, Text, View, Image, Platform } from 'react-native';
+import { Composer, GiftedChat, Actions, SystemMessage, Send } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
 import "moment/locale/tr";
 
+import { ImageButton } from '../components/common/Buttons.js'
+import ImagePicker from 'react-native-image-picker';
+import RNFetchBlob from 'react-native-fetch-blob'
+import firebase from 'react-native-firebase';
+
+
+const Blob = RNFetchBlob.polyfill.Blob;
+const fs = RNFetchBlob.fs;
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+window.Blob = Blob;
+const Fetch = RNFetchBlob.polyfill.Fetch
+
+window.fetch = new Fetch({
+  // enable this option so that the response data conversion handled automatically
+  auto: true,
+  // when receiving response data, the module will match its Content-Type header
+  // with strings in this array. If it contains any one of string in this array, 
+  // the response body will be considered as binary data and the data will be stored
+  // in file system instead of in memory.
+  // By default, it only store response data to file system when Content-Type 
+  // contains string `application/octet`.
+  binaryContentTypes: [
+    'image/',
+    'video/',
+    'audio/',
+    'foo/',
+  ]
+}).build()
 class CaregiverMessageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: `${navigation.getParam('title', '')}`,
@@ -12,7 +40,7 @@ class CaregiverMessageScreen extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
-    headerForceInset: {vercical: 'never'},
+    headerForceInset: { vercical: 'never' },
   });
 
   _isMounted = null;
@@ -44,18 +72,103 @@ class CaregiverMessageScreen extends React.Component {
         }}
         placeholder='Mesaj yazın...'
         renderSend={this._renderSend}
+        renderComposer={this.renderComposer}
+        alwaysShowSend
       />
     );
   }
 
+  renderComposer = props => {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 4 }}>
+        <Composer {...props} />
+        <ImageButton onPress={this.openPicker} />
+
+      </View>
+    );
+  }
   _renderSend = (props) => {
     return (
-      <Send {...props} containerStyle={{ justifyContent: 'center' }}>
+      <Send {...props} containerStyle={{ justifyContent: "center", flex: 2 }}>
         <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
       </Send>
     );
   }
 
+  openPicker = () => {
+
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+    const options = {
+      title: 'Fotoğraf Seç',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        const source = { uri: response.path }
+        this.setState({
+          imageMessageSrc: source
+        });
+        console.log(this.state.imageMessageSrc)
+        const imageRef = firebase.storage().ref("posts/image");
+        imageRef.putFile(this.state.imageMessageSrc)
+        // this.uploadImage(this.state.imageMessageSrc);
+      }
+    });
+
+  }
+
+
+  uploadImage(uri, mime = 'image/jpeg') {
+    return new Promise((resolve, reject) => {
+      console.log("here");
+      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+      let uploadBlob = null
+
+      const imageRef = firebase.storage().ref().child("posts").child("image1");
+
+      console.log(uploadUri)
+      imageRef.putFile()
+      fs.readStream(uploadUri, 'base64')
+        .then(data => {
+          return Blob.build(data, { type: `${mime};BASE64` });
+        })
+        .then(blob => {
+          uploadBlob = blob;
+          return imageRef.putFile(blob, { contentType: mime });
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL();
+        })
+        .then(url => {
+          resolve(url);
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  }
+
+  randIDGenerator = () => {
+    var S4 = () => {
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+  }
   async componentDidMount() {
     this._isMounted = true;
 
