@@ -146,7 +146,7 @@ export const fetch_profile = (callback, role = '') => async (dispatch) => {
 
 export const save_profile = (profile) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
-  const { displayName, photoURL, profession, experience } = profile;
+  const { displayName, photoURL, newPhoto, path, profession, experience } = profile;
   const url = `users/${_user.uid}/profile`;
   // First update displayName, email, photoURL, phoneNumber to _user
   // Then update gender, birthdate etc. to profile
@@ -154,6 +154,11 @@ export const save_profile = (profile) => async (dispatch) => {
   try {
     await firebase.auth().currentUser.updateProfile({ displayName });
     await firebase.auth().currentUser.updateProfile({ photoURL });
+    if ( newPhoto) {
+      await firebase.storage().ref().child("profilePics").child(_user.uid).putFile(path);
+      profile.photoURL = await firebase.storage().ref().child("profilePics").child(_user.uid).getDownloadURL();
+    }
+    delete profile.path;
     await firebase.database().ref(url).update(profile);
     console.log('save_profile is updated succesfully!');
   } catch (error) {

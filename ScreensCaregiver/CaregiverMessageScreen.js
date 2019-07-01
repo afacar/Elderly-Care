@@ -120,7 +120,7 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   sendImageMessage = (message) => {
-    updateState(message);
+    this.updateState(message);
     const { chatId, userRole, } = this.state;
     this.props.sendMessage(userRole, message, chatId);
   }

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { View, Picker, Image } from 'react-native';
+import { View, Picker, Image, TouchableOpacity } from 'react-native';
+import ImagePicker from 'react-native-image-picker';
+
 import { Input, Text, Card, Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 
@@ -24,11 +26,14 @@ class _ProfileForm extends Component {
 
   _saveProfile = async () => {
     const { profile } = this.state;
+    this.setState({
+      loading: true
+    })
     try {
       await this.props.save_profile(profile);
-      this.setState({ disabled: true })
+      this.setState({ disabled: true, loading: false })
     } catch (error) {
-      this.setState({ error });
+      this.setState({ error, loading: false });
     }
   };
 
@@ -41,15 +46,55 @@ class _ProfileForm extends Component {
     this.setState(prevState => {
       console.log('handleState prevState and newState', prevState, newState);
       let profile = prevState.profile;
-      for (var key in newState) {
-        if (newState.hasOwnProperty(key)) {
-          profile[key] = newState[key];
+        for (var key in newState) {
+          if (newState.hasOwnProperty(key)) {
+            if (key === "response") {
+              profile.photoURL = newState.response.uri;
+              profile.path = newState.response.path;
+              profile.newPhoto = true;
+            }else {
+            profile[key] = newState[key];
         }
       }
       prevState.profile = profile;
       prevState.disabled = false;
       console.log('handleState new prevState', prevState);
       return prevState;
+    }
+    });
+  }
+
+  onImageClicked = () => {
+    this.openPicker();
+  }
+
+  openPicker = () => {
+
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+    const options = {
+      title: 'Fotoğraf Seç',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        allowsEditing: true,
+      },
+    };
+
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        this.handleState({ response });
+      }
     });
   }
 
@@ -57,10 +102,16 @@ class _ProfileForm extends Component {
     console.log('ProfileForm rendered state,', this.state);
     return (
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
-        <Image
-          style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-          source={{ uri: this.state.profile.photoURL }}
-        />
+        <TouchableOpacity
+          onPress={this.onImageClicked}>
+          <View>
+            <Image
+              style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
+              source={{ uri: this.state.profile.photoURL }}
+            />
+          </View>
+        </TouchableOpacity>
+
         <CardItem>
           <TextInput
             label="Ad soyad"
@@ -108,6 +159,7 @@ class _ProfileForm extends Component {
           />
         </CardItem>
         <SaveButton
+          title={this.state.loading ? "Kaydediliyor..." : ""}
           disabled={this.state.disabled}
           onPress={this._saveProfile}
         />
