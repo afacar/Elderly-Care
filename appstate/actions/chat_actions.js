@@ -30,27 +30,41 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
   try {
     await firebase.database().ref(chatUrl).limitToLast(25).on('child_added', (snapshot, prevChildKey) => {
       const key = snapshot.key;
-      if (!localMessageIds.includes(key)) {
-        const message = snapshot.val();
-        //console.log("this message doesnt exist in local so fetched:", message);
-        const newMessage = {
-          _id: key,
-          text: message.text,
-          image: message.image,
-          createdAt: new Date(message.createdAt),
-          user: {
-            _id: message.user._id,
-            name: message.user.name,
-            avatar: message.user.avatar,
-          },
-        };
-        if (userRole === 'c') {
-          firebase.database().ref(`caregivers/${uid}/chats/${chatId}/unread`).set(0);
-        }
-        else if (userRole === 'p') {
-          firebase.database().ref(`providers/${uid}/chats/${chatId}/unread`).set(0);
-        }
-        callback(newMessage, isNewMessage = true);
+      console.log(localMessageIds);
+
+
+      let localMessageIdS = "";
+      try {
+        AsyncStorage.getItem(chatId).then((messageData) => {
+          messages = JSON.parse(messageData);
+          localMessageIdS = messages.map(message => { return message._id });
+          console.log(localMessageIdS);
+          console.log("KEY" + key);
+          if (!localMessageIdS.includes(key)) {
+            const message = snapshot.val();
+            //console.log("this message doesnt exist in local so fetched:", message);
+            const newMessage = {
+              _id: key,
+              text: message.text,
+              image: message.image,
+              createdAt: Date.now(),
+              user: {
+                _id: message.user._id,
+                name: message.user.name,
+                avatar: message.user.avatar,
+              },
+            };
+            if (userRole === 'c') {
+              firebase.database().ref(`caregivers/${uid}/chats/${chatId}/unread`).set(0);
+            }
+            else if (userRole === 'p') {
+              firebase.database().ref(`providers/${uid}/chats/${chatId}/unread`).set(0);
+            }
+            callback(newMessage, isNewMessage = true);
+          }
+        });
+      } catch (error) {
+        console.error(`${chatId} ait local data okunurken data`, error.message);
       }
     });
   } catch (error) {
@@ -105,7 +119,7 @@ export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
   if (!message.length) {
     messageData = {
       user: message.user,
-      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      createdAt: new Date(message.createdAt),
       image: downloadUrl,
     }
     messagesRef.child(message._id).set(messageData);
@@ -116,11 +130,11 @@ export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
       messageData = {
         text: message[i].text,
         user: message[i].user,
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        createdAt: new Date(message.createdAt),
         image: ""
       };
       messagesRef.push(messageData);
-  lastMessageRef.set(messageData);
+      lastMessageRef.set(messageData);
     }
   }
 
