@@ -27,7 +27,7 @@
     // NSString reports length in characters, but we want it in bytes, which strlen will give us.
     unsigned long dataLen = strlen(cstr);
     NSData *data = [NSData dataWithBytes:cstr length:dataLen];
-    uint8_t digest[CC__DIGEST_LENGTH];
+    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
     CC_SHA1(data.bytes, (unsigned int)data.length, digest);
     NSData* output = [[NSData alloc] initWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
     return [FSRUtilities base64EncodedStringFromData:output];
