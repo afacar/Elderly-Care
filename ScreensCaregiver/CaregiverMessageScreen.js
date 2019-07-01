@@ -7,32 +7,7 @@ import "moment/locale/tr";
 
 import { ImageButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
-import RNFetchBlob from 'rn-fetch-blob';
 import firebase from 'react-native-firebase';
-
-
-const Blob = RNFetchBlob.polyfill.Blob;
-const fs = RNFetchBlob.fs;
-window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
-window.Blob = Blob;
-const Fetch = RNFetchBlob.polyfill.Fetch
-
-window.fetch = new Fetch({
-  // enable this option so that the response data conversion handled automatically
-  auto: true,
-  // when receiving response data, the module will match its Content-Type header
-  // with strings in this array. If it contains any one of string in this array, 
-  // the response body will be considered as binary data and the data will be stored
-  // in file system instead of in memory.
-  // By default, it only store response data to file system when Content-Type 
-  // contains string `application/octet`.
-  binaryContentTypes: [
-    'image/',
-    'video/',
-    'audio/',
-    'foo/',
-  ]
-}).build()
 
 class CaregiverMessageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -62,6 +37,7 @@ class CaregiverMessageScreen extends React.Component {
         messages={messages}
         locale='tr'
         onSend={(message) => {
+          this.updateState(message);
           this.props.sendMessage(userRole, message, chatId);
         }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
@@ -105,6 +81,7 @@ class CaregiverMessageScreen extends React.Component {
       storageOptions: {
         skipBackup: true,
         path: 'images',
+        allowsEditing: true,
       },
     };
 
@@ -125,70 +102,42 @@ class CaregiverMessageScreen extends React.Component {
         this.setState({
           imageMessageSrc: source
         });
-        console.log('SOURCE:', source);
-        console.log(this.state.imageMessageSrc);
-        //const imageRef = firebase.storage().ref("posts/image");
-        //imageRef.putFile(this.state.imageMessageSrc)
-        this.uploadImage(this.state.imageMessageSrc);
+        const message = {
+          user: {
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          },
+          _id: this.randIDGenerator(),
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          image: response.uri.toString(),
+          path: response.path.toString()
+        };
+        this.sendImageMessage(message);
+        console.log(message.image);
       }
     });
-
   }
 
-  uploadImage(uri, mime = 'application/octet-stream') {
-    return new Promise((resolve, reject) => {
-      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-      let uploadBlob = null
-
-      const imageRef = firebase.storage().ref('images').child('image_001')
-      console.log('imageRef', imageRef);
-      console.log('uploadUri', uploadUri);
-
-      imageRef.putFile(uploadUri.uri, { contentType: mime })
-      .then(() => {
-        console.log('getDownloadURL ', imageRef.getDownloadURL());
-        return imageRef.getDownloadURL()
-      })
-      .then((url) => {
-        console.log('resolve url ', url);
-        resolve(url)
-      })
-      .catch((error) => {
-        console.error(error);
-        reject(error)
-      });
-
-/*       fs.readFile(uploadUri.uri, 'base64')
-        .then((data) => {
-          console.log('data', data);
-          return Blob.build(data, { type: `${mime};BASE64` })
-        })
-        .then((blob) => {
-          console.log('blob', blob);
-          uploadBlob = blob
-          return imageRef.putFile(uploadUri.uri, { contentType: mime })
-        })
-        .then(() => {
-          uploadBlob.close()
-          console.log('getDownloadURL ', imageRef.getDownloadURL());
-          return imageRef.getDownloadURL()
-        })
-        .then((url) => {
-          console.log('resolve url ', url);
-          resolve(url)
-        })
-        .catch((error) => {
-          console.error(error);
-          reject(error)
-        }) */
-    })
+  sendImageMessage = (message) => {
+    updateState(message);
+    const { chatId, userRole, } = this.state;
+    this.props.sendMessage(userRole, message, chatId);
   }
+
+  updateState(message) {
+    this.setState((previousState) => {
+      return { messages: GiftedChat.append(previousState.messages, message) }
+    });
+  }
+
 
   randIDGenerator = () => {
-    var S4 = () => {
-      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    var date = new Date().getTime().toString();
+    date = date.substring(date.length - 4);
+    var randId = this.props.getUid() + date;
+    console.log(randId);
+    return (randId);
   }
 
   async componentDidMount() {

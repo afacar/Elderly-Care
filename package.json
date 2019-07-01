@@ -29,7 +29,6 @@
     "react-redux": "^7.0.3",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "rn-fetch-blob": "^0.10.15",
     "victory-native": "^32.0.2"
   },
   "devDependencies": {

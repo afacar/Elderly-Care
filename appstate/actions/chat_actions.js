@@ -36,6 +36,7 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
         const newMessage = {
           _id: key,
           text: message.text,
+          image: message.image,
           createdAt: new Date(message.createdAt),
           user: {
             _id: message.user._id,
@@ -62,13 +63,33 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
 // send the message to the Backend
 export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
   const uid = firebase.auth().currentUser.uid;
+  var firebaseStorage = firebase.storage().ref();
   let url = `commonchat/`;
+  var downloadUrl = "";
+
+  if (chatId === 'commonchat') {
+    if (message.image) {
+      await firebaseStorage.child("commonchat").child(message._id).putFile(message.path);
+      downloadUrl = await firebaseStorage.child("commonchat").child(message._id).getDownloadURL();
+    }
+  }
   if (chatId !== 'commonchat' && userRole === 'c') {
     url = `providerchat/${chatId}/${uid}/`;
+
+    if (message.image) {
+      await firebaseStorage.child("chatFiles").child(`${chatId}/${uid}`).child(message._id).putFile(message.path);
+      downloadUrl = await firebaseStorage.child("chatFiles").child(`${chatId}/${uid}`).child(message._id).getDownloadURL();
+    }
     const unreadRef = firebase.database().ref(`providers/${chatId}/chats/${uid}/`);
     await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
+
   } else if (chatId !== 'commonchat' && userRole === 'p') {
     url = `providerchat/${uid}/${chatId}/`;
+
+    if (message.image) {
+      await firebaseStorage.child("chatFiles").child(`${uid}/${chatId}`).child(message._id).putFile(message.path);
+      downloadUrl = await firebaseStorage.child("chatFiles").child(`${uid}/${chatId}`).child(message._id).getDownloadURL();
+    }
     const unreadRef = firebase.database().ref(`caregivers/${chatId}/chats/${uid}/`);
     await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
   }
@@ -77,15 +98,32 @@ export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
   const messagesRef = firebase.database().ref(url + 'messages');
   const lastMessageRef = firebase.database().ref(url + 'lastMessage');
   // It was all beacause of this line
-  for (let i = 0; i < message.length; i++) {
-    const messageData = {
-      text: message[i].text,
-      user: message[i].user,
+  console.log(downloadUrl.toString());
+  console.log("Length: ", message.length);
+
+  var messageData = {};
+  if (!message.length) {
+    messageData = {
+      user: message.user,
       createdAt: firebase.database.ServerValue.TIMESTAMP,
-    };
-    messagesRef.push(messageData);
-    lastMessageRef.update(messageData);
+      image: downloadUrl,
+    }
+    messagesRef.child(message._id).set(messageData);
+    lastMessageRef.set(messageData);
   }
+  else {
+    for (let i = 0; i < message.length; i++) {
+      messageData = {
+        text: message[i].text,
+        user: message[i].user,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        image: ""
+      };
+      messagesRef.push(messageData);
+  lastMessageRef.set(messageData);
+    }
+  }
+
 }
 
 // close the connection to the Backend
