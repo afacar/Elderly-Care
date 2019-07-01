@@ -123,7 +123,6 @@ class CaregiverMessageScreen extends React.Component {
     updateState(message);
     const { chatId, userRole, } = this.state;
     this.props.sendMessage(userRole, message, chatId);
-  // sadasd
   }
 
   updateState(message) {
