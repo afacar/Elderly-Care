@@ -1,7 +1,7 @@
 package com.afacar.evdebakim;
 
 import android.app.Application;
-
+import com.google.firebase.database.FirebaseDatabase; // -> for setPersistenceEnabled(true)
 import com.facebook.react.ReactApplication;
 import com.imagepicker.ImagePickerPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
@@ -77,5 +77,7 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    // TODO: For setPersistenceEnabled on IOS => https://rnfirebase.io/docs/v5.x.x/core/default-app 
+    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
   }
 }

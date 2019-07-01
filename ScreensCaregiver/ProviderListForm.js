@@ -14,6 +14,7 @@ class ProviderList extends Component {
     headerStyle: {
       backgroundColor: 'white',
     },
+    headerForceInset: {vercical: 'never'},
   });
 
   state = { /** List of provider data */
