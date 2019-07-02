@@ -120,7 +120,7 @@ export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
         image: ""
       };
       messagesRef.push(messageData);
-  lastMessageRef.set(messageData);
+      lastMessageRef.set(messageData);
     }
   }
 

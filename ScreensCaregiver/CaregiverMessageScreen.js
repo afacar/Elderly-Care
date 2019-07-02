@@ -38,6 +38,7 @@ class CaregiverMessageScreen extends React.Component {
         locale='tr'
         onSend={(message) => {
           this.updateState(message);
+          console.log('onSend message', message);
           this.props.sendMessage(userRole, message, chatId);
         }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
@@ -60,15 +61,14 @@ class CaregiverMessageScreen extends React.Component {
       <View style={{ flexDirection: 'row', alignItems: 'center', flex: 4 }}>
         <Composer {...props} />
         <ImageButton onPress={this.openPicker} />
-
       </View>
     );
   }
 
   _renderSend = (props) => {
     return (
-      <Send {...props} containerStyle={{ justifyContent: "center", flex: 2 }}>
-        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
+      <Send {...props} containerStyle={{ justifyContent: "center", flex: 1 }}>
+        <Text style={{ fontSize: 19, color: 'blue', margin: 1 }}>Gönder</Text>
       </Send>
     );
   }
@@ -113,15 +113,15 @@ class CaregiverMessageScreen extends React.Component {
           image: response.uri.toString(),
           path: response.path.toString()
         };
+        console.log('sendImageMessage', message);
         this.sendImageMessage(message);
-        console.log(message.image);
       }
     });
   }
 
   sendImageMessage = (message) => {
-    updateState(message);
-    const { chatId, userRole, } = this.state;
+    this.updateState(message);
+    const { chatId, userRole } = this.state;
     this.props.sendMessage(userRole, message, chatId);
   }
 
@@ -142,7 +142,6 @@ class CaregiverMessageScreen extends React.Component {
 
   async componentDidMount() {
     this._isMounted = true;
-
     const userRole = this.props.navigation.getParam('userRole', '');
     const chatId = this.props.navigation.getParam('chatId', '');
     //const userid = this.props.navigation.getParam('userid', '');
