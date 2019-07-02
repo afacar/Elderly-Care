@@ -180,7 +180,6 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   fetch_messages = async (localMessageIds) => {
-
     const { chatId, userRole } = this.state;
     this.props.fetchMessages(userRole, localMessageIds, chatId, (message) => {
       /** @callback */

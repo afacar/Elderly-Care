@@ -144,7 +144,7 @@ export const closeChat = (chatId, userRole) => async () => {
 
 // load chat rooms for the current Caregiver
 export const loadCaregiverChats = (callback) => async (dispatch) => {
-  const uid = firebase.auth().currentUser._user.uid;
+  const uid = firebase.auth().currentUser.uid;
 
   await firebase.database().ref(`caregivers/${uid}/chats/`).on('value', async (snapshot) => {
     snapshot.forEach(async (snap) => {

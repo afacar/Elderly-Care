@@ -1,9 +1,12 @@
 import React from 'react';
 import { AsyncStorage, TouchableHighlight, Text, View, Image } from 'react-native';
-import { GiftedChat, Send } from 'react-native-gifted-chat';
+import { Composer, GiftedChat, Actions, SystemMessage, Send } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
 import "moment/locale/tr";
+
+import { ImageButton } from '../components/common/Buttons.js'
+import ImagePicker from 'react-native-image-picker';
 
 class ProviderMessageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -52,7 +55,7 @@ class ProviderMessageScreen extends React.Component {
           /* this.setState(previousState => ({
             messages: GiftedChat.append(previousState.messages, messages),
           })) */
-          this.props.sendMessage(userRole, message, chatId);
+          this.sendMessage(message);
         }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
         showUserAvatar={true}
@@ -63,17 +66,100 @@ class ProviderMessageScreen extends React.Component {
         }}
         placeholder='Mesaj yazın...'
         renderSend={this._renderSend}
+        renderComposer={this.renderComposer}
+        alwaysShowSend
       />
+    );
+  }
+
+  renderComposer = props => {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 4 }}>
+        <Composer {...props} />
+        <ImageButton onPress={this.openPicker} />
+
+      </View>
     );
   }
 
   _renderSend = (props) => {
     return (
-      <Send {...props} containerStyle={{ justifyContent: 'center' }}>
-        <Text style={{ fontSize: 19, color: 'blue', marginRight:5 }}>Gönder</Text>
+      <Send {...props} containerStyle={{ justifyContent: "center", flex: 2 }}>
+        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
       </Send>
     );
   }
+
+  openPicker = () => {
+
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+    const options = {
+      title: 'Fotoğraf Seç',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        allowsEditing: true,
+      },
+    };
+
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        // const source = { uri: response.path }
+        // this.setState({
+        //   imageMessageSrc: source
+        // });
+        const message = {
+          text: "",
+          user: {
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          },
+          image: response.uri.toString(),
+          path: response.path.toString()
+        };
+        this.sendMessage([message]);
+      }
+    });
+  }
+
+  sendMessage = async(messages) => {
+    let messagesArray = [];
+    for ( let i = 0; i< messages.length; i++) {
+      let message = messages[i];
+      message.createdAt = new Date().getTime();
+      message._id = this.randIDGenerator();
+      await this.updateState(message);
+      messagesArray.push(message);
+    }
+    const { chatId, userRole, } = this.state;
+    this.props.sendMessage(userRole, messagesArray, chatId);
+  }
+ 
+  updateState (message) {
+    this.setState((previousState) => {
+      console.log("Message:",message);
+    return { messages: GiftedChat.append(previousState.messages, message)}
+    });
+  }
+
+  randIDGenerator = () => {
+    var date = new Date().getTime().toString();
+    var randId = this.props.getUid() + date;
+    return (randId);
+  }
+
 
   async componentDidMount() {
     this._isMounted = true;
@@ -112,11 +198,19 @@ class ProviderMessageScreen extends React.Component {
 
   fetch_messages = async (localMessageIds) => {
     const { chatId, userRole } = this.state;
-    this.props.fetchMessages(userRole, localMessageIds, chatId, (message, isNewMessage) => {
+    this.props.fetchMessages(userRole, localMessageIds, chatId, (message) => {
       /** @callback */
       this._isMounted && this.setState((previousState) => {
-        if (isNewMessage) return { messages: GiftedChat.append(previousState.messages, message), isNewMessage };
-        return { messages: GiftedChat.append(previousState.messages, message) };
+        var allMessages = this.state.messages;
+        var exists = false;
+        allMessages.forEach(element => {
+          console.log(element);
+            if ( element._id === message._id)
+              exists = true;
+        })
+        if ( !exists) {
+          return { messages: GiftedChat.append(previousState.messages, message) }
+        }
       });
     });
   }
