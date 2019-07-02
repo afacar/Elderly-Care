@@ -8,9 +8,41 @@ import { connect } from 'react-redux';
 import * as actions from '../../appstate/actions';
 import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput } from '../common';
 
+
+const METHOD_DATA = [{
+  supportedMethods: ['android-pay'],
+  data: {
+    supportedNetworks: ['visa', 'mastercard', 'amex'],
+    currencyCode: 'USD',
+    environment: 'TEST', // defaults to production
+    paymentMethodTokenizationParameters: {
+      tokenizationType: 'NETWORK_TOKEN',
+      parameters: {
+        publicKey: 'your-pubic-key'
+      }
+    }
+  }
+}];
+
 class _ProfileForm extends Component {
 
   state = { profile: {}, loading: false, error: '', disabled: true };
+
+  DETAILS = {
+    id: 'basic-example',
+    displayItems: [
+      {
+        label: 'Movie Ticket',
+        amount: { currency: 'USD', value: '1.00' }
+      }
+    ],
+    total: {
+      label: 'Merchant Name',
+      amount: { currency: 'USD', value: '1.00' }
+    }
+  };
+
+  paymentRequest = new PaymentRequest(METHOD_DATA, this.DETAILS);
 
   _isMounted = false;
 
@@ -46,21 +78,21 @@ class _ProfileForm extends Component {
     this.setState(prevState => {
       console.log('handleState prevState and newState', prevState, newState);
       let profile = prevState.profile;
-        for (var key in newState) {
-          if (newState.hasOwnProperty(key)) {
-            if (key === "response") {
-              profile.photoURL = newState.response.uri;
-              profile.path = newState.response.path;
-              profile.newPhoto = true;
-            }else {
+      for (var key in newState) {
+        if (newState.hasOwnProperty(key)) {
+          if (key === "response") {
+            profile.photoURL = newState.response.uri;
+            profile.path = newState.response.path;
+            profile.newPhoto = true;
+          } else {
             profile[key] = newState[key];
+          }
         }
+        prevState.profile = profile;
+        prevState.disabled = false;
+        console.log('handleState new prevState', prevState);
+        return prevState;
       }
-      prevState.profile = profile;
-      prevState.disabled = false;
-      console.log('handleState new prevState', prevState);
-      return prevState;
-    }
     });
   }
 
@@ -98,6 +130,15 @@ class _ProfileForm extends Component {
     });
   }
 
+  openPay = () => {
+    this.paymentRequest.show()
+      .then(paymentResponse => {
+        // Your payment processing code goes here
+        console.log('paymentResponse', paymentResponse);
+        //return processPayment(paymentResponse);
+      });
+  }
+
   render() {
     console.log('ProfileForm rendered state,', this.state);
     return (
@@ -111,6 +152,8 @@ class _ProfileForm extends Component {
             />
           </View>
         </TouchableOpacity>
+
+        <Button title='Kredi al' onPress={this.openPay} />
 
         <CardItem>
           <TextInput
