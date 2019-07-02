@@ -7,7 +7,6 @@ import "moment/locale/tr";
 
 import { ImageButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
-import firebase from 'react-native-firebase';
 
 class CaregiverMessageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -37,12 +36,7 @@ class CaregiverMessageScreen extends React.Component {
         messages={messages}
         locale='tr'
         onSend={ async (message) => {
-          await this.updateState(message);
-          this.setState({
-            isNewMessage: true
-          });
-          await this.save_messages();
-          this.props.sendMessage(userRole, message, chatId);
+          this.sendMessage(message);
         }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
         showUserAvatar={true}
@@ -64,14 +58,15 @@ class CaregiverMessageScreen extends React.Component {
       <View style={{ flexDirection: 'row', alignItems: 'center', flex: 4 }}>
         <Composer {...props} />
         <ImageButton onPress={this.openPicker} />
+
       </View>
     );
   }
 
   _renderSend = (props) => {
     return (
-      <Send {...props} containerStyle={{ justifyContent: "center", flex: 1 }}>
-        <Text style={{ fontSize: 19, color: 'blue', margin: 1 }}>Gönder</Text>
+      <Send {...props} containerStyle={{ justifyContent: "center", flex: 2 }}>
+        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
       </Send>
     );
   }
@@ -101,55 +96,55 @@ class CaregiverMessageScreen extends React.Component {
         console.log('User tapped custom button: ', response.customButton);
       }
       else {
-        const source = { uri: response.path }
-        this.setState({
-          imageMessageSrc: source
-        });
+        // const source = { uri: response.path }
+        // this.setState({
+        //   imageMessageSrc: source
+        // });
         const message = {
+          text: "",
           user: {
             _id: this.props.getUid(),
             name: this.props.getName(),
             avatar: this.props.getPhotoURL(),
           },
-          _id: this.randIDGenerator(),
-          createdAt: Date.now(),
           image: response.uri.toString(),
           path: response.path.toString()
         };
-        console.log('sendImageMessage', message);
-        this.sendImageMessage(message);
+        this.sendMessage([message]);
       }
     });
   }
 
-  sendImageMessage = async (message) => {
-    this.updateState(message);
+  sendMessage = async(messages) => {
+    let messagesArray = [];
+    for ( let i = 0; i< messages.length; i++) {
+      let message = messages[i];
+      message.createdAt = new Date().getTime();
+      message._id = this.randIDGenerator();
+      await this.updateState(message);
+      messagesArray.push(message);
+    }
     const { chatId, userRole, } = this.state;
-    this.setState({
-      isNewMessage: true
-    })
-    await this.save_messages();
-    this.props.sendMessage(userRole, message, chatId);
+    this.props.sendMessage(userRole, messagesArray, chatId);
   }
-
-  updateState(message) {
+ 
+  updateState (message) {
     this.setState((previousState) => {
-      GiftedChat.append(previousState.messages, message)
-      return previousState;
+      console.log("Message:",message);
+    return { messages: GiftedChat.append(previousState.messages, message)}
     });
   }
 
 
   randIDGenerator = () => {
     var date = new Date().getTime().toString();
-    date = date.substring(date.length - 6);
     var randId = this.props.getUid() + date;
-    console.log(randId);
     return (randId);
   }
 
   async componentDidMount() {
     this._isMounted = true;
+
     const userRole = this.props.navigation.getParam('userRole', '');
     const chatId = this.props.navigation.getParam('chatId', '');
     //const userid = this.props.navigation.getParam('userid', '');
@@ -187,11 +182,19 @@ class CaregiverMessageScreen extends React.Component {
   fetch_messages = async (localMessageIds) => {
 
     const { chatId, userRole } = this.state;
-    this.props.fetchMessages(userRole, localMessageIds, chatId, (message, isNewMessage) => {
+    this.props.fetchMessages(userRole, localMessageIds, chatId, (message) => {
       /** @callback */
       this._isMounted && this.setState((previousState) => {
-        if (isNewMessage) return { messages: GiftedChat.append(previousState.messages, message), isNewMessage };
-        return { messages: GiftedChat.append(previousState.messages, message) };
+        var allMessages = this.state.messages;
+        var exists = false;
+        allMessages.forEach(element => {
+          console.log(element);
+            if ( element._id === message._id)
+              exists = true;
+        })
+        if ( !exists) {
+          return { messages: GiftedChat.append(previousState.messages, message) }
+        }
       });
     });
   }
