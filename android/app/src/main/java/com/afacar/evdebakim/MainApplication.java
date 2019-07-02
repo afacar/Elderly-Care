@@ -3,6 +3,7 @@ package com.afacar.evdebakim;
 import android.app.Application;
 import com.google.firebase.database.FirebaseDatabase; // -> for setPersistenceEnabled(true)
 import com.facebook.react.ReactApplication;
+import com.reactnativepayments.ReactNativePaymentsPackage;
 import com.imagepicker.ImagePickerPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.horcrux.svg.SvgPackage;
@@ -45,6 +46,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativePaymentsPackage(),
             new ImagePickerPackage(),
             new RNGoogleSigninPackage(),
             new SvgPackage(),
