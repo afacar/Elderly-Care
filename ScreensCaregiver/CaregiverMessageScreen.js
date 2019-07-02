@@ -36,9 +36,12 @@ class CaregiverMessageScreen extends React.Component {
         key={chatId}
         messages={messages}
         locale='tr'
-        onSend={(message) => {
-          this.updateState(message);
-          console.log('onSend message', message);
+        onSend={ async (message) => {
+          await this.updateState(message);
+          this.setState({
+            isNewMessage: true
+          });
+          await this.save_messages();
           this.props.sendMessage(userRole, message, chatId);
         }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
@@ -109,7 +112,7 @@ class CaregiverMessageScreen extends React.Component {
             avatar: this.props.getPhotoURL(),
           },
           _id: this.randIDGenerator(),
-          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          createdAt: Date.now(),
           image: response.uri.toString(),
           path: response.path.toString()
         };
@@ -119,22 +122,27 @@ class CaregiverMessageScreen extends React.Component {
     });
   }
 
-  sendImageMessage = (message) => {
+  sendImageMessage = async (message) => {
     this.updateState(message);
-    const { chatId, userRole } = this.state;
+    const { chatId, userRole, } = this.state;
+    this.setState({
+      isNewMessage: true
+    })
+    await this.save_messages();
     this.props.sendMessage(userRole, message, chatId);
   }
 
   updateState(message) {
     this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message) }
+      GiftedChat.append(previousState.messages, message)
+      return previousState;
     });
   }
 
 
   randIDGenerator = () => {
     var date = new Date().getTime().toString();
-    date = date.substring(date.length - 4);
+    date = date.substring(date.length - 6);
     var randId = this.props.getUid() + date;
     console.log(randId);
     return (randId);
@@ -177,6 +185,7 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   fetch_messages = async (localMessageIds) => {
+
     const { chatId, userRole } = this.state;
     this.props.fetchMessages(userRole, localMessageIds, chatId, (message, isNewMessage) => {
       /** @callback */
