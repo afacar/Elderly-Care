@@ -45,7 +45,7 @@ class ChatScreen extends React.Component {
   _setChatRooms = (chat) => {
     const { chatId, title, lastMessage, status, avatar, unread } = chat;
     this.setState(previousState => {
-      const { chats } = previousState;
+      var { chats } = previousState;
 
       if (!chats[chatId]) chats[chatId] = {};
       chats[chatId]['lastMessage'] = lastMessage;
@@ -54,9 +54,31 @@ class ChatScreen extends React.Component {
       chats[chatId]['unread'] = unread;
       chats[chatId]['avatar'] = avatar;
 
-      return { chats };
+      var sortable = [];
+      for ( var chatID in chats){
+        var chat = chats[chatID];
+        chat.chatId = chatID;
+        chats[chatID] = chat;
+        sortable.push(chats[chatID]);
+      }
+      var sortedChats = {}
+      sortable.sort(this.compareChats);
+      for ( var i = 0; i < sortable.length; i++ ){
+        var tmpChat = sortable[i];
+        sortedChats[tmpChat.chatId] = tmpChat; 
+        delete sortedChats[tmpChat.chatId].chatId;
+      }
+      chats = sortedChats;
+      return { chats }
     });
-    console.log('newChat is fetched and state updated->', this.state);
+  }
+
+  compareChats(chat1, chat2) {
+    if ( chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
+      return -1;
+    if ( chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
+      return 1;
+    return 0;
   }
 
   async componentDidMount() {

@@ -8,8 +8,9 @@ import {
 import firebase from 'react-native-firebase';
 import { getUserRole } from './auth_actions';
 import { AsyncStorage } from 'react-native';
-
 import { Translations } from '../../constants/Translations';
+
+
 
 // retrieve the messages from the Backend
 export const fetchMessages = (userRole, localMessageIds, chatId, callback) => async (dispatch) => {
@@ -28,15 +29,16 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
   }
   // fet
   try {
-    await firebase.database().ref(chatUrl).limitToLast(25).on('child_added', (snapshot, prevChildKey) => {
+    await firebase.database().ref(chatUrl).orderByChild('createdAt').limitToLast(25).on('child_added', (snapshot, prevChildKey) => {
       const key = snapshot.key;
-      if (!localMessageIds.includes(key)) {
+
+      try {
         const message = snapshot.val();
-        //console.log("this message doesnt exist in local so fetched:", message);
         const newMessage = {
           _id: key,
           text: message.text,
-          createdAt: new Date(message.createdAt),
+          image: message.image,
+          createdAt: message.createdAt,
           user: {
             _id: message.user._id,
             name: message.user.name,
@@ -49,7 +51,11 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
         else if (userRole === 'p') {
           firebase.database().ref(`providers/${uid}/chats/${chatId}/unread`).set(0);
         }
-        callback(newMessage, isNewMessage = true);
+        callback(newMessage);
+        // }
+        // });
+      } catch (error) {
+        console.error(`${chatId} ait local data okunurken data`, error.message);
       }
     });
   } catch (error) {
@@ -60,31 +66,59 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
 }
 
 // send the message to the Backend
-export const sendMessage = (userRole, message, chatId) => async (dispatch) => {
+export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
   const uid = firebase.auth().currentUser.uid;
   let url = `commonchat/`;
-  if (chatId !== 'commonchat' && userRole === 'c') {
-    url = `providerchat/${chatId}/${uid}/`;
-    const unreadRef = firebase.database().ref(`providers/${chatId}/chats/${uid}/`);
-    await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
-  } else if (chatId !== 'commonchat' && userRole === 'p') {
-    url = `providerchat/${uid}/${chatId}/`;
-    const unreadRef = firebase.database().ref(`caregivers/${chatId}/chats/${uid}/`);
-    await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
-  }
+  var downloadUrl = "";
+  var uploadUrl = "";
+  var unreadRef = "";
 
-  console.log(`sendMessage will send message to ${url} with chatID (${chatId}) and uid (${uid})`);
-  const messagesRef = firebase.database().ref(url + 'messages');
-  const lastMessageRef = firebase.database().ref(url + 'lastMessage');
-  // It was all beacause of this line
-  for (let i = 0; i < message.length; i++) {
-    const messageData = {
-      text: message[i].text,
-      user: message[i].user,
-      createdAt: firebase.database.ServerValue.TIMESTAMP,
+  for (let i = 0; i < messages.length; i++) {
+    let message = messages[i];
+    if (chatId === 'commonchat') {
+      if (message.image) {
+        uploadUrl = "chatFiles/commonchat";
+      }
+    }
+    else if (userRole === 'c') {
+      url = `providerchat/${chatId}/${uid}/`;
+      if (message.image) {
+        uploadUrl = `chatFiles/${chatId}/${uid}`;
+      }
+      unreadRef = firebase.database().ref(`providers/${chatId}/chats/${uid}/`);
+
+    } else if (userRole === 'p') {
+      url = `providerchat/${uid}/${chatId}/`;
+
+      if (message.image) {
+        uploadUrl = `chatFiles/${uid}/${chatId}`;
+      }
+      unreadRef = firebase.database().ref(`caregivers/${chatId}/chats/${uid}/`);
+    }
+
+    if (uploadUrl) {
+      await firebase.storage().ref(uploadUrl).child(message._id).putFile(message.path);
+      downloadUrl = await firebase.storage().ref(uploadUrl).child(message._id).getDownloadURL();
+    }
+    if (unreadRef) {
+      await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
+    }
+
+    console.log(`sendMessage will send message to ${url} with chatID (${chatId}) and uid (${uid})`);
+    const messagesRef = firebase.database().ref(url + 'messages').child(message._id);
+    const lastMessageRef = firebase.database().ref(url + 'lastMessage');
+    // It was all beacause of this line
+    console.log(downloadUrl.toString());
+
+    var messageData = {
+      user: message.user,
+      createdAt: message.createdAt,
+      image: downloadUrl,
+      text: message.text
     };
-    messagesRef.push(messageData);
-    lastMessageRef.update(messageData);
+
+    messagesRef.set(messageData);
+    lastMessageRef.set(messageData);
   }
 }
 
@@ -110,7 +144,7 @@ export const closeChat = (chatId, userRole) => async () => {
 
 // load chat rooms for the current Caregiver
 export const loadCaregiverChats = (callback) => async (dispatch) => {
-  const uid = firebase.auth().currentUser._user.uid;
+  const uid = firebase.auth().currentUser.uid;
 
   await firebase.database().ref(`caregivers/${uid}/chats/`).on('value', async (snapshot) => {
     snapshot.forEach(async (snap) => {

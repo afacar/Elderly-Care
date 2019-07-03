@@ -61,8 +61,8 @@ class CaregiverMessageScreen extends React.Component {
         key={chatId}
         messages={messages}
         locale='tr'
-        onSend={(message) => {
-          this.props.sendMessage(userRole, message, chatId);
+        onSend={ async (message) => {
+          this.sendMessage(message);
         }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
         showUserAvatar={true}
@@ -105,6 +105,7 @@ class CaregiverMessageScreen extends React.Component {
       storageOptions: {
         skipBackup: true,
         path: 'images',
+        allowsEditing: true,
       },
     };
 
@@ -121,74 +122,50 @@ class CaregiverMessageScreen extends React.Component {
         console.log('User tapped custom button: ', response.customButton);
       }
       else {
-        const source = { uri: response.path }
-        this.setState({
-          imageMessageSrc: source
-        });
-        console.log('SOURCE:', source);
-        console.log(this.state.imageMessageSrc);
-        //const imageRef = firebase.storage().ref("posts/image");
-        //imageRef.putFile(this.state.imageMessageSrc)
-        this.uploadImage(this.state.imageMessageSrc);
+        // const source = { uri: response.path }
+        // this.setState({
+        //   imageMessageSrc: source
+        // });
+        const message = {
+          text: "",
+          user: {
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          },
+          image: response.uri.toString(),
+          path: response.path.toString()
+        };
+        this.sendMessage([message]);
       }
     });
-
   }
 
-  uploadImage(uri, mime = 'application/octet-stream') {
-    return new Promise((resolve, reject) => {
-      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-      let uploadBlob = null
-
-      const imageRef = firebase.storage().ref('images').child('image_001')
-      console.log('imageRef', imageRef);
-      console.log('uploadUri', uploadUri);
-
-      imageRef.putFile(uploadUri.uri, { contentType: mime })
-      .then(() => {
-        console.log('getDownloadURL ', imageRef.getDownloadURL());
-        return imageRef.getDownloadURL()
-      })
-      .then((url) => {
-        console.log('resolve url ', url);
-        resolve(url)
-      })
-      .catch((error) => {
-        console.error(error);
-        reject(error)
-      });
-
-/*       fs.readFile(uploadUri.uri, 'base64')
-        .then((data) => {
-          console.log('data', data);
-          return Blob.build(data, { type: `${mime};BASE64` })
-        })
-        .then((blob) => {
-          console.log('blob', blob);
-          uploadBlob = blob
-          return imageRef.putFile(uploadUri.uri, { contentType: mime })
-        })
-        .then(() => {
-          uploadBlob.close()
-          console.log('getDownloadURL ', imageRef.getDownloadURL());
-          return imageRef.getDownloadURL()
-        })
-        .then((url) => {
-          console.log('resolve url ', url);
-          resolve(url)
-        })
-        .catch((error) => {
-          console.error(error);
-          reject(error)
-        }) */
-    })
+  sendMessage = async(messages) => {
+    let messagesArray = [];
+    for ( let i = 0; i< messages.length; i++) {
+      let message = messages[i];
+      message.createdAt = new Date().getTime();
+      message._id = this.randIDGenerator();
+      await this.updateState(message);
+      messagesArray.push(message);
+    }
+    const { chatId, userRole, } = this.state;
+    this.props.sendMessage(userRole, messagesArray, chatId);
   }
+ 
+  updateState (message) {
+    this.setState((previousState) => {
+      console.log("Message:",message);
+    return { messages: GiftedChat.append(previousState.messages, message)}
+    });
+  }
+
 
   randIDGenerator = () => {
-    var S4 = () => {
-      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    var date = new Date().getTime().toString();
+    var randId = this.props.getUid() + date;
+    return (randId);
   }
 
   async componentDidMount() {
@@ -219,8 +196,7 @@ class CaregiverMessageScreen extends React.Component {
     if (messageData) {
       let messages = await JSON.parse(messageData);
       this._isMounted && this.setState({ messages });
-      const localMessageIds = messages.map(message => { return message._id });
-      this._isMounted && this.fetch_messages(localMessageIds);
+      this._isMounted && this.fetch_messages();
     } else {
       this._isMounted && this.setState({ messages: [] });
       this._isMounted && this.fetch_messages([]);
@@ -230,11 +206,19 @@ class CaregiverMessageScreen extends React.Component {
 
   fetch_messages = async (localMessageIds) => {
     const { chatId, userRole } = this.state;
-    this.props.fetchMessages(userRole, localMessageIds, chatId, (message, isNewMessage) => {
+    this.props.fetchMessages(userRole, localMessageIds, chatId, (message) => {
       /** @callback */
       this._isMounted && this.setState((previousState) => {
-        if (isNewMessage) return { messages: GiftedChat.append(previousState.messages, message), isNewMessage };
-        return { messages: GiftedChat.append(previousState.messages, message) };
+        var allMessages = this.state.messages;
+        var exists = false;
+        allMessages.forEach(element => {
+          console.log(element);
+            if ( element._id === message._id)
+              exists = true;
+        })
+        if ( !exists) {
+          return { messages: GiftedChat.append(previousState.messages, message) }
+        }
       });
     });
   }

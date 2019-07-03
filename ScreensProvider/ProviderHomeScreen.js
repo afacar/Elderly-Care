@@ -42,7 +42,7 @@ class ProviderHome extends React.Component {
   _fetchChatRooms = (chat) => {
     const { chatId, title, lastMessage, status, unread, avatar } = chat;
     this._isMounted && this.setState(previousState => {
-      const { chats } = previousState;
+      var { chats } = previousState;
 
       if (!chats[chatId]) chats[chatId] = {}
 
@@ -51,9 +51,32 @@ class ProviderHome extends React.Component {
       chats[chatId]['status'] = status;
       chats[chatId]['avatar'] = avatar;
       chats[chatId]['unread'] = unread;
-
-      return { chats };
+      
+      var sortable = [];
+      for ( var chatID in chats){
+        var chat = chats[chatID];
+        chat.chatId = chatID;
+        chats[chatID] = chat;
+        sortable.push(chats[chatID]);
+      }
+      var sortedChats = {}
+      sortable.sort(this.compareChats);
+      for ( var i = 0; i < sortable.length; i++ ){
+        var tmpChat = sortable[i];
+        sortedChats[tmpChat.chatId] = tmpChat; 
+        delete sortedChats[tmpChat.chatId].chatId;
+      }
+      chats = sortedChats;
+      return { chats }
     });
+  }
+
+  compareChats(chat1, chat2) {
+    if (chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
+      return -1;
+    if (chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
+      return 1;
+    return 0;
   }
 
   async componentDidMount() {
@@ -92,7 +115,11 @@ class ProviderHome extends React.Component {
       } else {
         userName = (lastMessage.user._id === firebase.auth().currentUser._user.uid) ? 'Siz:' : '';
       }
-      subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
+      if (lastMessage.text)
+        subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
+      else if (lastMessage.image)
+        subtitle = <Text>{userName + ' resim'}</Text>;
+
       if (unread > 0) badge = { value: unread, status: 'primary', textStyle: { fontSize: 18 } }
     } else {
       subtitle = "Mesaj yok! İlk mesajı siz yazın."
