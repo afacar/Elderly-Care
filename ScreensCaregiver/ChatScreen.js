@@ -58,7 +58,7 @@ class ChatScreen extends React.Component {
     });
     console.log('newChat is fetched and state updated->', this.state);
   }
-
+555
   async componentDidMount() {
     // Load the chatRooms with lastMessages
     console.log('ChatScreen Mounted!');
