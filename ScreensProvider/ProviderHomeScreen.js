@@ -92,7 +92,11 @@ class ProviderHome extends React.Component {
       } else {
         userName = (lastMessage.user._id === firebase.auth().currentUser._user.uid) ? 'Siz:' : '';
       }
-      subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
+      if (lastMessage.text)
+        subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
+      else if (lastMessage.image)
+        subtitle = <Text>{userName + ' resim'}</Text>;
+
       if (unread > 0) badge = { value: unread, status: 'primary', textStyle: { fontSize: 18 } }
     } else {
       subtitle = "Mesaj yok! İlk mesajı siz yazın."

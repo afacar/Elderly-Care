@@ -1,124 +1,42 @@
 import React, { Component } from 'react';
-import { StyleSheet } from "react-native";
-import { connect } from "react-redux";
-import { Input, Card } from "react-native-elements";
+import { View, Picker, Image, TouchableOpacity } from 'react-native';
+import ImagePicker from 'react-native-image-picker';
 
-import * as actions from "../../appstate/actions";
-import { SaveButton, LogoutButton, TextInput, NoteInput } from '../common';
+import { Input, Text, Card, Button } from 'react-native-elements';
+import { connect } from 'react-redux';
+
+import * as actions from '../../appstate/actions';
+import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput } from '../common';
 
 class ProviderProfileForm extends Component {
-  state = {
-    disabled: true,
-    profile: {
-      displayName: '',
-      profession: '',
-      experience: '',
-    },
-    nameError: '',
-    professionError: '',
-    experienceError: '',
 
-    saveButtonTitle: 'Kaydedildi',
-  };
+  state = { profile: {newPhoto: false}, loading: false, error: '', disabled: true };
 
-  handleProfileState = (newState) => {
-    this.setState(previousState => {
-      let profile = previousState.profile;
-      for (var key in newState) {
-        if (newState.hasOwnProperty(key)) {
-          profile[key] = newState[key];
-        }
-      }
-      previousState.profile = profile;
-      previousState.disabled = false;
-      return previousState;
-    })
-  }
+  _isMounted = false;
 
-  render() {
-    return (
-      <Card
-        containerStyle={styles.containerStyle}
-        title='Profil Bilgileriniz'
-        image={this.state.photoURL || require('../../assets/images/doctor.png')}
-        imageStyle={{ width: 90, height: 90, borderRadius: 100, alignSelf: 'center' }}
-      >
-        <TextInput
-          key='displayname'
-          label='Ad soyad'
-          placeholder='Ör. Ahmet Yılmaz'
-          value={this.state.profile.displayName}
-          onChangeText={displayName => this.handleProfileState({ displayName })}
-          errorMessage={this.state.nameError}
-          ref={ref => this.displayName = ref}
-          must={true}
-        />
-        <TextInput
-          key='profession'
-          label='Uzmanlık'
-          placeholder='Ör. Nörolog, Psikolog, Sosyal Hizmetler Uzmanı'
-          value={this.state.profile.profession}
-          onChangeText={profession => this.handleProfileState({ profession })}
-          errorMessage={this.state.professionError}
-          ref={ref => this.profession = ref}
-          must={true}
-        />
-        <NoteInput
-          key='biography'
-          label='Biyografi'
-          placeholder='Ör. 7 (Yıl) Tecrübe'
-          value={this.state.profile.experience}
-          onChangeText={experience => this.handleProfileState({ experience })}
-          errorMessage={this.state.experienceError}
-          ref={ref => this.experience = ref}
-          must={true}
-        />
-        <SaveButton
-          title='Kaydet'
-          onPress={this._saveProfile}
-          disabled={this.state.disabled}
-        />
-        <LogoutButton
-          onPress={this._logoutUser}
-        />
-      </Card>
-    );
+  _fetchProfile = async () => {
+    try {
+      this.props.fetch_profile((profile) => {
+        this._isMounted && this.setState({ profile });
+      });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   _saveProfile = async () => {
     const { profile } = this.state;
-
-    await this.setState({
-      nameError: '',
-      professionError: '',
-      experienceError: '',
-      profile: {
-        displayName: profile.displayName.trim(),
-        profession: profile.profession.trim(),
-        experience: profile.experience.trim()
-      }
-    });
-
-    if (!this.displayName.isValid()) {
-      this.setState({ nameError: 'Bu alan boş bırakılamaz' })
-      return;
-    } 
-    if (!this.profession.isValid()) {
-      this.setState({ professionError: 'Bu alan boş bırakılamaz' })
-      return;
-    } 
-    if (!this.experience.isValid()) {
-      this.setState({ experienceError: 'Bu alan boş bırakılamaz' })
-      return;
-    } 
-
+    console.log("Profile details",profile);
+    this.setState({
+      loading: true
+    })
     try {
-      await this.props.save_profile(this.state.profile);
-      this.setState({ disabled: true });
+      await this.props.save_profile(profile);
+      this.setState({ disabled: true, loading: false })
     } catch (error) {
-      console.error('Uzman profil kaydederken hata:', error.message);
+      this.setState({ error, loading: false });
     }
-  }
+  };
 
   _logoutUser = async () => {
     try {
@@ -129,34 +47,138 @@ class ProviderProfileForm extends Component {
     this.props.navigate('Auth');
   }
 
-  async componentDidMount() {
-    await this._bootstrapProfile();
-    console.log('ProviderProfileDidMount state', this.state);
+  handleState = (newState) => {
+    this.setState(prevState => {
+      console.log('handleState prevState and newState', prevState, newState);
+      let profile = prevState.profile;
+      for (var key in newState) {
+        if (newState.hasOwnProperty(key)) {
+          if (key === "response") {
+            console.log("We got new photo");
+            profile.photoURL = newState.response.uri;
+            profile.path = newState.response.path;
+            profile.newPhoto = true;
+          } else {
+            profile[key] = newState[key];
+          }
+        }
+        prevState.profile = profile;
+        prevState.disabled = false;
+        console.log('handleState new prevState', prevState);
+        return prevState;
+      }
+    });
   }
 
-  _bootstrapProfile = async () => {
-    try {
-      await this.props.fetch_profile((profile) => {
-        this.setState({ profile });
-      });
-    } catch (error) {
-      console.log('Could not fetch profile data', error.message);
-    }
+  onImageClicked = () => {
+    this.openPicker();
   }
+
+  openPicker = () => {
+
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+    const options = {
+      title: 'Fotoğraf Seç',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        allowsEditing: true,
+      },
+    };
+
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        this.handleState({ response });
+      }
+    });
+  }
+
+  render() {
+    console.log('ProfileForm rendered state,', this.state);
+    return (
+      <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
+        <TouchableOpacity
+          onPress={this.onImageClicked}>
+          <View>
+            <Image
+              style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
+              source={ this.state.profile.photoURL ? {uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png") }
+            />
+          </View>
+        </TouchableOpacity>
+
+        <CardItem>
+          <TextInput
+            key="displayname"
+            label="Ad soyad"
+            value={this.state.profile.displayName}
+            placeholder="Ör. Ahmet Yılmaz"
+            onChangeText={displayName => this.handleState({ displayName })}
+          />
+        </CardItem>
+        <CardItem>
+          <TextInput
+            key='profession'
+            label='Uzmanlık'
+            placeholder='Ör. Nörolog, Psikolog, Sosyal Hizmetler Uzmanı'
+            value={this.state.profile.profession}
+            onChangeText={profession => this.handleState({ profession })}
+            errorMessage={this.state.professionError}
+            ref={ref => this.profession = ref}
+            must={true}
+          />
+        </CardItem>
+        <CardItem>
+          <NoteInput
+            key='biography'
+            label='Biyografi'
+            placeholder='Ör. 7 (Yıl) Tecrübe'
+            value={this.state.profile.experience}
+            onChangeText={experience => this.handleState({ experience })}
+            errorMessage={this.state.experienceError}
+            ref={ref => this.experience = ref}
+            must={true}
+          />
+        </CardItem>
+        <SaveButton
+          title={this.state.loading ? "Kaydediliyor..." : ""}
+          disabled={this.state.disabled}
+          onPress={this._saveProfile}
+        />
+        <LogoutButton
+          onPress={this._logoutUser}
+          title="Çıkış yap"
+        />
+      </Card>
+    );
+  }
+
+  async componentDidMount() {
+    this._isMounted = true;
+    this._fetchProfile();
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
 }
 
-const styles = StyleSheet.create({
+const styles = {
   containerStyle: {
-    flex: 1,
     margin: 5,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-  },
-  buttonStyle: {
-    marginTop: 15,
-    borderRadius: 20,
-    backgroundColor: '#096887',
   }
-});
+}
 
 export default connect(null, actions)(ProviderProfileForm)
