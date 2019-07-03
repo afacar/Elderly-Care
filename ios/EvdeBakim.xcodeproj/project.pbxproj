@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -13,6 +14,7 @@
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* EvdeBakimTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* EvdeBakimTests.m */; };
 		0228F5A4DDCF411380F5CA29 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7470730DF671400FAB52996A /* FontAwesome.ttf */; };
+		0406723D22CA012F0062AC4D /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0406723722CA011D0062AC4D /* libRNImagePicker.a */; };
 		04286DCF22AB020500F230F8 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04286DA222AB01FF00F230F8 /* Bolts.framework */; };
 		04286DD022AB020500F230F8 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04286DCC22AB020100F230F8 /* FBSDKLoginKit.framework */; };
 		04286DD122AB020500F230F8 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04286DCD22AB020300F230F8 /* FBSDKCoreKit.framework */; };
@@ -112,6 +114,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = EvdeBakim;
+		};
+		0406723622CA011D0062AC4D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0406720822CA011D0062AC4D /* RNImagePicker.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 014A3B5C1C6CF33500B6D375;
+			remoteInfo = RNImagePicker;
 		};
 		043EA2EA22B7BDD0006353F9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -427,6 +436,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* EvdeBakimTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EvdeBakimTests.m; sourceTree = "<group>"; };
 		01F49A18526E642CD05E9D62 /* Pods-EvdeBakim.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EvdeBakim.release.xcconfig"; path = "Target Support Files/Pods-EvdeBakim/Pods-EvdeBakim.release.xcconfig"; sourceTree = "<group>"; };
+		0406720822CA011D0062AC4D /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		04286DA222AB01FF00F230F8 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		04286DCC22AB020100F230F8 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		04286DCD22AB020300F230F8 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
@@ -495,6 +505,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0406723D22CA012F0062AC4D /* libRNImagePicker.a in Frameworks */,
 				04B1587122B148F900B13986 /* libRNSVG.a in Frameworks */,
 				04B1586722B1479F00B13986 /* libVoice.a in Frameworks */,
 				04B1586022B1459A00B13986 /* libRNGestureHandler.a in Frameworks */,
@@ -608,6 +619,14 @@
 				00E356F11AD99517003FC87E /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		0406720922CA011D0062AC4D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0406723722CA011D0062AC4D /* libRNImagePicker.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		043EA2E722B7BDD0006353F9 /* Products */ = {
@@ -775,6 +794,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				0406720822CA011D0062AC4D /* RNImagePicker.xcodeproj */,
 				04B1586822B148EC00B13986 /* RNSVG.xcodeproj */,
 				04B1586122B1478B00B13986 /* Voice.xcodeproj */,
 				04B1585722B1458200B13986 /* RNGestureHandler.xcodeproj */,
@@ -1057,6 +1077,10 @@
 					ProjectRef = 6BC68444A21E4C409E77C2D4 /* RNGoogleSignin.xcodeproj */;
 				},
 				{
+					ProductGroup = 0406720922CA011D0062AC4D /* Products */;
+					ProjectRef = 0406720822CA011D0062AC4D /* RNImagePicker.xcodeproj */;
+				},
+				{
 					ProductGroup = 04B1586922B148EC00B13986 /* Products */;
 					ProjectRef = 04B1586822B148EC00B13986 /* RNSVG.xcodeproj */;
 				},
@@ -1113,6 +1137,13 @@
 			fileType = archive.ar;
 			path = libRCTVibration.a;
 			remoteRef = 00C302E31ABCB9EE00DB3ED1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0406723722CA011D0062AC4D /* libRNImagePicker.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNImagePicker.a;
+			remoteRef = 0406723622CA011D0062AC4D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		043EA2EB22B7BDD0006353F9 /* libRNGoogleSignin.a */ = {

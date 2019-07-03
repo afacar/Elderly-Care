@@ -21,6 +21,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [FIRApp configure];
+  [FIRDatabase database].persistenceEnabled = YES;
   [RNFirebaseNotifications configure];
   
   [[FBSDKApplicationDelegate sharedInstance] application:application

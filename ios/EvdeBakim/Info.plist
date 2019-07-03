@@ -65,8 +65,14 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>for uploading images / video</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>for uploading images / video</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>for uploading images / video</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
