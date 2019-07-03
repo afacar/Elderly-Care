@@ -26,7 +26,7 @@ export const loginWithGoogle = () => async (dispatch) => {
     //await GoogleSignin.hasPlayServices();
     // Add any configuration settings here:
     console.log('googlesignin.configure()?')
-    GoogleSignin.configure(configuration.configure);    
+    GoogleSignin.configure(configuration.configure);
     console.log('google.signin()?')
     const data = await GoogleSignin.signIn();
     // console.log("data from GoogleSignin", data);
@@ -153,14 +153,16 @@ export const save_profile = (profile) => async (dispatch) => {
   console.log('In save_profile and recieved..', profile);
   try {
     await firebase.auth().currentUser.updateProfile({ displayName });
-    await firebase.auth().currentUser.updateProfile({ photoURL });
-    if ( newPhoto) {
+    if (newPhoto) {
+      console.log("New photo")
       await firebase.storage().ref().child("profilePics").child(_user.uid).putFile(path);
       profile.photoURL = await firebase.storage().ref().child("profilePics").child(_user.uid).getDownloadURL();
+      await firebase.auth().currentUser.updateProfile({ photoURL });
+      delete profile.path;
     }
-    delete profile.path;
+    delete profile.newPhoto;
     await firebase.database().ref(url).update(profile);
-    console.log('save_profile is updated succesfully!');
+    console.log('save_profile is updated succesfully!', profile);
   } catch (error) {
     const errorMessage = Translations[error.code] || error.message;
     console.error(errorMessage);
