@@ -187,8 +187,7 @@ class ProviderMessageScreen extends React.Component {
     if (messageData) {
       let messages = await JSON.parse(messageData);
       this._isMounted && this.setState({ messages });
-      const localMessageIds = messages.map(message => { return message._id });
-      this._isMounted && this.fetch_messages(localMessageIds);
+      this._isMounted && this.fetch_messages();
     } else {
       this._isMounted && this.setState({ messages: [] });
       this._isMounted && this.fetch_messages([]);
