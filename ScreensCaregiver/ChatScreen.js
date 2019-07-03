@@ -54,9 +54,18 @@ class ChatScreen extends React.Component {
       chats[chatId]['unread'] = unread;
       chats[chatId]['avatar'] = avatar;
 
+      // chats.sort(this.compareChats)
       return { chats };
     });
     console.log('newChat is fetched and state updated->', this.state);
+  }
+
+  compareChats(chat1, chat2) {
+    if ( chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
+      return -1;
+    if ( chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
+      return 1;
+    return 0;
   }
 
   async componentDidMount() {
