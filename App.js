@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-navigation';
 
 import store from './appstate/store';
 
+global.PaymentRequest = require('react-native-payments').PaymentRequest;
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
