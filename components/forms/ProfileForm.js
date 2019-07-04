@@ -8,43 +8,55 @@ import { connect } from 'react-redux';
 import * as actions from '../../appstate/actions';
 import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput } from '../common';
 
-
-const METHOD_DATA = [{
-  supportedMethods: ['android-pay'],
-  data: {
-    supportedNetworks: ['visa', 'mastercard', 'amex'],
-    currencyCode: 'USD',
-    environment: 'TEST', // defaults to production
-    paymentMethodTokenizationParameters: {
-      tokenizationType: 'NETWORK_TOKEN',
-      parameters: {
-        publicKey: 'your-pubic-key'
-      }
-    }
-  }
-}];
-
 class _ProfileForm extends Component {
 
   state = { profile: {}, loading: false, error: '', disabled: true };
+  _isMounted = false;
+  
+  METHOD_DATA = [{
+    supportedMethods: ['android-pay'],
+    data: {
+      supportedNetworks: ['visa', 'mastercard', 'amex'],
+      currencyCode: 'TRY',
+      environment: 'TEST', // defaults to production
+      paymentMethodTokenizationParameters: {
+        tokenizationType: 'GATEWAY_TOKEN',
+        parameters: {
+          gateway: 'braintree',
+          publicKey: 'PUBLIC KEY FROM BRAINTREE',
+        }
+      }
+    }
+  }];
 
   DETAILS = {
     id: 'basic-example',
     displayItems: [
       {
         label: 'Movie Ticket',
-        amount: { currency: 'USD', value: '1.00' }
+        amount: { currency: 'TRY', value: '1.00' }
       }
     ],
     total: {
       label: 'Merchant Name',
-      amount: { currency: 'USD', value: '1.00' }
+      amount: { currency: 'TRY', value: '1.00' }
     }
   };
 
-  paymentRequest = new PaymentRequest(METHOD_DATA, this.DETAILS);
+  paymentRequest = new PaymentRequest(this.METHOD_DATA, this.DETAILS);
 
-  _isMounted = false;
+  openPay = () => {
+    this.paymentRequest.show()
+      .then(paymentResponse => {
+        // Your payment processing code goes here
+        console.log('paymentResponse', paymentResponse);
+        //return processPayment(paymentResponse);
+      })
+      .catch(err => {
+        this.paymentRequest.abort();
+        console.log('Payment Error:', err);
+      });
+  }
 
   _fetchProfile = async () => {
     try {
@@ -128,15 +140,6 @@ class _ProfileForm extends Component {
         this.handleState({ response });
       }
     });
-  }
-
-  openPay = () => {
-    this.paymentRequest.show()
-      .then(paymentResponse => {
-        // Your payment processing code goes here
-        console.log('paymentResponse', paymentResponse);
-        //return processPayment(paymentResponse);
-      });
   }
 
   render() {
