@@ -61,7 +61,7 @@ class BPView extends Component {
         </View>
       );
     } else {
-      return <Text h4>Şeker kaydı bulunamadı!</Text>;
+      return <Text style={{ alignSelf: 'center' }}>Kayıt bulunamadı!</Text>;
     }
   }
 

@@ -58,7 +58,7 @@ class WeightView extends Component {
         </View>
       );
     } else {
-      return <Text h4>Kilo kaydı bulunamadı!</Text>;
+      return <Text style={{ alignSelf: 'center' }}>Kayıt bulunamadı!</Text>;
     }
   }
 
