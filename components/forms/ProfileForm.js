@@ -13,51 +13,6 @@ class _ProfileForm extends Component {
   state = { profile: {}, loading: false, error: '', disabled: true };
   _isMounted = false;
   
-  METHOD_DATA = [{
-    supportedMethods: ['android-pay'],
-    data: {
-      supportedNetworks: ['visa', 'mastercard', 'amex'],
-      currencyCode: 'TRY',
-      environment: 'TEST', // defaults to production
-      paymentMethodTokenizationParameters: {
-        tokenizationType: 'GATEWAY_TOKEN',
-        parameters: {
-          gateway: 'braintree',
-          publicKey: 'PUBLIC KEY FROM BRAINTREE',
-        }
-      }
-    }
-  }];
-
-  DETAILS = {
-    id: 'basic-example',
-    displayItems: [
-      {
-        label: 'Movie Ticket',
-        amount: { currency: 'TRY', value: '1.00' }
-      }
-    ],
-    total: {
-      label: 'Merchant Name',
-      amount: { currency: 'TRY', value: '1.00' }
-    }
-  };
-
-  paymentRequest = new PaymentRequest(this.METHOD_DATA, this.DETAILS);
-
-  openPay = () => {
-    this.paymentRequest.show()
-      .then(paymentResponse => {
-        // Your payment processing code goes here
-        console.log('paymentResponse', paymentResponse);
-        //return processPayment(paymentResponse);
-      })
-      .catch(err => {
-        this.paymentRequest.abort();
-        console.log('Payment Error:', err);
-      });
-  }
-
   _fetchProfile = async () => {
     try {
       this.props.fetch_profile((profile) => {
@@ -155,8 +110,6 @@ class _ProfileForm extends Component {
             />
           </View>
         </TouchableOpacity>
-
-        <Button title='Kredi al' onPress={this.openPay} />
 
         <CardItem>
           <TextInput
