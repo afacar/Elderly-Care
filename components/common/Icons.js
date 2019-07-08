@@ -217,7 +217,59 @@ export const GalleryIcon = (props) => {
       name='perm-media'
       type='material'
       onPress={props.onPress || null}
-      color={'blue'}
+      color={'grey'}
+      size={60}
+      onPress={props.onPress}
+    />
+  );
+}
+
+export const CameraIcon = (props) => {
+  return (
+    <Icon
+      name='camera-alt'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
+      size={60}
+      onPress={props.onPress}
+    />
+  );
+}
+
+export const AttachmentIcon = (props) => {
+  return (
+    <Icon
+      name='attach-file'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
+      size={30}
+      onPress={props.onPress}
+    />
+  );
+}
+
+export const PlayIcon = (props) => {
+  return (
+    <Icon
+      name='play-arrow'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
+      size={30}
+      onPress={props.onPress}
+    />
+  );
+}
+
+export const PauseIcon = (props) => {
+  return (
+    <Icon
+      name='pause'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
       size={30}
       onPress={props.onPress}
     />

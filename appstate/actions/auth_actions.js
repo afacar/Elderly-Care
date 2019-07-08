@@ -157,7 +157,7 @@ export const save_profile = (profile) => async (dispatch) => {
       console.log("New photo")
       await firebase.storage().ref().child("profilePics").child(_user.uid).putFile(path);
       profile.photoURL = await firebase.storage().ref().child("profilePics").child(_user.uid).getDownloadURL();
-      await firebase.auth().currentUser.updateProfile({ photoURL });
+      await firebase.auth().currentUser.updateProfile({ photoURL: profile.photoURL });
       delete profile.path;
     }
     delete profile.newPhoto;

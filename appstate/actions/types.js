@@ -33,3 +33,6 @@ export const SUMMARY_FETCH = 'summary_fetch';
 
 // TYPES FOR MESSAGES
 export const CHATS_FETCH = 'chats_fetch';
+
+// TYPE FOR AUDIO MESSAGE
+export const CHATS_AUDIO = 'chats_audio';

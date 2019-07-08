@@ -4,11 +4,13 @@ import {
   ATTEMPT,
   SUCCESS,
   FAIL,
+  CHATS_AUDIO,
 } from './types';
 import firebase from 'react-native-firebase';
 import { getUserRole } from './auth_actions';
 import { AsyncStorage } from 'react-native';
 import { Translations } from '../../constants/Translations';
+import Sound from "react-native-sound";
 
 
 
@@ -36,6 +38,7 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
         const message = snapshot.val();
         const newMessage = {
           _id: key,
+          audio: message.audio,
           text: message.text,
           image: message.image,
           createdAt: message.createdAt,
@@ -72,18 +75,23 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
   var downloadUrl = "";
   var uploadUrl = "";
   var unreadRef = "";
-
+  var audioUrl = "";
+  var audioDownloadUrl = "";
   for (let i = 0; i < messages.length; i++) {
     let message = messages[i];
     if (chatId === 'commonchat') {
       if (message.image) {
-        uploadUrl = "chatFiles/commonchat";
+        uploadUrl = "chatFiles/commonchat/image";
+      } else if (message.audio) {
+        audioUrl = 'chatFiles/commonchat/audio';
       }
     }
     else if (userRole === 'c') {
       url = `providerchat/${chatId}/${uid}/`;
       if (message.image) {
-        uploadUrl = `chatFiles/${chatId}/${uid}`;
+        uploadUrl = `chatFiles/${chatId}/${uid}/image`;
+      } else if (message.audio) {
+        audioUrl = `chatFiles/${chatId}/${uid}/audio`;
       }
       unreadRef = firebase.database().ref(`providers/${chatId}/chats/${uid}/`);
 
@@ -91,7 +99,9 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       url = `providerchat/${uid}/${chatId}/`;
 
       if (message.image) {
-        uploadUrl = `chatFiles/${uid}/${chatId}`;
+        uploadUrl = `chatFiles/${uid}/${chatId}/image`;
+      } else if (message.audio) {
+        audioUrl = `chatFiles/${uid}/${chatId}/audio`;
       }
       unreadRef = firebase.database().ref(`caregivers/${chatId}/chats/${uid}/`);
     }
@@ -102,6 +112,13 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
     }
     if (unreadRef) {
       await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
+    }
+    if (audioUrl) {
+      var metadata = {
+        contentType: 'audio/mp3',
+      };
+      await firebase.storage().ref(audioUrl).child(message._id).putFile(message.audio, metadata);
+      audioDownloadUrl = await firebase.storage().ref(audioUrl).child(message._id).getDownloadURL();
     }
 
     console.log(`sendMessage will send message to ${url} with chatID (${chatId}) and uid (${uid})`);
@@ -114,7 +131,8 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       user: message.user,
       createdAt: message.createdAt,
       image: downloadUrl,
-      text: message.text
+      text: message.text,
+      audio: audioDownloadUrl
     };
 
     messagesRef.set(messageData);
@@ -228,5 +246,8 @@ export const loadProviderChats = (callback) => async (dispatch) => {
 
     });
   });
-
+}
+// load currently playing chat audio
+export const setAudio = (id) => async (dispatch) => {
+    return dispatch({ type: CHATS_AUDIO, payload: { id } })
 }
