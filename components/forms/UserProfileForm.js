@@ -32,7 +32,7 @@ class UserProfileForm extends Component {
             );
         }
         else {
-            if (this.state.profile.profession) {
+            if (this.state.profile.userRole == 'p') {
                 return (
                     <View>
                         {this.renderProvider()}

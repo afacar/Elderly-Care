@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { View, Image, AsyncStorage } from 'react-native';
-import { Button, Text, Input } from 'react-native-elements';
+import { Button, Text, Input, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
 
 import * as actions from '../appstate/actions';
+import { TextInput, CardItem } from '../components/common/';
 
 const successImageUri = 'https://cdn.pixabay.com/photo/2015/06/09/16/12/icon-803718_1280.png';
 
@@ -16,8 +17,9 @@ class ProviderLogin extends Component {
       user: null,
       message: '',
       codeInput: '',
-      phoneNumber: '+90 5542421417',
+      phoneNumber: '',
       confirmResult: null,
+      displayName: ''
     };
   }
 
@@ -53,7 +55,7 @@ class ProviderLogin extends Component {
 
         if (isNewUser) {
           try {
-            await this.props.createNewUserProfile(userRole);
+            await this.props.createNewUserProfile(userRole, this.state.displayName);
             console.log(`!createNewUserProfile() is successful for new user:`);
           } catch (error) {
             console.error(`createNewUserProfile() gives error:`, error.message);
@@ -67,8 +69,9 @@ class ProviderLogin extends Component {
           user: null,
           message: '',
           codeInput: '',
-          phoneNumber: '+90 5542421417',
+          phoneNumber: '',
           confirmResult: null,
+          displayName: ""
         });
       }
     });
@@ -81,10 +84,12 @@ class ProviderLogin extends Component {
   }
 
   signIn = () => {
-    const { phoneNumber } = this.state;
+    const { phoneNumber, displayName } = this.state;
     if (phoneNumber.length < 10) {
       this.setState({ message: 'Geçerli bir numara giriniz...' });
     }
+    else if (displayName.length < 6 || !displayName)
+      this.setState({ message: 'Geçerli bir isim giriniz...' });
     else {
       this.setState({ message: 'Kod SMS ile yollanıyor ...' });
       firebase.auth().signInWithPhoneNumber(phoneNumber)
@@ -113,22 +118,40 @@ class ProviderLogin extends Component {
   }
 
   renderPhoneNumberInput() {
-    const { phoneNumber } = this.state;
+    const { phoneNumber, displayName } = this.state;
 
     return (
-      <View style={{ padding: 25 }}>
-        <Input
-          label="Telefon numarası"
-          autoFocus
-          keyboardType='phone-pad'
-          style={{ height: 40, marginTop: 15, marginBottom: 15 }}
-          onChangeText={value => this.setState({ phoneNumber: value })}
-          placeholder={'55... '}
-          value={phoneNumber}
-        />
-        <Button title="Giriş yap" color="green" onPress={this.signIn} />
-        <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} />
-      </View>
+      <Card style={{ padding: 25 }}>
+        <CardItem>
+          <Input
+            key='displayname'
+            label='Ad Soyad'
+            placeholder='Ör. Ahmet Yılmaz'
+            onChangeText={value => this.setState({ displayName: value })}
+            value={displayName}
+          />
+        </CardItem>
+
+
+        <CardItem>
+          <Input
+            label="Telefon numarası"
+            keyboardType='phone-pad'
+            style={{ height: 40, marginTop: 15, marginBottom: 15 }}
+            onChangeText={value => this.setState({ phoneNumber: value })}
+            placeholder={'+90 55... '}
+            value={phoneNumber}
+          />
+        </CardItem>
+
+        <View style={styles.buttonStyle}>
+          <Button title="Giriş yap" color="green" onPress={this.signIn} />
+        </View>
+
+        <View style={styles.buttonStyle}>
+          <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+        </View>
+      </Card>
     );
   }
 
@@ -151,7 +174,7 @@ class ProviderLogin extends Component {
         <Input
           autoFocus
           keyboardType='phone-pad'
-          style={{height: 40, marginTop: 15, marginBottom: 15 }}
+          style={{ height: 40, marginTop: 15, marginBottom: 15 }}
           onChangeText={value => this._isMounted && this.setState({ codeInput: value })}
           placeholder={'Kod ... '}
           value={codeInput}
@@ -173,6 +196,12 @@ class ProviderLogin extends Component {
         {!user && confirmResult && this.renderVerificationCodeInput()}
       </View>
     );
+  }
+}
+
+const styles = {
+  buttonStyle: {
+    margin: 10
   }
 }
 
