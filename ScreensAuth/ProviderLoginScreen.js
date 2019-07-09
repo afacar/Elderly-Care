@@ -179,7 +179,9 @@ class ProviderLogin extends Component {
           placeholder={'Kod ... '}
           value={codeInput}
         />
-        <Button title="Doğrula" color="#841584" onPress={this.confirmCode} />
+        <View style={styles.buttonStyle}>
+          <Button title="Doğrula" color="#841584" onPress={this.confirmCode} />
+        </View>
       </View>
     );
   }
