@@ -10,7 +10,7 @@ import { AudioUtils, AudioRecorder } from 'react-native-audio';
 import { PermissionsAndroid } from 'react-native';
 import AudioCard from '../components/common/AudioCard';
 
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../components/common/Buttons.js'
@@ -25,7 +25,7 @@ class ProviderMessageScreen extends React.Component {
     },
     headerRight: (
       <View>
-        <TouchableHighlight onPress={() => navigation.navigate('PatientScreen', {
+        <TouchableOpacity onPress={() => navigation.navigate('PatientScreen', {
           userid: navigation.getParam('userid', '')
         })}>
           <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
@@ -35,7 +35,7 @@ class ProviderMessageScreen extends React.Component {
             />
             <Text style={{ fontWeight: 'bold' }}>Hasta Bilgisi</Text>
           </View>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     )
   });
@@ -185,9 +185,9 @@ class ProviderMessageScreen extends React.Component {
                 <View style={{ flex: 1 }}>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <TouchableHighlight onPress={this.openGallery}>
+                  <TouchableOpacity onPress={this.openGallery}>
                     <ImageButton />
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                 </View>
               </View>
               <View style={{ flexDirection: 'row', flex: 1 }}>
@@ -196,9 +196,9 @@ class ProviderMessageScreen extends React.Component {
                 <View style={{ flex: 1 }}>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <TouchableHighlight onPress={this.openCamera}>
+                  <TouchableOpacity onPress={this.openCamera}>
                     <CameraButton />
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                 </View>
               </View>
             </CircleTransition>
@@ -288,16 +288,18 @@ class ProviderMessageScreen extends React.Component {
     })
   }
 
-  openPicker = () => {
+  onImageResult = (response) => {
+
+    this.transitedView.collapse();
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+
+
 
     if (response.didCancel) {
-      console.log('User cancelled image picker');
     }
     else if (response.error) {
-      console.log('ImagePicker Error: ', response.error);
     }
     else if (response.customButton) {
-      console.log('User tapped custom button: ', response.customButton);
     }
     else {
       // const source = { uri: response.path }

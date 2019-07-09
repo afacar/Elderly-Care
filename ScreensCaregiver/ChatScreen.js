@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, StyleSheet, FlatList, TouchableHighlight, Image } from 'react-native';
+import { ScrollView, View, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { ListItem, Text, Badge } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
@@ -19,7 +19,7 @@ class ChatScreen extends React.Component {
     headerForceInset: {vercical: 'never'},
     headerRight: (
      
-      <TouchableHighlight onPress={() => navigation.navigate('ProviderListScreen')}>
+      <TouchableOpacity onPress={() => navigation.navigate('ProviderListScreen')}>
         <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Image
             style={{ width: 25, height: 25 }}
@@ -27,7 +27,7 @@ class ChatScreen extends React.Component {
           />
           <Text style={{ fontWeight: 'bold' }}>Uzman Ekle</Text>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     ),
   });
 

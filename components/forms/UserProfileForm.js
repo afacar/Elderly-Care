@@ -59,7 +59,7 @@ class UserProfileForm extends Component {
                     <View>
                         <Image
                             style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-                            source={{ uri: this.state.profile.photoURL }} />
+                            source={ this.state.profile.photoURL ? {uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png") } />
                     </View>
                 </TouchableOpacity>
 
@@ -102,8 +102,7 @@ class UserProfileForm extends Component {
                     <View>
                         <Image
                             style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-                            source={{ uri: this.state.profile.photoURL }}
-                        />
+                            source={ this.state.profile.photoURL ? {uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png") } />
                     </View>
                 </TouchableOpacity>
 

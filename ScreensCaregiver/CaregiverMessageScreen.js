@@ -9,7 +9,7 @@ import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../compo
 import ImagePicker from 'react-native-image-picker';
 
 import CircleTransition from 'react-native-circle-reveal-view';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { AudioUtils, AudioRecorder } from 'react-native-audio';
 import { PermissionsAndroid } from 'react-native';
@@ -154,9 +154,9 @@ class CaregiverMessageScreen extends React.Component {
                 <View style={{ flex: 1 }}>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <TouchableHighlight onPress={this.openGallery}>
+                  <TouchableOpacity onPress={this.openGallery}>
                     <ImageButton />
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                 </View>
               </View>
               <View style={{ flexDirection: 'row', flex: 1 }}>
@@ -165,9 +165,9 @@ class CaregiverMessageScreen extends React.Component {
                 <View style={{ flex: 1 }}>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <TouchableHighlight onPress={this.openCamera}>
+                  <TouchableOpacity onPress={this.openCamera}>
                     <CameraButton />
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                 </View>
               </View>
             </CircleTransition>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, FlatList, TouchableHighlight, View, Text, Image } from 'react-native';
+import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text, Image } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
@@ -14,7 +14,7 @@ class ProviderHome extends React.Component {
       backgroundColor: 'white',
     },
     headerRight: (
-      <TouchableHighlight onPress={() => navigation.navigate('CaregiverList')}>
+      <TouchableOpacity onPress={() => navigation.navigate('CaregiverList')}>
         <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Image
             style={{ width: 40, height: 40 }}
@@ -22,7 +22,7 @@ class ProviderHome extends React.Component {
           />
           <Text style={{ fontWeight: 'bold' }}>Danışmanlık Talepleri</Text>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     )
   });
 
@@ -126,7 +126,7 @@ class ProviderHome extends React.Component {
     }
 
     return (
-      <TouchableHighlight onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId })}>
+      <TouchableOpacity onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 18 }}
@@ -141,7 +141,7 @@ class ProviderHome extends React.Component {
           containerStyle={{ borderBottomWidth: 1, }}
           badge={badge}
         />
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 
