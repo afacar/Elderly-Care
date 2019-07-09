@@ -20,7 +20,6 @@ export class ProgressBar extends Component {
 
     componentDidUpdate(prevProps, prevState){
         if (prevProps.currentTime !== this.props.currentTime){
-        console.log(this.props.currentTime, + " duration ", this.props.duration);
             Animated.timing(this.animation, {
                 toValue: this.props.currentTime/this.props.duration,
                 duration: this.props.currentTime - prevProps.currentTime

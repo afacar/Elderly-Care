@@ -151,22 +151,17 @@ export const save_profile = (profile) => async (dispatch) => {
   // First update displayName, email, photoURL, phoneNumber to _user
   // Then update gender, birthdate etc. to profile
   console.log('In save_profile and recieved..', profile);
-  try {
-    await firebase.auth().currentUser.updateProfile({ displayName });
+    firebase.auth().currentUser.updateProfile({ displayName });
     if (newPhoto) {
       console.log("New photo")
       await firebase.storage().ref().child("profilePics").child(_user.uid).putFile(path);
       profile.photoURL = await firebase.storage().ref().child("profilePics").child(_user.uid).getDownloadURL();
-      await firebase.auth().currentUser.updateProfile({ photoURL: profile.photoURL });
+      firebase.auth().currentUser.updateProfile({ photoURL: profile.photoURL });
       delete profile.path;
     }
     delete profile.newPhoto;
     await firebase.database().ref(url).update(profile);
-    console.log('save_profile is updated succesfully!', profile);
-  } catch (error) {
-    const errorMessage = Translations[error.code] || error.message;
-    console.error(errorMessage);
-  }
+    console.log('save_profile is updated succesfully!', profile); 
   console.log('save_profile is quiting...');
 };
 

@@ -3,10 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { PlayIcon, PauseIcon } from './Icons';
 import { ProgressBar } from './ProgressBar';
-import { PauseButton, PlayButton } from './Buttons';
+import { PauseButton, PlayButton, ResetButton } from './Buttons';
 import Sound from "react-native-sound";
 import * as actions from '../../appstate/actions/chat_actions';
 import { connect } from 'react-redux';
+import { Icon } from 'react-native-elements';
 
 class AudioCard extends Component {
 
@@ -77,11 +78,19 @@ class AudioCard extends Component {
                     </View>
                     <View style={{ flex: 1, flexDirection: 'row' }} >
                         <Text style={{ flex: 1, marginLeft: 4, alignSelf: 'flex-start', fontSize: 12 }}>{this.state.tmpCurrentDurMins}:{this.state.tmpCurrentDurSecs}</Text>
+                        <ResetButton onPress={this.resetSound} style={{ flex: 1}}/>
                         <Text style={{ flex: 1, alignSelf: 'flex-end', fontSize: 12 }}>{this.state.createdAt}</Text>
                     </View>
                 </View>
             </View>
         );
+    }
+
+    resetSound = () => {
+        console.log("Reset Sound");
+        const sound = this.state.sound;
+        if (sound)
+            sound.stop();
     }
 
     renderPlayPause = () => {
@@ -134,13 +143,12 @@ class AudioCard extends Component {
         if (seconds < 10) {
             tmpSeconds = '0' + seconds;
         }
-        console.log(seconds)
-            this.setState({
-                tmpCurrentDurMins: tmpMinutes,
-                tmpCurrentDurSecs: tmpSeconds,
-                seconds: seconds,
-                minutes: minutes
-            })
+        this.setState({
+            tmpCurrentDurMins: tmpMinutes,
+            tmpCurrentDurSecs: tmpSeconds,
+            seconds: seconds,
+            minutes: minutes
+        })
     }
 
     stopPlaying = () => {
