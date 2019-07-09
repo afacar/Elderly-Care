@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity,  Text, View, Image, Platform } from 'react-native';
+import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform } from 'react-native';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
@@ -122,9 +122,19 @@ class ProviderMessageScreen extends React.Component {
         renderBubble={this.renderBubble}
         // renderComposer={this.renderComposer}
         renderActions={this.renderActions}
+        onPressAvatar={this.onPressAvatar}
       // alwaysShowSend
       />
     );
+  }
+
+  onPressAvatar = (props) => {
+    /*
+    props = user { _id, name, avatar}
+    */
+    console.log("User PMS", props);
+    const {navigate} = this.props.navigation;
+    navigate('UserProfileScreen', {user: props});
   }
 
   renderAudio = (props) => {

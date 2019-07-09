@@ -95,11 +95,15 @@ class CaregiverMessageScreen extends React.Component {
         renderSend={this._renderSend}
         // renderComposer={this.renderComposer}
         renderActions={this.renderActions}
+        onPressAvatar={this.onPressAvatar}
       // alwaysShowSend
       />
     );
   }
 
+  onPressAvatar = (props) => {
+    console.log("Avatar clicked ", props);
+  }
 
   renderAudio = (props) => {
     return !props.currentMessage.audio ? (

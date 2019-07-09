@@ -8,6 +8,7 @@ import HomeScreen from '../ScreensCaregiver/HomeScreen';
 import PatientScreen from '../ScreensCaregiver/PatientScreen';
 import ChartScreen from "../ScreensCaregiver/ChartScreen";
 import ChatScreen from '../ScreensCaregiver/ChatScreen';
+import UserProfileScreen from '../ScreensAuth/UserProfileScreen';
 import CaregiverMessageScreen from '../ScreensCaregiver/CaregiverMessageScreen';
 import SettingsStack from './SettingsNavigations';
 import ProviderListScreen from '../ScreensCaregiver/ProviderListForm';
@@ -47,6 +48,7 @@ const SupportStack = createStackNavigator(
   {
     ChatScreen,
     CaregiverMessageScreen,
+    UserProfileScreen,
     ProviderListScreen,
   },
   {

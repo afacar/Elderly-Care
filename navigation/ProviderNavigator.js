@@ -9,10 +9,12 @@ import ChartScreen from '../ScreensCaregiver/ChartScreen';
 import PatientScreen from "../ScreensCaregiver/PatientScreen";
 import CaregiverList from '../ScreensProvider/CaregiverListScreen';
 import ProviderSettings from '../ScreensProvider/ProviderSettingsScreen';
+import UserProfileScreen from '../ScreensAuth/UserProfileScreen';
 
 const ProviderHomeStack = createStackNavigator({
   ProviderHome,
   ProviderMessageScreen,
+  UserProfileScreen,
   CaregiverList,
   PatientScreen,
   ChartScreen,

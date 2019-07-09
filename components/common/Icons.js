@@ -206,7 +206,6 @@ export const MicIcon = (props) => {
       onPress={props.onPress || null}
       color={(props.isListening) ? 'red' : 'black'}
       size={30}
-      onPress={props.onPress}
     />
   );
 }
@@ -219,7 +218,6 @@ export const GalleryIcon = (props) => {
       onPress={props.onPress || null}
       color={'grey'}
       size={60}
-      onPress={props.onPress}
     />
   );
 }
@@ -232,7 +230,6 @@ export const CameraIcon = (props) => {
       onPress={props.onPress || null}
       color={'grey'}
       size={60}
-      onPress={props.onPress}
     />
   );
 }
@@ -245,7 +242,6 @@ export const AttachmentIcon = (props) => {
       onPress={props.onPress || null}
       color={'grey'}
       size={30}
-      onPress={props.onPress}
     />
   );
 }
@@ -258,7 +254,6 @@ export const PlayIcon = (props) => {
       onPress={props.onPress || null}
       color={'grey'}
       size={30}
-      onPress={props.onPress}
     />
   );
 }
@@ -271,7 +266,18 @@ export const PauseIcon = (props) => {
       onPress={props.onPress || null}
       color={'grey'}
       size={30}
-      onPress={props.onPress}
+    />
+  );
+}
+
+export const ResetIcon = (props) => {
+  return (
+    <Icon
+    name='replay'
+    type='material'
+    onPress={props.onPress || null}
+    color ='black'
+    size={18}
     />
   );
 }
