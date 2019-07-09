@@ -9,7 +9,6 @@ import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../compo
 import ImagePicker from 'react-native-image-picker';
 
 import CircleTransition from 'react-native-circle-reveal-view';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { AudioUtils, AudioRecorder } from 'react-native-audio';
 import { PermissionsAndroid } from 'react-native';
@@ -58,7 +57,6 @@ class CaregiverMessageScreen extends React.Component {
       IncludeBase64: true,
       AudioEncodingBitRate: 32000
     },
-    currentAudioId: ""
   };
 
   changeTypeState = (text) => {
@@ -93,16 +91,16 @@ class CaregiverMessageScreen extends React.Component {
         placeholder='Mesaj yazın...'
         renderBubble={this.renderBubble}
         renderSend={this._renderSend}
-        // renderComposer={this.renderComposer}
         renderActions={this.renderActions}
         onPressAvatar={this.onPressAvatar}
-      // alwaysShowSend
       />
     );
   }
 
   onPressAvatar = (props) => {
     console.log("Avatar clicked ", props);
+    const {navigate} = this.props.navigation;
+    navigate('UserProfileScreen', {user: props});
   }
 
   renderAudio = (props) => {
@@ -231,13 +229,6 @@ class CaregiverMessageScreen extends React.Component {
     }
   }
 
-
-  renderComposer = props => {
-    return (
-      <Composer {...props} style={{ margin: 30 }} />
-    );
-  }
-
   _renderSend = (props) => {
     return (
       <Send {...props} containerStyle={{ justifyContent: "center" }}>
@@ -262,8 +253,6 @@ class CaregiverMessageScreen extends React.Component {
 
     this.transitedView.collapse();
     // More info on all the options is below in the API Reference... just some common use cases shown here
-
-
 
     if (response.didCancel) {
     }

@@ -10,9 +10,6 @@ import { AudioUtils, AudioRecorder } from 'react-native-audio';
 import { PermissionsAndroid } from 'react-native';
 import AudioCard from '../components/common/AudioCard';
 
-import { TouchableOpacity } from 'react-native-gesture-handler';
-
-
 import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
 
@@ -71,7 +68,6 @@ class ProviderMessageScreen extends React.Component {
       IncludeBase64: true,
       AudioEncodingBitRate: 32000
     },
-    currentAudioId: ""
   };
 
   // More info on all the options is below in the API Reference... just some common use cases shown here
@@ -120,10 +116,8 @@ class ProviderMessageScreen extends React.Component {
         placeholder='Mesaj yazın...'
         renderSend={this._renderSend}
         renderBubble={this.renderBubble}
-        // renderComposer={this.renderComposer}
         renderActions={this.renderActions}
         onPressAvatar={this.onPressAvatar}
-      // alwaysShowSend
       />
     );
   }
@@ -262,12 +256,6 @@ class ProviderMessageScreen extends React.Component {
     }
   }
 
-  renderComposer = props => {
-    return (
-      <Composer {...props} style={{ margin: 30 }} />
-    );
-  }
-
   _renderSend = (props) => {
     return (
       <Send {...props} containerStyle={{ justifyContent: "center" }}>
@@ -292,8 +280,6 @@ class ProviderMessageScreen extends React.Component {
 
     this.transitedView.collapse();
     // More info on all the options is below in the API Reference... just some common use cases shown here
-
-
 
     if (response.didCancel) {
     }
