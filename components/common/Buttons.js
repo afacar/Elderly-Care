@@ -237,6 +237,7 @@ export class ResetButton extends Component {
         title=""
         onPress={this.props.onPress}
         containerStyle={styles.buttonStyle}
+        icon={<ResetIcon />} 
         buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
       />
     );

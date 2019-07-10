@@ -276,7 +276,7 @@ export const ResetIcon = (props) => {
     name='replay'
     type='material'
     onPress={props.onPress || null}
-    color ='black'
+    color ='grey'
     size={18}
     />
   );

@@ -31,8 +31,15 @@ export class ProgressBar extends Component {
         const widthInterpolated = this.animation.interpolate({
             inputRange: [0,1],
             outputRange: ["0%", "100%"],
-            extrapolate: 'clamp'
+            extrapolate: 'clamp',
         })
+        if (this.props.currentTime){
+            widthInterpolated._parent._startingValue = this.props.currentTime/this.props.duration;
+
+        }
+        widthInterpolated._parent._startingValue = 0;
+        widthInterpolated._parent._value = 1;
+        console.log('Width', widthInterpolated)
         return (
             <View style={{ flex: 1, flexDirection: "row", height: "100%", justifyContent: 'center'}}>
                 <View style={{ flex: 1, borderRadius: 4, justifyContent: 'center', flexDirection: 'column' }}>

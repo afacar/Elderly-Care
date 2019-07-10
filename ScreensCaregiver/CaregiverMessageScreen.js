@@ -251,21 +251,12 @@ class CaregiverMessageScreen extends React.Component {
     } else {
       this.setState({ startAudio: false });
 
-      await AudioRecorder.stopRecording();
+      const filePath = await AudioRecorder.stopRecording();
       AudioRecorder.onFinished = data => {
-
-        const audioPath = `${
-          AudioUtils.DocumentDirectoryPath}/${this.randIDGenerator()}test.acc`;
-
-        const fileName = `${this.randIDGenerator()}.aac`;
-        const file = {
-          uri: Platform.OS === 'ios' ? audioPath : `file://${audioPath}`,
-          name: fileName,
-          type: `audio/aac`
-        }
         const message = {
           text: '',
           audio: data.audioFileURL,
+          audioPath:filePath,
           image: '',
           user: {
             _id: this.props.getUid(),
@@ -334,9 +325,17 @@ class CaregiverMessageScreen extends React.Component {
       let message = messages[i];
       message.createdAt = new Date().getTime();
       message._id = this.randIDGenerator();
+      var tmp = message.audio;
+      message.audio = message.audioPath;
+      message.audioPath = tmp;
       await this.updateState(message);
       messagesArray.push(message);
     }
+    messages.forEach(message =>{
+      var tmp = message.audio;
+      message.audio = message.audioPath;
+      message.audioPath = tmp;
+    })
     const { chatId, userRole, } = this.state;
     this.props.sendMessage(userRole, messagesArray, chatId);
   }
