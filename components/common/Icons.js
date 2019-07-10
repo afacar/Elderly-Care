@@ -229,7 +229,7 @@ export const CameraIcon = (props) => {
       type='material'
       onPress={props.onPress || null}
       color={'grey'}
-      size={60}
+      size={30}
     />
   );
 }

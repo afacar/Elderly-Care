@@ -127,8 +127,8 @@ class ProviderMessageScreen extends React.Component {
     props = user { _id, name, avatar}
     */
     console.log("User PMS", props);
-    const {navigate} = this.props.navigation;
-    navigate('UserProfileScreen', {user: props});
+    const { navigate } = this.props.navigation;
+    navigate('UserProfileScreen', { user: props });
   }
 
   renderAudio = (props) => {
@@ -163,7 +163,7 @@ class ProviderMessageScreen extends React.Component {
     if (!this.state.userIsTyping) {
       return (
         <View style={{ width: '20%', flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ flex: 1, alignItems: 'center' }}>
+          {/* <View style={{ flex: 1, alignItems: 'center' }}>
             <AttachmentButton onPress={() => { this.transitedView.toggle() }} />
 
             <CircleTransition
@@ -180,7 +180,7 @@ class ProviderMessageScreen extends React.Component {
                 </View>
                 <View style={{ flex: 1 }}>
                   <TouchableOpacity onPress={this.openGallery}>
-                    <ImageButton />
+                    <ImageButton onPress={this.openGallery}/>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -191,11 +191,16 @@ class ProviderMessageScreen extends React.Component {
                 </View>
                 <View style={{ flex: 1 }}>
                   <TouchableOpacity onPress={this.openCamera}>
-                    <CameraButton />
+                    <CameraButton onPress={this.openCamera}/>
                   </TouchableOpacity>
                 </View>
               </View>
             </CircleTransition>
+          </View> */}
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={this.openPicker}>
+              <CameraButton onPress={this.openPicker}/>
+            </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }} >
             <TouchableOpacity onPress={this.handleAudio}>
@@ -205,6 +210,50 @@ class ProviderMessageScreen extends React.Component {
         </View>
       )
     }
+  }
+
+  openPicker = () => {
+
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+    const options = {
+      title: 'Fotoğraf Seç',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        allowsEditing: true,
+      },
+    };
+
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      }
+      else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      }
+      else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      }
+      else {
+        // const source = { uri: response.path }
+        // this.setState({
+        //   imageMessageSrc: source
+        // });
+        const message = {
+          text: "",
+          user: {
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          },
+          image: response.uri.toString(),
+          path: response.path.toString()
+        };
+        this.sendMessage([message]);
+      }
+    });
   }
 
   handleAudio = async () => {

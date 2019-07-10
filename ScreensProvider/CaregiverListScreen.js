@@ -91,7 +91,7 @@ class CaregiverList extends Component {
       }}
       type='clear'
       title="Başlat"
-      onPress={() => this._answerCaregiverRequest(caregiverId, true)}
+      onPress={() => this._answerCaregiverRequest(caregiverId, 'start')}
     />
   );
 

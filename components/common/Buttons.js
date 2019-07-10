@@ -166,7 +166,7 @@ export class CameraButton extends Component {
       <Button
         title=""
         onPress={this.props.onPress}
-        icon={<CameraIcon />}
+        icon={<CameraIcon/>}
         containerStyle={styles.buttonStyle}
         buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
       />
