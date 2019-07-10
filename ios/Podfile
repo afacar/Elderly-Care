@@ -25,4 +25,6 @@ pod 'GoogleSignIn', '~> 4.4.0'
 
   pod 'RNSound', :path => '../node_modules/react-native-sound'
 
+  pod 'react-native-slider', :path => '../node_modules/@react-native-community/slider'
+
 end

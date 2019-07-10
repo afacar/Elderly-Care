@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { PlayIcon, PauseIcon } from './Icons';
 import { ProgressBar } from './ProgressBar';
@@ -15,8 +16,12 @@ class AudioCard extends Component {
         // sound 
         seconds: -1,
         minutes: 0,
-        tmpCurrentDurMins: 0,
-        tmpCurrentDurSecs: 0
+        currentDuration: 0,
+        loading: true,
+        paused: false,
+        playing: false,
+        duration: "",
+        sound: ''
     }
 
     timer;
@@ -31,67 +36,119 @@ class AudioCard extends Component {
         }
         const sound = new Sound(this.props.audio, "", error => {
             var duration = sound.getDuration();
-            var durationMins = parseInt(duration / 60);
-            var durationSecs = parseInt(duration % 60);
-            if (durationSecs < 10) {
-                durationSecs = '0' + durationSecs
-            }
             if (!error) {
                 this.setState({
                     sound: sound,
                     createdAt: dateh + ':' + datem,
-                    tmpCurrentDurMins: durationMins,
-                    tmpCurrentDurSecs: durationSecs,
-                    totalMins: durationMins,
-                    totalSecs: durationSecs,
+                    duration: duration,
+                    loading: false
                 })
             }
         })
     }
 
     render() {
-        return (
-            <View style={{
-                flexDirection: "row",
-                backgroundColor: 'rgb(220,220,220)',
-                height: 60,
-                width: "100%",
-                borderRadius: 4,
-                justifyContent: 'center'
-            }}>
-                <TouchableHighlight style={{ backgroundColor: 'transparent', flex: 1, alignItems: "center" }}>
-                    <View style={{ justifyContent: 'center', flex: 1 }}>
-                        {this.renderPlayPause()}
-                    </View>
-                </TouchableHighlight>
+        if (this.state.loading)
+            return (
                 <View style={{
-                    flex: 5,
+                    flexDirection: "row",
+                    backgroundColor: 'rgb(220,220,220)',
+                    height: 60,
+                    width: "100%",
+                    borderRadius: 4,
                     justifyContent: 'center',
-                    flexDirection: 'column'
+                    padding: 8
                 }}>
-                    <View style={{ flex: 2, }}>
-                        <ProgressBar
-                            style={{ marginLeft: 4, position: 'absolute', bottom: 0 }}
-                            duration={this.state.totalMins * 60 + this.state.totalSecs}
-                            currentTime={this.state.tmpCurrentDurMins * 60 + this.state.tmpCurrentDurSecs}
-                        />
-                    </View>
-                    <View style={{ flex: 1, flexDirection: 'row' }} >
-                        <Text style={{ flex: 1, marginLeft: 4, alignSelf: 'flex-start', fontSize: 12 }}>{this.state.tmpCurrentDurMins}:{this.state.tmpCurrentDurSecs}</Text>
-                        <ResetButton onPress={this.resetSound} style={{ flex: 1}}/>
-                        <Text style={{ flex: 1, alignSelf: 'flex-end', fontSize: 12 }}>{this.state.createdAt}</Text>
+                    <ActivityIndicator size="small" color='#2fb4dc' />
+                </View>
+            )
+        else {
+            return (
+                <View style={{
+                    flexDirection: "row",
+                    backgroundColor: 'rgb(220,220,220)',
+                    height: 60,
+                    width: "100%",
+                    borderRadius: 4,
+                    justifyContent: 'center',
+                    padding: 8
+                }}>
+                    <TouchableHighlight style={{ backgroundColor: 'transparent', flex: 1, alignItems: "center" }}>
+                        <View style={{ justifyContent: 'center', flex: 1 }}>
+                            {this.renderPlayPause()}
+                        </View>
+                    </TouchableHighlight>
+                    <View style={{
+                        flex: 5,
+                        justifyContent: 'center',
+                        flexDirection: 'column'
+                    }}>
+                        <View style={{ flex: 10, flexDirection: 'column', justifyContent: "center"}}>
+                            <Slider
+                                step={1}
+                                minimumValue={0}
+                                maximumValue={this.state.duration}
+                                value={this.state.currentDuration}
+                                minimumTrackTintColor="#2fb4dc"
+                                thumbTintColor='#2fb4dc'
+                                onValueChange={(ChangedValue) => { this.SliderValueChanged(ChangedValue) }}
+                                style={{ marginLeft: 4, alignSelf: 'flex-end', width: '100%'}}
+                            />
+                            {/* <ProgressBar
+                                style={{ marginLeft: 4, alignSelf: 'flex-end' }}
+                                duration={this.state.totalMins * 60 + this.state.totalSecs}
+                                currentTime={this.state.tmpCurrentDurMins * 60 + this.state.tmpCurrentDurSecs}
+                            /> */}
+                        </View>
+                        <View style={{ flex: 1, flexDirection: 'row' }} >
+                            <Text style={{ flex: 1, marginLeft: 4, alignSelf: 'center', fontSize: 12 }}>{this.getPlayTimeText()}</Text>
+                            <Text style={{ flex: 1, alignSelf: 'center', fontSize: 12 }}>{this.state.createdAt}</Text>
+                        </View>
                     </View>
                 </View>
-            </View>
-        );
+            );
+        }
     }
 
-    resetSound = () => {
-        console.log("Reset Sound");
-        const sound = this.state.sound;
-        if (sound)
-            sound.stop();
+    SliderValueChanged = (ChangedValue) => {
+        this.setState({ currentDuration: ChangedValue });
+        this.state.sound.setCurrentTime(ChangedValue);
     }
+
+    getPlayTimeText = () => {
+        console.log("PTT")
+        const { paused, duration, currentDuration, playing } = this.state;
+        let mins = '';
+        let secs = '';
+        if (paused || playing) {
+            mins = parseInt(currentDuration / 60);
+            secs = parseInt(currentDuration % 60);
+        } else {
+            mins = parseInt(duration / 60);
+            secs = parseInt(duration % 60);
+        }
+        if (secs < 10)
+            secs = '0' + secs;
+        return mins + ":" + secs;
+    }
+
+    // resetSound = () => {
+    //     console.log("Reset Sound");
+    //     this.props.setAudio("");
+    //     const sound = this.state.sound;
+    //     if (sound) {
+    //         sound.stop();
+    //         if (this.timer)
+    //             clearInterval(this.timer);
+    //         this.setState({
+    //             seconds: 0,
+    //             minutes: 0,
+    //             paused: false,
+    //             playing: false,
+    //             currentDuration: 0
+    //         })
+    //     }
+    // }
 
     renderPlayPause = () => {
         if (this.props.currentAudio) {
@@ -114,7 +171,9 @@ class AudioCard extends Component {
 
     startPlaying = () => {
         this.props.setAudio(this.props.id);
-
+        this.setState({
+            playing: true
+        })
         const sound = this.state.sound;
         if (sound) {
             this.timer = setInterval(this.incrementTimer, 1000);
@@ -123,8 +182,9 @@ class AudioCard extends Component {
                 this.setState({
                     seconds: 0,
                     minutes: 0,
-                    tmpCurrentDurMins: this.state.totalMins,
-                    tmpCurrentDurSecs: this.state.totalSecs
+                    paused: false,
+                    playing: false,
+                    currentDuration: 0
                 })
                 this.props.setAudio("");
             })
@@ -136,22 +196,23 @@ class AudioCard extends Component {
         seconds += 1;
         if (seconds >= 60) {
             seconds = 0;
-            minutes++;
+            minutes += seconds / 60;
         }
-        var tmpSeconds = seconds;
-        var tmpMinutes = minutes;
         if (seconds < 10) {
             tmpSeconds = '0' + seconds;
         }
         this.setState({
-            tmpCurrentDurMins: tmpMinutes,
-            tmpCurrentDurSecs: tmpSeconds,
+            currentDuration: this.state.currentDuration + 1,
             seconds: seconds,
             minutes: minutes
         })
     }
 
     stopPlaying = () => {
+        this.setState({
+            pause: true,
+            playing: false
+        })
         this.props.setAudio("");
         const sound = this.state.sound;
         if (sound) {
