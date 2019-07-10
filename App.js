@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-navigation';
 
 import store from './appstate/store';
 
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -20,10 +21,8 @@ export default class App extends React.Component {
 
   render() {
     return (
-
-
       <Provider store={store} >
-        <SafeAreaView style={styles.container} forceInset={{bottom: 'never'}}>
+        <SafeAreaView style={styles.container} forceInset={{ bottom: 'never' }}>
           <AppNavigator />
         </SafeAreaView>
       </Provider>

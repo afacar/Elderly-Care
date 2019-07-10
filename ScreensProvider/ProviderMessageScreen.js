@@ -1,11 +1,16 @@
 import React from 'react';
-import { AsyncStorage, TouchableHighlight, Text, View, Image } from 'react-native';
-import { Composer, GiftedChat, Actions, SystemMessage, Send } from 'react-native-gifted-chat';
+import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform } from 'react-native';
+import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
 import "moment/locale/tr";
 
-import { ImageButton } from '../components/common/Buttons.js'
+import CircleTransition from 'react-native-circle-reveal-view';
+import { AudioUtils, AudioRecorder } from 'react-native-audio';
+import { PermissionsAndroid } from 'react-native';
+import AudioCard from '../components/common/AudioCard';
+
+import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
 
 class ProviderMessageScreen extends React.Component {
@@ -17,7 +22,7 @@ class ProviderMessageScreen extends React.Component {
     },
     headerRight: (
       <View>
-        <TouchableHighlight onPress={() => navigation.navigate('PatientScreen', {
+        <TouchableOpacity onPress={() => navigation.navigate('PatientScreen', {
           userid: navigation.getParam('userid', '')
         })}>
           <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
@@ -27,12 +32,21 @@ class ProviderMessageScreen extends React.Component {
             />
             <Text style={{ fontWeight: 'bold' }}>Hasta Bilgisi</Text>
           </View>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     )
   });
 
   _isMounted = null;
+
+  cameraOptions = {
+    title: 'Fotoğraf Seç',
+    storageOptions: {
+      skipBackup: true,
+      path: 'images',
+      allowsEditing: true,
+    },
+  };
 
   state = {
     messages: [],
@@ -40,7 +54,41 @@ class ProviderMessageScreen extends React.Component {
     chatId: null,
     userRole: null,
     isApproved: true,
+    userIsTyping: false,
+    hasPermission: false,
+    startAudio: false,
+    audioPlaying: false,
+    fetchChats: false,
+    audioSettings: {
+      SampleRate: 22050,
+      Channels: 1,
+      AudioQuality: "High",
+      AudioEncoding: "aac",
+      MateringEnabled: true,
+      IncludeBase64: true,
+      AudioEncodingBitRate: 32000
+    },
   };
+
+  // More info on all the options is below in the API Reference... just some common use cases shown here
+  cameraOptions = {
+    title: 'Fotoğraf Seç',
+    storageOptions: {
+      skipBackup: true,
+      path: 'images',
+      allowsEditing: true,
+    },
+  };
+
+  changeTypeState = (text) => {
+    var typing = false;
+    if (text) {
+      typing = true;
+    }
+    this.setState({
+      userIsTyping: typing
+    })
+  }
 
   render() {
     const { chatId, userRole, messages, isApproved } = this.state;
@@ -57,6 +105,7 @@ class ProviderMessageScreen extends React.Component {
           })) */
           this.sendMessage(message);
         }}
+        onInputTextChanged={(text) => { this.changeTypeState(text) }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
         showUserAvatar={true}
         user={{
@@ -66,28 +115,101 @@ class ProviderMessageScreen extends React.Component {
         }}
         placeholder='Mesaj yazın...'
         renderSend={this._renderSend}
-        renderComposer={this.renderComposer}
-        alwaysShowSend
+        renderBubble={this.renderBubble}
+        renderActions={this.renderActions}
+        onPressAvatar={this.onPressAvatar}
       />
     );
   }
 
-  renderComposer = props => {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 4 }}>
-        <Composer {...props} />
-        <ImageButton onPress={this.openPicker} />
-
-      </View>
-    );
+  onPressAvatar = (props) => {
+    /*
+    props = user { _id, name, avatar}
+    */
+    console.log("User PMS", props);
+    const { navigate } = this.props.navigation;
+    navigate('UserProfileScreen', { user: props });
   }
 
-  _renderSend = (props) => {
-    return (
-      <Send {...props} containerStyle={{ justifyContent: "center", flex: 2 }}>
-        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
-      </Send>
-    );
+  renderAudio = (props) => {
+    return !props.currentMessage.audio ? (
+      <View />
+    ) : (
+        <AudioCard
+          id={props.currentMessage._id}
+          audio={props.currentMessage.audio}
+          createdAt={props.currentMessage.createdAt}
+        />
+      );
+  };
+
+  renderBubble = props => {
+    if (props.currentMessage.audio) {
+      return (
+        <View>
+          {this.renderAudio(props)}
+        </View>
+      )
+    } else {
+      return (
+        <View>
+          <Bubble {...props} />
+        </View>
+      );
+    }
+  };
+
+  renderActions = props => {
+    if (!this.state.userIsTyping) {
+      return (
+        <View style={{ width: '20%', flexDirection: 'row', alignItems: 'center' }}>
+          {/* <View style={{ flex: 1, alignItems: 'center' }}>
+            <AttachmentButton onPress={() => { this.transitedView.toggle() }} />
+
+            <CircleTransition
+              ref={(ref) => this.transitedView = ref}
+              backgroundColor={'#EEEBE9'}
+              duration={100}
+              style={{ position: 'absolute', bottom: 48, right: 8, left: 8, width: '1000%', borderRadius: 8 }}
+              revealPositionArray={{ bottom: true, left: true }}// must use less than two combination e.g bottom and left or top right or right
+            >
+              <View style={{ flexDirection: 'row', flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                </View>
+                <View style={{ flex: 1 }}>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <TouchableOpacity onPress={this.openGallery}>
+                    <ImageButton onPress={this.openGallery}/>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                </View>
+                <View style={{ flex: 1 }}>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <TouchableOpacity onPress={this.openCamera}>
+                    <CameraButton onPress={this.openCamera}/>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </CircleTransition>
+          </View> */}
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={this.openPicker}>
+              <CameraButton onPress={this.openPicker}/>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1 }} >
+            <TouchableOpacity onPress={this.handleAudio}>
+              <MicButton onPress={this.handleAudio} isListening={this.state.startAudio} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
   }
 
   openPicker = () => {
@@ -137,9 +259,108 @@ class ProviderMessageScreen extends React.Component {
     });
   }
 
-  sendMessage = async(messages) => {
+  handleAudio = async () => {
+
+    user = {
+      _id: this.props.getUid(),
+      name: this.props.getName(),
+      avatar: this.props.getPhotoURL(),
+    }
+    if (!this.state.startAudio) {
+      this.setState({
+        startAudio: true
+      });
+      const audioPath = `${
+        AudioUtils.DocumentDirectoryPath}/${this.randIDGenerator()}test.acc`;
+      await AudioRecorder.prepareRecordingAtPath(
+        audioPath,
+        this.state.audioSettings
+      );
+      await AudioRecorder.startRecording();
+
+    } else {
+      this.setState({ startAudio: false });
+
+      await AudioRecorder.stopRecording();
+      AudioRecorder.onFinished = data => {
+
+        const audioPath = `${
+          AudioUtils.DocumentDirectoryPath}/${this.randIDGenerator()}test.acc`;
+
+        const fileName = `${this.randIDGenerator()}.aac`;
+        const file = {
+          uri: Platform.OS === 'ios' ? audioPath : `file://${audioPath}`,
+          name: fileName,
+          type: `audio/aac`
+        }
+        const message = {
+          text: '',
+          audio: data.audioFileURL,
+          image: '',
+          user: {
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          },
+        }
+        this.sendMessage([message]);
+      };
+    }
+  }
+
+  _renderSend = (props) => {
+    return (
+      <Send {...props} containerStyle={{ justifyContent: "center" }}>
+        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
+      </Send>
+    );
+  }
+
+  openCamera = () => {
+    ImagePicker.launchCamera(this.cameraOptions, (response) => {
+      this.onImageResult(response);
+    })
+  }
+
+  openGallery = () => {
+    ImagePicker.launchImageLibrary(this.cameraOptions, (response) => {
+      this.onImageResult(response);
+    })
+  }
+
+  onImageResult = (response) => {
+
+    this.transitedView.collapse();
+    // More info on all the options is below in the API Reference... just some common use cases shown here
+
+    if (response.didCancel) {
+    }
+    else if (response.error) {
+    }
+    else if (response.customButton) {
+    }
+    else {
+      // const source = { uri: response.path }
+      // this.setState({
+      //   imageMessageSrc: source
+      // });
+      const message = {
+        text: "",
+        user: {
+          _id: this.props.getUid(),
+          name: this.props.getName(),
+          avatar: this.props.getPhotoURL(),
+        },
+        image: response.uri.toString(),
+        path: response.path.toString()
+      };
+      this.sendMessage([message]);
+    }
+  }
+
+  sendMessage = async (messages) => {
     let messagesArray = [];
-    for ( let i = 0; i< messages.length; i++) {
+    for (let i = 0; i < messages.length; i++) {
       let message = messages[i];
       message.createdAt = new Date().getTime();
       message._id = this.randIDGenerator();
@@ -149,11 +370,11 @@ class ProviderMessageScreen extends React.Component {
     const { chatId, userRole, } = this.state;
     this.props.sendMessage(userRole, messagesArray, chatId);
   }
- 
-  updateState (message) {
+
+  updateState(message) {
     this.setState((previousState) => {
-      console.log("Message:",message);
-    return { messages: GiftedChat.append(previousState.messages, message)}
+      console.log("Message:", message);
+      return { messages: GiftedChat.append(previousState.messages, message) }
     });
   }
 
@@ -161,6 +382,24 @@ class ProviderMessageScreen extends React.Component {
     var date = new Date().getTime().toString();
     var randId = this.props.getUid() + date;
     return (randId);
+  }
+
+  // Permission check for microphone access
+  checkPermission() {
+    if (Platform.OS !== "android") {
+      return Promise.resolve(true);
+    }
+    const rationale = {
+      title: "Microphone Permission",
+      message:
+        "AudioExample needs access to your microphone so you can record audio."
+    };
+    return PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      rationale
+    ).then(result => {
+      return result === true || result === PermissionsAndroid.RESULTS.GRANTED;
+    });
   }
 
 
@@ -175,6 +414,12 @@ class ProviderMessageScreen extends React.Component {
       this.setState({ chatId, title, userRole, isApproved });
       this.load_messages(chatId);
     }
+    // preparation for Audio
+    this.checkPermission().then(async hasPermission => {
+      this.setState({ hasPermission });
+      if (!hasPermission) return;
+
+    });
   }
 
   load_messages = async (chatId) => {
@@ -207,10 +452,10 @@ class ProviderMessageScreen extends React.Component {
         var exists = false;
         allMessages.forEach(element => {
           console.log(element);
-            if ( element._id === message._id)
-              exists = true;
+          if (element._id === message._id)
+            exists = true;
         })
-        if ( !exists) {
+        if (!exists) {
           return { messages: GiftedChat.append(previousState.messages, message) }
         }
       });

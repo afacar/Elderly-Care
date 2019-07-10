@@ -33,14 +33,18 @@ class AgendaScreen extends PureComponent {
         onDayPress={(day) => { console.log("onDayPress day", day) }}
         onDayChange={(day) => this.loadItemsForNextMonth(day)}
         hideKnob={false}
-      //displayLoadingIndicator
-      //renderKnob={this.renderKnob}
-      /* theme={{
-        agendaDayTextColor: 'yellow',
-        agendaDayNumColor: 'green',
-        agendaTodayColor: 'red',
-        agendaKnobColor: 'blue'
-      }} */
+        //displayLoadingIndicator
+        //renderKnob={this.renderKnob}
+        theme={{
+          'stylesheet.agenda.header': {
+            header: {
+              height: 0
+            },
+            week: {
+              height: 0
+            }
+          }
+        }}
       />
     );
   }

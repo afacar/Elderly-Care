@@ -59,10 +59,13 @@ export class ChatItem extends Component {
         userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : '';
       }
       if (theChat.unread > 0) badge = { value: theChat.unread, status: 'primary', textStyle: { fontSize: 15 } }
-      if ( lastMessage.text)
-      subtitle = userName + lastMessage.text;
-      else if ( lastMessage.image)
-      subtitle = userName + ' resim';
+      if (lastMessage.text)
+        subtitle = userName + lastMessage.text;
+      else if (lastMessage.image)
+        subtitle = userName + ' resim';
+      else if (lastMessage.audio)
+        subtitle = userName + ' sesli mesaj';
+
 
     } else {
       subtitle = "Mesaj yok! İlk mesajı siz yazın.";

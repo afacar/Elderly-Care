@@ -14,9 +14,8 @@ import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, 
 class _ProfileForm extends Component {
 
   state = { profile: {}, loading: false, error: '', disabled: true };
-
   _isMounted = false;
-
+  
   _fetchProfile = async () => {
     try {
       this.props.fetch_profile((profile) => {

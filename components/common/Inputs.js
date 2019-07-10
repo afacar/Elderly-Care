@@ -52,13 +52,15 @@ export class TextInput extends Component {
   }
 
   render() {
-    const { label, placeholder, value, onChangeText, errorMessage } = this.props;
+    const { label, placeholder, value, onChangeText, errorMessage, editable,multiline } = this.props;
 
     return (
       <Input
         label={label || ''}
+        editable={editable}
         labelStyle={styles.labelStyle}
         errorMessage={errorMessage}
+        multiline={multiline}
         maxLength={150}
         placeholder={placeholder || ''}
         value={value}
