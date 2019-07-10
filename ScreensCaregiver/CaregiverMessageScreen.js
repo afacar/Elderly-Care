@@ -120,6 +120,7 @@ class CaregiverMessageScreen extends React.Component {
       }
       else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
+
       }
       else {
         // const source = { uri: response.path }
@@ -134,8 +135,10 @@ class CaregiverMessageScreen extends React.Component {
             avatar: this.props.getPhotoURL(),
           },
           image: response.uri.toString(),
-          path: response.path.toString()
         };
+        if (Platform.OS === 'ios'){
+          message.path = message.image.replace("file://", '');
+        }
         this.sendMessage([message]);
       }
     });

@@ -127,8 +127,11 @@ class ProviderMessageScreen extends React.Component {
             avatar: this.props.getPhotoURL(),
           },
           image: response.uri.toString(),
-          path: response.path.toString()
+         // path: response.path.toString()
         };
+        if (Platform.OS === 'ios'){
+          message.path = message.image.replace("file://", '');
+        }
         this.sendMessage([message]);
       }
     });

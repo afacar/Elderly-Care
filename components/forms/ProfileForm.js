@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import { View, Picker, Image, TouchableOpacity } from 'react-native';
+import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
+
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 import { Input, Text, Card, Button } from 'react-native-elements';
 import { connect } from 'react-redux';
@@ -46,21 +49,21 @@ class _ProfileForm extends Component {
     this.setState(prevState => {
       console.log('handleState prevState and newState', prevState, newState);
       let profile = prevState.profile;
-        for (var key in newState) {
-          if (newState.hasOwnProperty(key)) {
-            if (key === "response") {
-              profile.photoURL = newState.response.uri;
-              profile.path = newState.response.path;
-              profile.newPhoto = true;
-            }else {
+      for (var key in newState) {
+        if (newState.hasOwnProperty(key)) {
+          if (key === "response") {
+            profile.photoURL = newState.response.uri;
+            profile.path = newState.response.path;
+            profile.newPhoto = true;
+          } else {
             profile[key] = newState[key];
+          }
         }
+        prevState.profile = profile;
+        prevState.disabled = false;
+        console.log('handleState new prevState', prevState);
+        return prevState;
       }
-      prevState.profile = profile;
-      prevState.disabled = false;
-      console.log('handleState new prevState', prevState);
-      return prevState;
-    }
     });
   }
 
@@ -93,7 +96,15 @@ class _ProfileForm extends Component {
         console.log('User tapped custom button: ', response.customButton);
       }
       else {
+
+
+        if (Platform.OS === 'ios') {
+          response.path = response.uri.replace("file://", '');
+        }
+
         this.handleState({ response });
+
+
       }
     });
   }
@@ -102,7 +113,7 @@ class _ProfileForm extends Component {
     console.log('ProfileForm rendered state,', this.state);
     return (
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={this.onImageClicked}>
           <View>
             <Image
@@ -110,7 +121,28 @@ class _ProfileForm extends Component {
               source={{ uri: this.state.profile.photoURL }}
             />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View style={{ paddingBottom: 25}}>
+          <ImageBackground style={{ width: 150, height: 150, alignSelf: 'center', justifyContent: 'flex-end' }}
+            //imageStyle={{ borderRadius:75 }}
+            source={{ uri: this.state.profile.photoURL }}
+          >
+            <Button
+              icon={{
+                name: "camera",
+                size: 20,
+                color: "white"
+              }}
+              title="Change"
+              type='clear'
+              titleStyle={{ color: 'white' }}
+              buttonStyle={{ backgroundColor: 'rgba(52, 52, 52, 0.5)' }}
+              onPress={this.onImageClicked}
+            />
+
+          </ImageBackground>
+        </View>
+
 
         <CardItem>
           <TextInput

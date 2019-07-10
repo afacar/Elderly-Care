@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -70,6 +69,7 @@
 		ED2971652150620600B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED2971642150620600B7C4FE /* JavaScriptCore.framework */; };
 		F990B86E86594393B16FB252 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1CA909415C52409CB44EE55C /* EvilIcons.ttf */; };
 		FD3E481CF7364676A9B4B75F /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63A27FA11F9D40588FB8F3F3 /* SimpleLineIcons.ttf */; };
+		6B83102A340A4273902ACC8F /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DC3BFD016E54EA3B0674028 /* Ionicons.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -490,6 +490,7 @@
 		EC0E6D1F9F0D45558026DC4E /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		FCB552EF92304F758816D783 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
+		6DC3BFD016E54EA3B0674028 /* Ionicons.ttf */ = {isa = PBXFileReference; name = "Ionicons.ttf"; path = "../node_modules/react-native-ionicons/fonts/Ionicons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -891,6 +892,7 @@
 				C070AC9A2EF7479095DCC7C5 /* Octicons.ttf */,
 				63A27FA11F9D40588FB8F3F3 /* SimpleLineIcons.ttf */,
 				9465122FFA3742058D541DC6 /* Zocial.ttf */,
+				6DC3BFD016E54EA3B0674028 /* Ionicons.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1472,6 +1474,7 @@
 				B799E91A99684B89A6F96D81 /* Octicons.ttf in Resources */,
 				FD3E481CF7364676A9B4B75F /* SimpleLineIcons.ttf in Resources */,
 				875F5D23414941D683CCEDB7 /* Zocial.ttf in Resources */,
+				6B83102A340A4273902ACC8F /* Ionicons.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
