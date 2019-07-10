@@ -4,15 +4,17 @@ import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button } from 'react-native-elements';
 import { connect } from 'react-redux';
+import { CreditCardInput, LiteCreditCardInput } from "react-native-credit-card-input";
 
 import * as actions from '../../appstate/actions';
 import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput } from '../common';
+import Modal from 'react-native-modal';
 
 class _ProfileForm extends Component {
 
   state = { profile: {}, loading: false, error: '', disabled: true };
   _isMounted = false;
-  
+
   _fetchProfile = async () => {
     try {
       this.props.fetch_profile((profile) => {
@@ -97,6 +99,62 @@ class _ProfileForm extends Component {
     });
   }
 
+  _onCardChange = (card) => this.setState({ card });
+
+
+  // buyer: {
+  //     id: 'BY789',
+  //     name: 'John',
+  //     surname: 'Doe',
+  //     gsmNumber: '+905350000000',
+  //     email: 'email@email.com',
+  //     identityNumber: '74300864791',
+  //     lastLoginDate: '2015-10-05 12:43:35',
+  //     registrationDate: '2013-04-21 15:12:09',
+  //     registrationAddress: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
+  //     ip: '85.34.78.112',
+  //     city: 'Istanbul',
+  //     country: 'Turkey',
+  //     zipCode: '34732'
+  // },
+  // shippingAddress: {
+  //     contactName: 'Jane Doe',
+  //     city: 'Istanbul',
+  //     country: 'Turkey',
+  //     address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
+  //     zipCode: '34742'
+  // },
+  // billingAddress: {
+  //     contactName: 'Jane Doe',
+  //     city: 'Istanbul',
+  //     country: 'Turkey',
+  //     address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
+  //     zipCode: '34742'
+  // },
+  // basketItems: [
+  //     {
+  //         id: 'BI101',
+  //         name: 'Binocular',
+  //         category1: 'Collectibles',
+  //         category2: 'Accessories',
+  //         itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
+  //         price
+  //     }
+  // ]
+
+  _confirmPayment = async () => {
+    this.setState({ cardError: '' })
+    const { card } = this.state;
+    const { valid, status, values } = card;
+    if (valid) {
+      console.log('doing payment...');
+      await this.props.do_payment(this.state.card.values);
+      console.log('payment done!');
+    } else {
+      this.setState({ cardError: 'Kard bilgilerini kontrol edin!' })
+    }
+  }
+
   render() {
     console.log('ProfileForm rendered state,', this.state);
     return (
@@ -110,6 +168,16 @@ class _ProfileForm extends Component {
             />
           </View>
         </TouchableOpacity>
+
+        <Modal backdropOpacity={0.9} backdropColor='white' isVisible={this.state.isCardVisible} onBackButtonPress={() => this.setState({ isCardVisible: false })}>
+          <CreditCardInput
+            requiresName
+            requiresCVC
+            onChange={this._onCardChange} />
+          <Text>{this.state.cardError}</Text>
+          <Button title='Onayla' onPress={this._confirmPayment} />
+        </Modal>
+        <Button title='Odeme Yap' onPress={() => this.setState({ isCardVisible: true })} />
 
         <CardItem>
           <TextInput

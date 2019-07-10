@@ -6,3 +6,4 @@ export * from './doctor_actions';
 export * from './common_actions';
 export * from './chat_actions';
 export * from './calendar_actions';
+export * from './payment_actions';
