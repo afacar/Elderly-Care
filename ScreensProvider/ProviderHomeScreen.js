@@ -1,6 +1,6 @@
 import React from 'react';
-import { ScrollView, StyleSheet, FlatList, TouchableHighlight, View, Text, Image } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text, Image } from 'react-native';
+import { ListItem, Badge } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
 import * as actions from '../appstate/actions';
@@ -14,17 +14,37 @@ class ProviderHome extends React.Component {
       backgroundColor: 'white',
     },
     headerRight: (
-      <TouchableHighlight onPress={() => navigation.navigate('CaregiverList')}>
+      <TouchableOpacity onPress={() => navigation.navigate('CaregiverList')}>
         <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
-          <Image
-            style={{ width: 40, height: 40 }}
-            source={require('../assets/images/family.png')}
-          />
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Image
+              style={{ width: 40, height: 40 }}
+              source={require('../assets/images/family.png')}
+            />
+            <Badge status="primary" value={navigation.getParam('newRequests', 0)} />
+          </View>
           <Text style={{ fontWeight: 'bold' }}>Danışmanlık Talepleri</Text>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     )
   });
+
+  renderBadge = () => {
+    console.log("LOG3");
+    const { newRequests } = this.state
+    console.log("LOG3", newRequests);
+    if (newRequests && newRequests !== 0)
+      return <Badge status="primary" value={this.state.newRequests} />
+  }
+
+  componentWillMount() {
+    this.props.fetch_requests((newRequests) => {
+      console.log("LOG2", newRequests);
+      this.props.navigation.setParams({
+        newRequests: newRequests
+      })
+    })
+  }
 
   _isMounted = false;
 
@@ -51,9 +71,9 @@ class ProviderHome extends React.Component {
       chats[chatId]['status'] = status;
       chats[chatId]['avatar'] = avatar;
       chats[chatId]['unread'] = unread;
-      
+
       var sortable = [];
-      for ( var chatID in chats){
+      for (var chatID in chats) {
         var chat = chats[chatID];
         chat.chatId = chatID;
         chats[chatID] = chat;
@@ -61,9 +81,9 @@ class ProviderHome extends React.Component {
       }
       var sortedChats = {}
       sortable.sort(this.compareChats);
-      for ( var i = 0; i < sortable.length; i++ ){
+      for (var i = 0; i < sortable.length; i++) {
         var tmpChat = sortable[i];
-        sortedChats[tmpChat.chatId] = tmpChat; 
+        sortedChats[tmpChat.chatId] = tmpChat;
         delete sortedChats[tmpChat.chatId].chatId;
       }
       chats = sortedChats;
@@ -119,6 +139,8 @@ class ProviderHome extends React.Component {
         subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
       else if (lastMessage.image)
         subtitle = <Text>{userName + ' resim'}</Text>;
+      else if (lastMessage.audio)
+        subtitle = <Text>{userName + ' sesli mesaj'}</Text>;
 
       if (unread > 0) badge = { value: unread, status: 'primary', textStyle: { fontSize: 18 } }
     } else {
@@ -126,7 +148,7 @@ class ProviderHome extends React.Component {
     }
 
     return (
-      <TouchableHighlight onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId })}>
+      <TouchableOpacity onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 18 }}
@@ -141,7 +163,7 @@ class ProviderHome extends React.Component {
           containerStyle={{ borderBottomWidth: 1, }}
           badge={badge}
         />
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 

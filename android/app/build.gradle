@@ -150,6 +150,9 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_slider')
+    implementation project(':react-native-sound')
+    implementation project(':react-native-audio')
     implementation project(':react-native-image-picker')
     implementation project(':react-native-google-signin')
     implementation project(':react-native-svg')

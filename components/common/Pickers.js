@@ -40,7 +40,7 @@ export class ListPicker extends Component {
           {label && <Text style={styles.labelStyle}>{label || ''}</Text>}
           <View style={styles.pickerStyle}>
             <TouchableOpacity onPress={() => this.setState({ visible: true })}>
-              <Text>{selectedValue}</Text>
+              <Text style={{fontSize:19}}>{selectedValue}</Text>
             </TouchableOpacity>
             <Modal visible={this.state.visible} transparent={true}>
 
@@ -50,11 +50,14 @@ export class ListPicker extends Component {
 
                     <Picker
                       selectedValue={selectedValue || ''}
-                      onValueChange={(itemValue, itemIndex) => onValueChange(itemValue)}>
+                      onValueChange={(itemValue, itemIndex) => onValueChange(itemValue)}
+                      //itemStyle={{fontSize: 20,color:'yellow'}}
+                      >
                       <Picker.Item key='nokey' label='Seçiniz...' value='' />
                       {
                         options.map((item, index) => {
-                          return <Picker.Item key={index} label={item} value={item} />;
+                          return <Picker.Item  key={index} label={item} value={item}
+                           />;
                         })
                       }
                     </Picker>
@@ -110,6 +113,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     justifyContent: 'center',
     borderBottomWidth: 1,
+    
+   
+    
   },
   labelStyle: {
     alignSelf: 'center',

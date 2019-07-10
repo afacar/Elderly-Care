@@ -66,11 +66,14 @@ export const send_provider_request = (providerId) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
-
+  const providerRequestUrl = `providers/${providerId}/newRequests`;
   try {
     // null means pending
     await firebase.database().ref(caregiverurl).set('pending');
     await firebase.database().ref(providerurl).set('pending');
+    await firebase.database().ref(providerRequestUrl).transaction(function (value) {
+      return (value || 0) + 1;
+    })
   } catch (error) {
     console.error('Error while adding provider', error.message);
   }
@@ -82,11 +85,15 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const providerRequestUrl = `providers/${providerId}/newRequests`;
 
   try {
     // Cancel the pending request to Provider
     await firebase.database().ref(caregiverurl).set(null);
     await firebase.database().ref(providerurl).set(null);
+    await firebase.database().ref(providerRequestUrl).transaction(function (value) {
+      return value - 1;
+    })
   } catch (error) {
     console.error('Error while adding provider', error.message);
   }
@@ -103,15 +110,24 @@ export const respond_caregiver_request = (caregiverId, answer) => async (dispatc
    * false for rejecting request
    * 'pause' for pausing 
    */
+  var tmpAnswer = answer;
+  if (answer == 'start')
+    answer = true
   console.log('approve_caregiver_request is called with caregiverId', caregiverId);
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${caregiverId}/chats/${_user.uid}/status`;
   const providerurl = `providers/${_user.uid}/chats/${caregiverId}/status`;
+  const providerRequestUrl = `providers/${_user.uid}/newRequests`;
 
   try {
     // Confirm the pending request to Provider
     await firebase.database().ref(caregiverurl).set(answer);
     await firebase.database().ref(providerurl).set(answer);
+    if (tmpAnswer !== 'pause' && tmpAnswer !== 'start') {
+      await firebase.database().ref(providerRequestUrl).transaction(function (value) {
+        return value - 1;
+      })
+    }
   } catch (error) {
     console.error('Error while approving caregiver', error.message);
   }

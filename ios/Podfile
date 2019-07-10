@@ -21,4 +21,10 @@ pod 'GoogleSignIn', '~> 4.4.0'
 
   pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
 
+  pod 'RNAudio', :path => '../node_modules/react-native-audio'
+
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
+  pod 'react-native-slider', :path => '../node_modules/@react-native-community/slider'
+
 end

@@ -4,6 +4,7 @@ import SplashScreen from '../ScreensAuth/SplashScreen';
 import CaregiverTabNavigator from './CaregiverTabNavigator';
 import AuthNavigation from './AuthNavigation';
 import ProviderTabNavigator from './ProviderNavigator';
+import UserProfileScreen from '../ScreensAuth/UserProfileScreen'
 
 const AppNavigator =  createSwitchNavigator({
   // You could add another route here for authentication.

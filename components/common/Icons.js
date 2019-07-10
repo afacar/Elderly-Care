@@ -206,7 +206,6 @@ export const MicIcon = (props) => {
       onPress={props.onPress || null}
       color={(props.isListening) ? 'red' : 'black'}
       size={30}
-      onPress={props.onPress}
     />
   );
 }
@@ -217,9 +216,68 @@ export const GalleryIcon = (props) => {
       name='perm-media'
       type='material'
       onPress={props.onPress || null}
-      color={'blue'}
+      color={'grey'}
+      size={60}
+    />
+  );
+}
+
+export const CameraIcon = (props) => {
+  return (
+    <Icon
+      name='camera-alt'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
       size={30}
-      onPress={props.onPress}
+    />
+  );
+}
+
+export const AttachmentIcon = (props) => {
+  return (
+    <Icon
+      name='attach-file'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
+      size={30}
+    />
+  );
+}
+
+export const PlayIcon = (props) => {
+  return (
+    <Icon
+      name='play-arrow'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
+      size={30}
+    />
+  );
+}
+
+export const PauseIcon = (props) => {
+  return (
+    <Icon
+      name='pause'
+      type='material'
+      onPress={props.onPress || null}
+      color={'grey'}
+      size={30}
+    />
+  );
+}
+
+export const ResetIcon = (props) => {
+  return (
+    <Icon
+    name='replay'
+    type='material'
+    onPress={props.onPress || null}
+    color ='grey'
+    size={18}
     />
   );
 }

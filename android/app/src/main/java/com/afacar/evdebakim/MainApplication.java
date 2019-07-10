@@ -3,6 +3,9 @@ package com.afacar.evdebakim;
 import android.app.Application;
 import com.google.firebase.database.FirebaseDatabase; // -> for setPersistenceEnabled(true)
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.slider.ReactSliderPackage;
+import com.zmxv.RNSound.RNSoundPackage;
+import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.imagepicker.ImagePickerPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.horcrux.svg.SvgPackage;
@@ -45,6 +48,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactSliderPackage(),
+            new RNSoundPackage(),
+            new ReactNativeAudioPackage(),
             new ImagePickerPackage(),
             new RNGoogleSigninPackage(),
             new SvgPackage(),

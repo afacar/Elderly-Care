@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { TouchableHighlight } from "react-native";
 import { Button, ButtonGroup } from 'react-native-elements';
-import { GalleryIcon, LogoutIcon, CancelIcon, DeleteIcon, SaveIcon, EditIcon } from "./Icons";
+import { GalleryIcon, LogoutIcon, CancelIcon, DeleteIcon, SaveIcon, EditIcon, CameraIcon, AttachmentIcon, MicIcon, PauseIcon, PlayIcon, ResetIcon } from "./Icons";
 
 export class SaveButton extends Component {
   render() {
@@ -160,13 +160,96 @@ export class ImageButton extends Component {
   }
 }
 
+export class CameraButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        icon={<CameraIcon/>}
+        containerStyle={styles.buttonStyle}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    )
+  }
+}
+
+export class AttachmentButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        icon={<AttachmentIcon />}
+        containerStyle={styles.buttonStyle}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    )
+  }
+}
+
+export class MicButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        icon={<MicIcon isListening={this.props.isListening} />}
+        containerStyle={styles.buttonStyle}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    )
+  }
+}
+
+export class PlayButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        icon={<PlayIcon isListening={this.props.isListening} />}
+        containerStyle={styles.buttonStyle}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    )
+  }
+}
+
+export class PauseButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        icon={<PauseIcon isListening={this.props.isListening} />}
+        containerStyle={styles.buttonStyle}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    )
+  }
+}
+
+export class ResetButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        containerStyle={styles.buttonStyle}
+        icon={<ResetIcon />} 
+        buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    );
+  }
+}
 
 const styles = {
   buttonStyle: {
     flex: 1,
     padding: 1,
     borderRadius: 20,
-    //backgroundColor: 'purple',
+    justifyContent: 'center'
   },
   titleStyle: {
     fontSize: 19,
