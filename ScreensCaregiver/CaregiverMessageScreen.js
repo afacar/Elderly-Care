@@ -198,7 +198,7 @@ class CaregiverMessageScreen extends React.Component {
           </View> */}
           <View style={{ flex: 1 }}>
             <TouchableOpacity onPress={this.openPicker}>
-              <CameraButton onPress={this.openPicker}/>
+              <CameraButton onPress={this.openPicker} />
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }} >
@@ -249,10 +249,8 @@ class CaregiverMessageScreen extends React.Component {
             avatar: this.props.getPhotoURL(),
           },
           image: response.uri.toString(),
+          path: response.path.toString()
         };
-        if (Platform.OS === 'ios'){
-          message.path = message.image.replace("file://", '');
-        }
         this.sendMessage([message]);
       }
     });
@@ -285,7 +283,7 @@ class CaregiverMessageScreen extends React.Component {
         const message = {
           text: '',
           audio: data.audioFileURL,
-          audioPath:filePath,
+          audioPath: filePath,
           image: '',
           user: {
             _id: this.props.getUid(),
@@ -330,10 +328,6 @@ class CaregiverMessageScreen extends React.Component {
     else if (response.customButton) {
     }
     else {
-      // const source = { uri: response.path }
-      // this.setState({
-      //   imageMessageSrc: source
-      // });
       const message = {
         text: "",
         user: {
@@ -360,7 +354,7 @@ class CaregiverMessageScreen extends React.Component {
       await this.updateState(message);
       messagesArray.push(message);
     }
-    messages.forEach(message =>{
+    messages.forEach(message => {
       var tmp = message.audio;
       message.audio = message.audioPath;
       message.audioPath = tmp;

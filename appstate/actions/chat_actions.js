@@ -70,6 +70,7 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
 
 // send the message to the Backend
 export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
+  console.log("Message 3", messages[0]);
   const uid = firebase.auth().currentUser.uid;
   let url = `commonchat/`;
   var downloadUrl = "";
