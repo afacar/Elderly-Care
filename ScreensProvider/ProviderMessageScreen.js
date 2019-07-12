@@ -108,7 +108,7 @@ class ProviderMessageScreen extends React.Component {
         }}
         onInputTextChanged={(text) => { this.changeTypeState(text) }}
         renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
-        showUserAvatar={true}
+        showUserAvatar={false}
         user={{
           _id: this.props.getUid(),
           name: this.props.getName(),

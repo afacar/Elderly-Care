@@ -1,19 +1,20 @@
 import firebase from 'react-native-firebase';
 import { Translations } from '../../constants/Translations';
 
-export const do_payment = (cardData) => async (dispatch) => {
+export const do_payment = (cardData, price) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const url = `users/${_user.uid}/payments`;
   // First update displayName, email, photoURL, phoneNumber to _user
   // Then update gender, birthdate etc. to profile
   console.log('In do_payment card recieved..', cardData);
+  console.log('In do_payment price recieved..', parseFloat(price));
   try {
     let ref = await firebase.database().ref(url).push(cardData);
     console.log('card is added succesfully to !', ref.key);
     var makePayment = await firebase.functions().httpsCallable('makePayment');
 
     let data = {
-      price: 1,
+      price: parseFloat(price),
       cardHolderName: cardData.name,
       cardNumber: cardData.number.replace(/ /g,''),
       expireMonth: cardData.expiry.split('/')[0],
@@ -48,7 +49,7 @@ export const do_payment = (cardData) => async (dispatch) => {
           category1: 'Collectibles',
           category2: 'Accessories',
           itemType: `Iyzipay.BASKET_ITEM_TYPE.VIRTUAL`,
-          price: 1
+          price: parseFloat(price)
         }
       ]
     };

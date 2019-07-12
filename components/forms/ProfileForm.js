@@ -10,12 +10,19 @@ import { connect } from 'react-redux';
 import { CreditCardInput, LiteCreditCardInput } from "react-native-credit-card-input";
 
 import * as actions from '../../appstate/actions';
-import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput } from '../common';
+import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput, NumericInput } from '../common';
 import Modal from 'react-native-modal';
 
 class _ProfileForm extends Component {
 
-  state = { profile: {}, loading: false, error: '', disabled: true };
+  state = {
+    profile: {},
+    loading: false,
+    error: '',
+    disabled: true,
+    price: '0',
+  };
+
   _isMounted = false;
 
   _fetchProfile = async () => {
@@ -112,54 +119,13 @@ class _ProfileForm extends Component {
 
   _onCardChange = (card) => this.setState({ card });
 
-
-  // buyer: {
-  //     id: 'BY789',
-  //     name: 'John',
-  //     surname: 'Doe',
-  //     gsmNumber: '+905350000000',
-  //     email: 'email@email.com',
-  //     identityNumber: '74300864791',
-  //     lastLoginDate: '2015-10-05 12:43:35',
-  //     registrationDate: '2013-04-21 15:12:09',
-  //     registrationAddress: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
-  //     ip: '85.34.78.112',
-  //     city: 'Istanbul',
-  //     country: 'Turkey',
-  //     zipCode: '34732'
-  // },
-  // shippingAddress: {
-  //     contactName: 'Jane Doe',
-  //     city: 'Istanbul',
-  //     country: 'Turkey',
-  //     address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
-  //     zipCode: '34742'
-  // },
-  // billingAddress: {
-  //     contactName: 'Jane Doe',
-  //     city: 'Istanbul',
-  //     country: 'Turkey',
-  //     address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
-  //     zipCode: '34742'
-  // },
-  // basketItems: [
-  //     {
-  //         id: 'BI101',
-  //         name: 'Binocular',
-  //         category1: 'Collectibles',
-  //         category2: 'Accessories',
-  //         itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
-  //         price
-  //     }
-  // ]
-
   _confirmPayment = async () => {
     this.setState({ cardError: '' })
-    const { card } = this.state;
+    const { card, price } = this.state;
     const { valid, status, values } = card;
     if (valid) {
       console.log('doing payment...');
-      await this.props.do_payment(this.state.card.values);
+      await this.props.do_payment(card.values, price);
       console.log('payment done!');
     } else {
       this.setState({ cardError: 'Kard bilgilerini kontrol edin!' })
@@ -170,16 +136,7 @@ class _ProfileForm extends Component {
     console.log('ProfileForm rendered state,', this.state);
     return (
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
-        {/* <TouchableOpacity
-          onPress={this.onImageClicked}>
-          <View>
-            <Image
-              style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-              source={{ uri: this.state.profile.photoURL }}
-            />
-          </View>
-        </TouchableOpacity> */}
-        <View style={{ paddingBottom: 25}}>
+        <View style={{ paddingBottom: 25 }}>
           <ImageBackground style={{ width: 150, height: 150, alignSelf: 'center', justifyContent: 'flex-end' }}
             //imageStyle={{ borderRadius:75 }}
             source={{ uri: this.state.profile.photoURL }}
@@ -209,6 +166,7 @@ class _ProfileForm extends Component {
           <Text>{this.state.cardError}</Text>
           <Button title='Onayla' onPress={this._confirmPayment} />
         </Modal>
+        <NumericInput label='Tutar' value={this.state.price} onChangeText={(price) => this.setState({ price })} />
         <Button title='Odeme Yap' onPress={() => this.setState({ isCardVisible: true })} />
 
         <CardItem>
