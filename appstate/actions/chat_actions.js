@@ -118,7 +118,7 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       var metadata = {
         contentType: 'audio/mp3',
       };
-      await firebase.storage().ref(audioUrl).child(message._id).putFile(message.audio, metadata);
+      await firebase.storage().ref(audioUrl).child(message._id).putFile(message.audioPath, metadata);
       audioDownloadUrl = await firebase.storage().ref(audioUrl).child(message._id).getDownloadURL();
     }
 

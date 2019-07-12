@@ -9,31 +9,7 @@ import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../compo
 import ImagePicker from 'react-native-image-picker';
 //import RNFetchBlob from 'rn-fetch-blob';
 import firebase from 'react-native-firebase';
-
-
-// const Blob = RNFetchBlob.polyfill.Blob;
-// const fs = RNFetchBlob.fs;
-// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
-// window.Blob = Blob;
-// const Fetch = RNFetchBlob.polyfill.Fetch
-
-// window.fetch = new Fetch({
-//   // enable this option so that the response data conversion handled automatically
-//   auto: true,
-//   // when receiving response data, the module will match its Content-Type header
-//   // with strings in this array. If it contains any one of string in this array, 
-//   // the response body will be considered as binary data and the data will be stored
-//   // in file system instead of in memory.
-//   // By default, it only store response data to file system when Content-Type 
-//   // contains string `application/octet`.
-//   binaryContentTypes: [
-//     'image/',
-//     'video/',
-//     'audio/',
-//     'foo/',
-//   ]
-// }).build()
-
+var RNFS = require('react-native-fs');
 import CircleTransition from 'react-native-circle-reveal-view';
 
 import { AudioUtils, AudioRecorder } from 'react-native-audio';
@@ -263,12 +239,17 @@ class CaregiverMessageScreen extends React.Component {
       name: this.props.getName(),
       avatar: this.props.getPhotoURL(),
     }
+
     if (!this.state.startAudio) {
+      var id = this.randIDGenerator();
+      this.setState({
+        lastAudioID: id
+      })
       this.setState({
         startAudio: true
       });
       const audioPath = `${
-        AudioUtils.DocumentDirectoryPath}/${this.randIDGenerator()}test.acc`;
+        AudioUtils.DocumentDirectoryPath}/${id}.acc`;
       await AudioRecorder.prepareRecordingAtPath(
         audioPath,
         this.state.audioSettings
@@ -276,14 +257,14 @@ class CaregiverMessageScreen extends React.Component {
       await AudioRecorder.startRecording();
 
     } else {
-      this.setState({ startAudio: false });
-
       const filePath = await AudioRecorder.stopRecording();
+      console.log("FilePath", filePath);
       AudioRecorder.onFinished = data => {
         const message = {
           text: '',
-          audio: data.audioFileURL,
-          audioPath: filePath,
+          audio: filePath,
+          audioPath: data.audioFileURL,
+          _id: this.state.lastAudioID,
           image: '',
           user: {
             _id: this.props.getUid(),
@@ -291,10 +272,14 @@ class CaregiverMessageScreen extends React.Component {
             avatar: this.props.getPhotoURL(),
           },
         }
+        this.setState({
+          startAudio: false
+        })
         this.sendMessage([message]);
       };
     }
   }
+
 
   _renderSend = (props) => {
     return (
@@ -347,25 +332,18 @@ class CaregiverMessageScreen extends React.Component {
     for (let i = 0; i < messages.length; i++) {
       let message = messages[i];
       message.createdAt = new Date().getTime();
-      message._id = this.randIDGenerator();
-      var tmp = message.audio;
-      message.audio = message.audioPath;
-      message.audioPath = tmp;
+      if (!message._id)
+        message._id = this.randIDGenerator();
       await this.updateState(message);
       messagesArray.push(message);
     }
-    messages.forEach(message => {
-      var tmp = message.audio;
-      message.audio = message.audioPath;
-      message.audioPath = tmp;
-    })
     const { chatId, userRole, } = this.state;
     this.props.sendMessage(userRole, messagesArray, chatId);
   }
 
   updateState(message) {
     this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message) }
+      return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true }
     });
   }
 
@@ -426,6 +404,7 @@ class CaregiverMessageScreen extends React.Component {
     }
     if (messageData) {
       let messages = await JSON.parse(messageData);
+      console.log("All messages", messages);
       this._isMounted && this.setState({ messages });
       this._isMounted && this.fetch_messages();
     } else {
@@ -439,17 +418,75 @@ class CaregiverMessageScreen extends React.Component {
     const { chatId, userRole } = this.state;
     this.props.fetchMessages(userRole, localMessageIds, chatId, (message) => {
       /** @callback */
-      this._isMounted && this.setState((previousState) => {
-        var allMessages = this.state.messages;
-        var exists = false;
-        allMessages.forEach(element => {
-          if (element._id === message._id)
-            exists = true;
-        })
-        if (!exists) {
-          return { messages: GiftedChat.append(previousState.messages, message) }
+      var allMessages = this.state.messages;
+      var exists = false;
+      allMessages.forEach(element => {
+        console.log(element);
+        if (element._id === message._id) {
+          exists = true;
+          if (message.audio) {
+            var filePath = `${AudioUtils.DocumentDirectoryPath}/${element._id}.acc`;
+            if (!RNFS.exists(filePath)) {
+              var ref = '';
+              var { _user } = firebase.auth().currentUser;
+              if (chatId === 'commonchat')
+                ref = 'chatFiles/commonchat/audio';
+
+              else if (userRole === 'c') {
+                ref = `chatFiles/${chatId}/${_user.uid}/audio`;
+              }
+              firebase.storage().ref().child(ref).child(message._id).downloadFile(filePath).then((onResolve, onReject) => {
+                if (onResolve) {
+                  if (RNFS.exists(filePath))
+                    element.audio = filePath;
+                  else {
+                    // could not download file
+                  }
+                }
+                else if (onReject)
+                  console.log("File not found");
+              });
+            }
+          }
         }
       });
+      if (!exists) {
+        if (message.audio) {
+          var filePath = `${AudioUtils.DocumentDirectoryPath}/${message._id}.acc`;
+          var ref = '';
+          var { _user } = firebase.auth().currentUser;
+          if (chatId === 'commonchat')
+            ref = 'chatFiles/commonchat/audio';
+          else if (userRole === 'c') {
+            ref = `chatFiles/${chatId}/${_user.uid}/audio`;
+          }
+          firebase.storage().ref().child(ref).child(message._id).downloadFile(filePath).then((onResolve, onReject) => {
+            if (onResolve) {
+              if (RNFS.exists(filePath))
+                message.audio = filePath;
+              else {
+                // could not download file
+              }
+            }
+            else if (onReject)
+              console.log("File not found");
+          });
+        }
+        else {
+          console.log("File not an audio");
+        }
+      }
+      if (!exists) {
+        this._isMounted && this.setState((previousState) => {
+          console.log("New message")
+          return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+        })
+      }
+      else {
+        this.setState({
+          messages: allMessages
+        })
+      }
     });
   }
 
