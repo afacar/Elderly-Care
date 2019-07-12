@@ -3,6 +3,7 @@ package com.afacar.evdebakim;
 import android.app.Application;
 import com.google.firebase.database.FirebaseDatabase; // -> for setPersistenceEnabled(true)
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
@@ -48,6 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFSPackage(),
             new ReactSliderPackage(),
             new RNSoundPackage(),
             new ReactNativeAudioPackage(),
