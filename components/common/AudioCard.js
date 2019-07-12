@@ -44,6 +44,9 @@ class AudioCard extends Component {
                     loading: false
                 })
             }
+            else {
+                console.log("Hata var", this.props.audio );
+            }
         })
     }
 
@@ -116,7 +119,6 @@ class AudioCard extends Component {
     }
 
     getPlayTimeText = () => {
-        console.log("PTT")
         const { paused, duration, currentDuration, playing } = this.state;
         let mins = '';
         let secs = '';
