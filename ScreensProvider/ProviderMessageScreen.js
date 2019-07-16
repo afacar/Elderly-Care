@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform } from 'react-native';
+import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal } from 'react-native';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
@@ -11,11 +11,12 @@ import { PermissionsAndroid } from 'react-native';
 import AudioCard from '../components/common/AudioCard';
 import Sound from "react-native-sound";
 
-import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../components/common/Buttons.js'
+import { ImageButton, AttachmentButton, CameraButton, MicButton, CancelButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
 
 import firebase from 'react-native-firebase';
-import { getUid } from '../appstate/actions';
+import ImageViewer from 'react-native-image-zoom-viewer';
+
 var RNFS = require('react-native-fs');
 
 class ProviderMessageScreen extends React.Component {
@@ -55,6 +56,9 @@ class ProviderMessageScreen extends React.Component {
 
   state = {
     messages: [],
+    images: [],
+    imageIndex: 1,
+    showImage: false,
     isNewMessage: false,
     chatId: null,
     userRole: null,
@@ -95,35 +99,73 @@ class ProviderMessageScreen extends React.Component {
     })
   }
 
+  openImage = (index) => {
+    console.log("Images", this.state.images);
+    this.setState({
+      showImage: true,
+      currentIndex: index
+    })
+  }
+
+  renderMessageImage = (props) => {
+    const images = [{
+      // Simplest usage.
+      url: props.currentMessage.image,
+      // You can pass props to <Image />.
+    }];
+    return (
+      <TouchableOpacity onPress={() => this.openImage(props.currentMessage.index)}>
+        <Image
+          source={{ uri: props.currentMessage.image }}
+          style={styles.image}
+        />
+      </TouchableOpacity>
+    );
+  }
+
   render() {
     const { chatId, userRole, messages, isApproved } = this.state;
     return (
-      <GiftedChat
-        key={chatId}
-        messages={messages}
-        locale='tr'
-        onSend={(message) => {
-          // TODO: Before sending message to server
-          // Add message to local state
-          /* this.setState(previousState => ({
-            messages: GiftedChat.append(previousState.messages, messages),
-          })) */
-          this.sendMessage(message);
-        }}
-        onInputTextChanged={(text) => { this.changeTypeState(text) }}
-        renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
-        showUserAvatar={false}
-        user={{
-          _id: this.props.getUid(),
-          name: this.props.getName(),
-          avatar: this.props.getPhotoURL(),
-        }}
-        placeholder='Mesaj yazın...'
-        renderSend={this._renderSend}
-        renderBubble={this.renderBubble}
-        renderActions={this.renderActions}
-        onPressAvatar={this.onPressAvatar}
-      />
+      <View style={{ flex: 1 }}>
+        <GiftedChat
+          key={chatId}
+          messages={messages}
+          locale='tr'
+          onSend={(message) => {
+            // TODO: Before sending message to server
+            // Add message to local state
+            /* this.setState(previousState => ({
+              messages: GiftedChat.append(previousState.messages, messages),
+            })) */
+            this.sendMessage(message);
+          }}
+          onInputTextChanged={(text) => { this.changeTypeState(text) }}
+          renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
+          showUserAvatar={false}
+          user={{
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          }}
+          placeholder='Mesaj yazın...'
+          renderSend={this._renderSend}
+          renderBubble={this.renderBubble}
+          renderActions={this.renderActions}
+          onPressAvatar={this.onPressAvatar}
+          renderMessageImage={this.renderMessageImage}
+        />
+        <Modal
+          visible={this.state.showImage}
+          transparent={true}
+        >
+          <ImageViewer
+            imageUrls={this.state.images}
+            onSwipeDown={() => this.setState({ showImage: false })}
+            enableSwipeDown={true}
+            index={this.state.currentIndex - 1}
+          />
+        </Modal>
+      </View>
     );
   }
 
@@ -283,7 +325,6 @@ class ProviderMessageScreen extends React.Component {
 
     } else {
       const filePath = await AudioRecorder.stopRecording();
-      console.log("FilePath", filePath);
       AudioRecorder.onFinished = data => {
         const message = {
           text: '',
@@ -370,9 +411,19 @@ class ProviderMessageScreen extends React.Component {
   }
 
   updateState(message) {
-    this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true }
-    });
+    if (message.image) {
+      message.index = this.state.imageIndex;
+      this.setState((previousState) => {
+        const image = {
+          url: message.image,
+        }
+        return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true, images: [...this.state.images, image], imageIndex: this.state.imageIndex + 1 };
+      });
+    } else {
+      this.setState((previousState) => {
+        return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true }
+      });
+    }
   }
 
   randIDGenerator = () => {
@@ -432,6 +483,18 @@ class ProviderMessageScreen extends React.Component {
     if (messageData) {
       let messages = await JSON.parse(messageData);
       console.log("All messages", messages);
+      messages.forEach(message => {
+        if (message.image) {
+          message.index = this.state.imageIndex;
+          const image = {
+            url: message.image,
+          }
+          this.setState({
+            images: [...this.state.images, image],
+            imageIndex: this.state.imageIndex + 1
+          })
+        }
+      })
       this._isMounted && this.setState({ messages });
       this._isMounted && this.fetch_messages();
     } else {
@@ -479,6 +542,9 @@ class ProviderMessageScreen extends React.Component {
             else if (element.audio !== filePath) {
               element.audio = filePath;
               console.log("Exists and file path changed", element);
+              this.setState({
+                isNewMessage: true
+              })
             }
           }
         }
@@ -521,11 +587,21 @@ class ProviderMessageScreen extends React.Component {
       if (!exists) {
         this._isMounted && this.setState((previousState) => {
           console.log("New message", message)
-          return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+          if (message.image) {
+            message.index = this.state.imageIndex;
+            const image = {
+              url: message.image,
+            }
+            return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true, images: [...this.state.images, image], imageIndex: this.state.imageIndex + 1 };
+          }
+          else {
+            return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+          }
         })
       } else {
+        console.log("Messages ", allMessages);
         this.setState({
-          messages: allMessages
+          messages: allMessages,
         })
       }
     });
@@ -553,7 +629,15 @@ class ProviderMessageScreen extends React.Component {
   }
 
 }
-
+const styles = {
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 13,
+    margin: 3,
+    resizeMode: 'cover',
+  },
+};
 /* function mapStateToProps({ chat, common }) {
   return { message: chat.message, common };
 } */

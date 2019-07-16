@@ -115,7 +115,7 @@ export const CancelIcon = (props) => {
       onPress={props.onPress || null}
       paddingRight={1}
       size={24}
-      color='white'
+      color={props.color || 'white'}  
     //containerStyle={{ paddingRight: 10 }}
     />
   );

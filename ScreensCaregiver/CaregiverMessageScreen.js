@@ -1,14 +1,16 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity, Text, View, Platform } from 'react-native';
+import { AsyncStorage, TouchableOpacity, Text, View, Platform, Modal, Image } from 'react-native';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
 import "moment/locale/tr";
 
-import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../components/common/Buttons.js'
+import { ImageButton, AttachmentButton, CameraButton, MicButton, CancelButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
 //import RNFetchBlob from 'rn-fetch-blob';
 import firebase from 'react-native-firebase';
+import ImageViewer from 'react-native-image-zoom-viewer';
+
 var RNFS = require('react-native-fs');
 import CircleTransition from 'react-native-circle-reveal-view';
 
@@ -41,6 +43,9 @@ class CaregiverMessageScreen extends React.Component {
   };
   state = {
     messages: [],
+    images: [],
+    imageIndex: 1,
+    showImage: false,
     isNewMessage: false,
     chatId: null,
     userRole: null,
@@ -70,32 +75,68 @@ class CaregiverMessageScreen extends React.Component {
       userIsTyping: typing
     })
   }
+  openImage = (index) => {
+    console.log("Images", this.state.images);
+    this.setState({
+      showImage: true,
+      currentIndex: index
+    })
+  }
 
+  renderMessageImage = (props) => {
+    const images = [{
+      // Simplest usage.
+      url: props.currentMessage.image,
+      // You can pass props to <Image />.
+    }];
+    return (
+      <TouchableOpacity onPress={() => this.openImage(props.currentMessage.index)}>
+        <Image
+          source={{ uri: props.currentMessage.image }}
+          style={styles.image}
+        />
+      </TouchableOpacity>
+    );
+  }
   render() {
     const { chatId, userRole, messages, isApproved } = this.state;
     return (
-      <GiftedChat
-        key={chatId}
-        messages={messages}
-        locale='tr'
-        onSend={async (message) => {
-          this.sendMessage(message);
-        }}
-        onInputTextChanged={(text) => { this.changeTypeState(text) }}
-        style={{ width: '100%', alignItems: 'center' }}
-        renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
-        showUserAvatar={false}
-        user={{
-          _id: this.props.getUid(),
-          name: this.props.getName(),
-          avatar: this.props.getPhotoURL(),
-        }}
-        placeholder='Mesaj yazın...'
-        renderBubble={this.renderBubble}
-        renderSend={this._renderSend}
-        renderActions={this.renderActions}
-        onPressAvatar={this.onPressAvatar}
-      />
+      <View style={{ flex: 1 }}>
+        <GiftedChat
+          key={chatId}
+          messages={messages}
+          locale='tr'
+          onSend={async (message) => {
+            this.sendMessage(message);
+          }}
+          onInputTextChanged={(text) => { this.changeTypeState(text) }}
+          style={{ width: '100%', alignItems: 'center' }}
+          renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
+          showUserAvatar={false}
+          user={{
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          }}
+          placeholder='Mesaj yazın...'
+          renderBubble={this.renderBubble}
+          renderSend={this._renderSend}
+          renderActions={this.renderActions}
+          onPressAvatar={this.onPressAvatar}
+          renderMessageImage={this.renderMessageImage}
+        />
+        <Modal
+          visible={this.state.showImage}
+          transparent={true}
+        >
+          <ImageViewer
+            imageUrls={this.state.images}
+            onSwipeDown={() => this.setState({ showImage: false })}
+            enableSwipeDown={true}
+            index={this.state.currentIndex - 1}
+          />
+        </Modal>
+      </View>
     );
   }
 
@@ -342,9 +383,19 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   updateState(message) {
-    this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true }
-    });
+    if (message.image) {
+      message.index = this.state.imageIndex;
+      this.setState((previousState) => {
+        const image = {
+          url: message.image,
+        }
+        return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true, images: [...this.state.images, image], imageIndex: this.state.imageIndex + 1 };
+      });
+    } else {
+      this.setState((previousState) => {
+        return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true }
+      });
+    }
   }
 
 
@@ -405,6 +456,18 @@ class CaregiverMessageScreen extends React.Component {
     if (messageData) {
       let messages = await JSON.parse(messageData);
       console.log("All messages", messages);
+      messages.forEach(message => {
+        if (message.image) {
+          message.index = this.state.imageIndex;
+          const image = {
+            url: message.image,
+          }
+          this.setState({
+            images: [...this.state.images, image],
+            imageIndex: this.state.imageIndex + 1
+          })
+        }
+      })
       this._isMounted && this.setState({ messages });
       this._isMounted && this.fetch_messages();
     } else {
@@ -421,8 +484,8 @@ class CaregiverMessageScreen extends React.Component {
       var allMessages = this.state.messages;
       var exists = false;
       allMessages.forEach(element => {
-        console.log(element);
         if (element._id === message._id) {
+          console.log("Exists ", element);
           exists = true;
           if (message.audio) {
             var filePath = `${AudioUtils.DocumentDirectoryPath}/${element._id}.acc`;
@@ -431,15 +494,17 @@ class CaregiverMessageScreen extends React.Component {
               var { _user } = firebase.auth().currentUser;
               if (chatId === 'commonchat')
                 ref = 'chatFiles/commonchat/audio';
-
-              else if (userRole === 'c') {
-                ref = `chatFiles/${chatId}/${_user.uid}/audio`;
+              else if (userRole === 'p') {
+                ref = `chatFiles/${_user.uid}/${chatId}/audio`;
               }
               firebase.storage().ref().child(ref).child(message._id).downloadFile(filePath).then((onResolve, onReject) => {
                 if (onResolve) {
-                  if (RNFS.exists(filePath))
+                  if (RNFS.exists(filePath)) {
+                    console.log("Exists and downloaded");
                     element.audio = filePath;
+                  }
                   else {
+                    console.log("Exists but not downloaded");
                     // could not download file
                   }
                 }
@@ -447,30 +512,46 @@ class CaregiverMessageScreen extends React.Component {
                   console.log("File not found");
               });
             }
+            else if (element.audio !== filePath) {
+              element.audio = filePath;
+              console.log("Exists and file path changed", element);
+              this.setState({
+                isNewMessage: true
+              })
+            }
           }
         }
       });
       if (!exists) {
+        console.log(" Not Exists ");
         if (message.audio) {
           var filePath = `${AudioUtils.DocumentDirectoryPath}/${message._id}.acc`;
           var ref = '';
           var { _user } = firebase.auth().currentUser;
           if (chatId === 'commonchat')
             ref = 'chatFiles/commonchat/audio';
-          else if (userRole === 'c') {
-            ref = `chatFiles/${chatId}/${_user.uid}/audio`;
+          else if (userRole === 'p') {
+            ref = `chatFiles/${_user.uid}/${chatId}/audio`;
           }
+
           firebase.storage().ref().child(ref).child(message._id).downloadFile(filePath).then((onResolve, onReject) => {
             if (onResolve) {
-              if (RNFS.exists(filePath))
+              if (RNFS.exists(filePath)) {
                 message.audio = filePath;
+                console.log(" Not Exists file saved ", message);
+                return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+              }
               else {
                 // could not download file
+                console.log(" Not Exists  not downloaded");
               }
             }
             else if (onReject)
               console.log("File not found");
-          });
+          })
+            .catch((error) => {
+              console.log("File not found", error);
+            });
         }
         else {
           console.log("File not an audio");
@@ -478,13 +559,22 @@ class CaregiverMessageScreen extends React.Component {
       }
       if (!exists) {
         this._isMounted && this.setState((previousState) => {
-          console.log("New message")
-          return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+          console.log("New message", message)
+          if (message.image) {
+            message.index = this.state.imageIndex;
+            const image = {
+              url: message.image,
+            }
+            return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true, images: [...this.state.images, image], imageIndex: this.state.imageIndex + 1 };
+          }
+          else {
+            return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+          }
         })
-      }
-      else {
+      } else {
+        console.log("Messages ", allMessages);
         this.setState({
-          messages: allMessages
+          messages: allMessages,
         })
       }
     });
@@ -509,7 +599,15 @@ class CaregiverMessageScreen extends React.Component {
     this._isMounted = false;
   }
 }
-
+const styles = {
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 13,
+    margin: 3,
+    resizeMode: 'cover',
+  },
+};
 /* function mapStateToProps({chat, common }) {
   return {message: chat.message, common };
           } */
