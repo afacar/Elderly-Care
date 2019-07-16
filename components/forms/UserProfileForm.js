@@ -52,7 +52,6 @@ class UserProfileForm extends Component {
     renderProvider = () => {
         return (
             <Card
-                title={this.state.profile.displayName || 'Doktorun isim bilgileri belirtilmedi.'}
                 containerStyle={{ margin: 5 }}>
                 <TouchableOpacity
                     onPress={this.onImageClicked}>

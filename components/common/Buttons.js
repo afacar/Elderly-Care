@@ -58,7 +58,7 @@ export class CancelButton extends Component {
       <Button
         title={this.props.title || "İptal"}
         onPress={this.props.onPress}
-        icon={<CancelIcon />}
+        icon={<CancelIcon color={this.props.color}/>}
         titleStyle={styles.titleStyle}
         containerStyle={styles.buttonStyle}
         buttonStyle={{ backgroundColor: '#ee7e68' }}

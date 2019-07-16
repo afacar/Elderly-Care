@@ -11,9 +11,10 @@ class UserProfileScreen extends React.Component {
 
   componentDidMount() { }
 
-  static navigationOptions = {
-    header: null,
-  };
+  static navigationOptions = ({ navigation }) => ({
+    title: `${navigation.getParam('user').name}`,
+    headerTitleStyle: { textAlign: 'center', alignSelf: 'center' },
+    });
 
   render() {
       console.log("User UPS", this.props.navigation.getParam('user'))
