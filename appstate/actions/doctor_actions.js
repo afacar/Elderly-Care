@@ -96,6 +96,73 @@ export const fetch_requests = (callback) => async (dispatch) => {
   })
 }
 
+export const saveQuestions = (questionArray) => async (dispatch) => {
+  const { _user } = firebase.auth().currentUser;
+  var url = `providers/${_user.uid}/questions`;
+  firebase.database().ref(url).set(questionArray);
+}
+
+export const fetchQuestions = (callback) => async (dispatch) => {
+  console.log("Fetch");
+  const { _user } = firebase.auth().currentUser;
+  var url = `providers/${_user.uid}/questions`;
+  await firebase.database().ref(url).on('value', (snapshot) => {
+    var questionArray = snapshot.val();
+    console.log("Question array", questionArray);
+    callback(questionArray);
+  });
+}
+
+// this function is called by caregive
+export const fetchDoctorQuestions = (providerID, callback) => async (dispatch) => {
+  console.log("Fetch");
+  var url = `providers/${providerID}/questions`;
+  await firebase.database().ref(url).on('value', (snapshot) => {
+    var questionArray = snapshot.val();
+    console.log("Question array", questionArray);
+    callback(questionArray);
+  });
+}
+
+export const fetchDoctorAnswers = (providerID, caregiverID, callback) => async (dispatch) => {
+  var answerURL = `providers/${providerID}/chats/${caregiverID}/answers`;
+  var questionURL = `providers/${providerID}/questions`;
+
+  console.log("P ", providerID, " C ", caregiverID);
+  await firebase.database().ref(questionURL).on('value', async (snapshot) => {
+    var questions = [];
+    questions = snapshot.val();
+    var questionArray = questions;
+    console.log("Questions", questions);
+    if (questions) {
+      await firebase.database().ref(answerURL).on('value', answerSnapshot => {
+        var answers = [];
+        answers = answerSnapshot.val();
+        console.log("Answers", answers);
+        var answerArray = [];
+        for (var i = 0; i < questions.length; i++) {
+          answers.forEach(answer => {
+            if (answer.id == i) {
+              if (answer[i] == undefined)
+                answerArray[i] = answer.answer;
+              else
+                answerArray[i] = answerArray[i] + ' ' + answer.answer;
+            }
+          })
+        }
+        for (var i = 0; i < answerArray.length; i++) {
+          if (!answerArray[i])
+            answerArray[i] = 'Yanıt Yok!'
+        }
+        callback({ questionArray, answerArray, noQuestion: false })
+      })
+    } else {
+      callback({ noQuestion: true })
+    }
+  })
+
+}
+
 function getUser() {
   const user = firebase.auth().currentUser;
   return user;

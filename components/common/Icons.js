@@ -281,3 +281,15 @@ export const ResetIcon = (props) => {
     />
   );
 }
+
+export const RightIcon = (props) => {
+  return (
+    <Icon
+    name='chevron-right'
+    type='material'
+    onPress={props.onPress || null}
+    color ='grey'
+    size={30}
+    />
+  );
+}

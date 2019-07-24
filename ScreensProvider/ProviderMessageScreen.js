@@ -1,5 +1,6 @@
 import React from 'react';
 import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal } from 'react-native';
+import { Icon, Button } from 'react-native-elements';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
@@ -16,6 +17,7 @@ import ImagePicker from 'react-native-image-picker';
 
 import firebase from 'react-native-firebase';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import { MODAL } from '../appstate/actions/types';
 
 var RNFS = require('react-native-fs');
 
@@ -26,22 +28,55 @@ class ProviderMessageScreen extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
+    // headerRight: (
+    //   <View>
+    //     <TouchableOpacity onPress={() => navigation.navigate('PatientScreen', {
+    //       userid: navigation.getParam('userid', '')
+    //     })}>
+    //       <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+    //         <Image
+    //           style={{ width: 40, height: 40 }}
+    //           source={require('../assets/images/patient.png')}
+    //         />
+    //         <Text style={{ fontWeight: 'bold' }}>Hasta Bilgisi</Text>
+    //       </View>
+    //     </TouchableOpacity>
+    //   </View>
+    // <View style={{ flex: 1 }}>
+    //   {() => this.renderArchive(isArchived)}
+    // </View>
+    // )
     headerRight: (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate('PatientScreen', {
-          userid: navigation.getParam('userid', '')
-        })}>
-          <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
-            <Image
-              style={{ width: 40, height: 40 }}
-              source={require('../assets/images/patient.png')}
-            />
-            <Text style={{ fontWeight: 'bold' }}>Hasta Bilgisi</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
+      <Button
+        onPress={() => navigation.navigate('CaregiverAnswerScreen', {
+          chatId: navigation.getParam('chatId')
+        })}
+        title="Hasta Yanıtları"
+        titleStyle={{ color: 'black', fontSize: 12 }}
+        color='transparent'
+        buttonStyle={{ backgroundColor: 'transparent' }}
+        icon={<Icon name='info' type='material' size={30} color='#51A0D5' />} />
+    ),
   });
+
+  renderArchive = (isArchived) => {
+    if (isArchived) {
+      return (
+        <View>
+          <CameraButton />
+          <Text>Arşivden Çıkar</Text>
+        </View>
+      )
+    } else {
+      return (
+        <View>
+          <MicButton />
+          <Text>Arşivden Çıkar</Text>
+        </View>
+      )
+    }
+  }
+
 
   _isMounted = null;
 
@@ -77,6 +112,7 @@ class ProviderMessageScreen extends React.Component {
       IncludeBase64: true,
       AudioEncodingBitRate: 32000
     },
+    showAnswers: false
   };
 
   // More info on all the options is below in the API Reference... just some common use cases shown here
@@ -164,6 +200,14 @@ class ProviderMessageScreen extends React.Component {
             enableSwipeDown={true}
             index={this.state.currentIndex - 1}
           />
+        </Modal>
+        <Modal
+          visible={this.state.showAnswers}
+          transparent={true}>
+          <View style={{ flex: 1, flexDirection: 'column' }}>
+            <Text style={{ alignSelf: 'center' }}>{this.state.QA}</Text>
+            <Button title='Kapat' buttonStyle={{ alignSelf: 'center', backgroundColor: '#51A0D5' }} onPress={() => { this.setState({ showAnswers: false }) }} />
+          </View>
         </Modal>
       </View>
     );
@@ -628,6 +672,18 @@ class ProviderMessageScreen extends React.Component {
     this._isMounted = false;
   }
 
+  fetchAnswers = () => {
+    console.log("Answer fetch request");
+    const providerID = firebase.auth().currentUser.uid;
+    const caregiverID = this.state.chatId;
+    this.props.fetchDoctorAnswers(providerID, caregiverID, (QA) => {
+      console.log("QA", QA)
+      this.setState({
+        QA: QA,
+        showAnswers: true
+      })
+    })
+  }
 }
 const styles = {
   image: {
