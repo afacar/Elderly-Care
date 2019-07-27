@@ -21,6 +21,9 @@ class _ProfileForm extends Component {
     error: '',
     disabled: true,
     price: '0',
+    priceError: '',
+    paymentError: '',
+    paymentResult: '',
   };
 
   _isMounted = false;
@@ -120,16 +123,31 @@ class _ProfileForm extends Component {
   _onCardChange = (card) => this.setState({ card });
 
   _confirmPayment = async () => {
-    this.setState({ cardError: '' })
+    this.setState({ cardError: '', paymentError: {} })
     const { card, price } = this.state;
     const { valid, status, values } = card;
-    if (valid) {
-      console.log('doing payment...');
-      await this.props.do_payment(card.values, price);
-      console.log('payment done!');
+    if (!valid) {
+      this.setState({ paymentLoading: false, cardError: 'Kard bilgilerini kontrol edin!' })
     } else {
-      this.setState({ cardError: 'Kard bilgilerini kontrol edin!' })
+      console.log('doing payment...');
+      this.setState({ paymentLoading: true });
+      this.props.do_payment(card.values, price)
+        .then(paymentResult => {
+          this.setState({ paymentResult, paymentLoading: false });
+        })
+        .catch(paymentError => {
+          this.setState({ paymentError, paymentLoading: false })
+        })
+      console.log('payment done!');
     }
+  }
+
+  _prePayment = () => {
+    if (this.state.price <= 0) {
+      this.setState({ priceError: 'Miktar 0 TL uzeri olmadilir' })
+      return;
+    }
+    this.setState({ isCardVisible: true })
   }
 
   render() {
@@ -164,10 +182,18 @@ class _ProfileForm extends Component {
             requiresCVC
             onChange={this._onCardChange} />
           <Text>{this.state.cardError}</Text>
-          <Button title='Onayla' onPress={this._confirmPayment} />
+          <Text>{this.state.paymentResult && 'Odeme Basarili :>'}</Text>
+          <Text>{this.state.paymentError.message}</Text>
+          <Button disabled={this.state.paymentLoading} title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
         </Modal>
-        <NumericInput label='Tutar' value={this.state.price} onChangeText={(price) => this.setState({ price })} />
-        <Button title='Odeme Yap' onPress={() => this.setState({ isCardVisible: true })} />
+
+
+        <NumericInput
+          label='Tutar'
+          errorMessage={this.state.priceError}
+          value={this.state.price}
+          onChangeText={(price) => this.setState({ price, priceError: '' })} />
+        <Button title='Odeme Yap' onPress={this._prePayment} />
 
         <CardItem>
           <TextInput
