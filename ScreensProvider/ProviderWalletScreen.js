@@ -23,6 +23,8 @@ class ProviderWalletScreen extends Component {
 
     state = {
         IBAN: "",
+        balance: "0",
+        disabled: true
     }
     async componentDidMount () {
         this.props.getIBAN( (IBAN) => {
@@ -31,6 +33,12 @@ class ProviderWalletScreen extends Component {
                 IBAN:IBAN
             })
         });
+        this.props.getBalance( balance => {
+            this.setState({
+                balance: balance,
+                disabled: false
+            })
+        })
     }
     render() {
         return (
@@ -41,7 +49,7 @@ class ProviderWalletScreen extends Component {
                         <Input
                             key='balance'
                             label="Balance"
-                            value="0₺"
+                            value={this.state.balance + "₺"}
                             multiline={false}
                             editable={false} />
                     </CardItem>
@@ -62,7 +70,7 @@ class ProviderWalletScreen extends Component {
                     </CardItem>
                 </Card>
                 <CardItem>
-                    <SaveButton onPress={() => {
+                    <SaveButton disabled={this.state.disabled} onPress={() => {
                         this.props.setIBAN(this.state.IBAN)
                     }} />
                 </CardItem>

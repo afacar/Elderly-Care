@@ -98,8 +98,10 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
   }
 
   let urlPrefix = `caregivers`;
-  if (userRole === 'p') urlPrefix = 'providers';
-
+  if (userRole === 'p') {
+    urlPrefix = 'providers';
+    await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
+  }
   try {
     // Add user to common chat 
     await firebase.database().ref(`${urlPrefix}/${uid}/chats/commonchat/`).set(true);
@@ -108,6 +110,7 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
   } catch (error) {
     console.log("yeni kullanıcı commonchat'e eklenirken hata:", error.message);
   }
+
 
   try {
     // create user profile
@@ -119,7 +122,10 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
       phoneNumber: phoneNumber || '',
       userRole: userRole
     };
+    if (userRole == 'p')
+      profile.generalFee = 0
     await firebase.database().ref(`users/${uid}/profile/`).set(profile);
+    await firebase.database().ref(`users/${uid}/wallet`).set("0");
     console.log("profile is created for new user");
   } catch (error) {
     console.log("yeni kullanıcı için profil oluşturulurken hata:", error.message);

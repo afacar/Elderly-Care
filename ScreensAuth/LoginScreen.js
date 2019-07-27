@@ -36,10 +36,10 @@ class LoginScreen extends Component {
     if (this._mounted) this.setState({ loading, errorMessage, successMessage });
     if (this._mounted && loading) {
       console.log("Opening Toast");
-      this.refs.toast.show(loadingIcon, DURATION.FOREVER);
+      // this.refs.toast.show(loadingIcon, DURATION.FOREVER);
     } else if (this._mounted) {
       console.log("Closing Toast");
-      this.refs.toast.close(loadingIcon, 0);
+      // this.refs.toast.close(loadingIcon, 0);
     }
   }
 

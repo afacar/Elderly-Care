@@ -19,7 +19,7 @@ class ProviderConsultancySettingsScreen extends Component {
                     <SettingsItem
                         key='chat_settings'
                         text='Chat Settings'
-                        // onPress={() => this.navigateNextScreen('profile')}
+                        onPress={() => this.navigateNextScreen('chat')}
                     />
                     <SettingsItem
                         key='appointments'
@@ -41,6 +41,8 @@ class ProviderConsultancySettingsScreen extends Component {
             navigate('ProviderWalletScreen', {navigation: this.props.navigation});
         }else if ( screen === 'prelim_questions'){
             navigate('ProviderPQScreen', {navigation: this.props.navigation});
+        }else if ( screen === 'chat'){
+            navigate('ProviderChatSettingsScreen', {navigation: this.props.navigation});
         }
     }
 }
