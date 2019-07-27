@@ -61,17 +61,4 @@ export const do_payment = (cardData, price) => async (dispatch) => {
       });
   });
 
-  /*   try {
-      let ref = await firebase.database().ref(url).push(cardData);
-      console.log('card is added succesfully to !', ref.key);
-      var makePayment = await firebase.functions().httpsCallable('makePayment');
-  
-      console.log('makePayment with...', data);
-  
-  
-    } catch (error) {
-      const errorMessage = Translations[error.code] || error.message;
-      console.error(errorMessage);
-    } */
-
 };

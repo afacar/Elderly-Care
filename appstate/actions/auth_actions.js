@@ -85,7 +85,7 @@ export const loginWithFacebook = (data) => async (dispatch) => {
 
 export const createNewUserProfile = (userRole, userName) => async (dispatch) => {
   // check newUSer
-  if (userRole === 'p'){
+  if (userRole === 'p') {
     await firebase.auth().currentUser.updateProfile({ displayName: userName });
   }
   const { uid, displayName, photoURL, email, phoneNumber } = firebase.auth().currentUser;
@@ -137,8 +137,12 @@ export const fetch_profile = (callback, role = '') => async (dispatch) => {
     await firebase.database().ref(url).once('value', async (snapshot) => {
       let profile = snapshot.val();
       //profile = { ...profile, ..._user };
-      console.log("returning profile with callback", profile);
-      callback(profile);
+      await firebase.database().ref(`users/${_user.uid}/wallet`).on('value', (snap) => {
+        const wallet = snap ? snap.val() : 0;
+        console.log("returning profile with callback", profile);
+        callback({ ...profile, wallet});
+      });
+
       //return dispatch({ type: PROFILE_FETCH, payload: profile });
     });
   } catch (error) {
@@ -163,6 +167,7 @@ export const save_profile = (profile) => async (dispatch) => {
     delete profile.path;
   }
   delete profile.newPhoto;
+  delete profile.wallet;
   await firebase.database().ref(url).update(profile);
   console.log('save_profile is updated succesfully!', profile);
   console.log('save_profile is quiting...');
