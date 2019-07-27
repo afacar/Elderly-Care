@@ -10,7 +10,7 @@ class GoogleSignin extends Component {
   state = { isSigninInProgress: false };
 
   _onPress = async () => {
-    this.props.handleLogin({ loading: true });
+    // this.props.handleLogin({ loading: true });
     /** If there is no userRole parameter from parent,
      *  Google Login will be caregiver Login
      */
@@ -20,7 +20,7 @@ class GoogleSignin extends Component {
       await this.props.loginWithGoogle();
     } catch (error) {
       console.log("Google Login Hatası Detayı", error.message);
-      this.props.handleLogin({ loading: false, errorMessage: `Google Login Hatası: ${error.message}` });
+     // this.props.handleLogin({ loading: false, errorMessage: `Google Login Hatası: ${error.message}` });
     }
 
     const { _user } = firebase.auth().currentUser;
@@ -56,7 +56,7 @@ class GoogleSignin extends Component {
     }
 
     this.props.navigate('SplashScreen', { isNewUser, role: userRole });
-    this.props.handleLogin({ loading: false });
+    // this.props.handleLogin({ loading: false });
   }
 
   render() {

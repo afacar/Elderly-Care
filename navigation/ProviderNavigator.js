@@ -16,6 +16,8 @@ import ProviderArchiveScreen from '../ScreensProvider/ProviderArchiveScreen';
 import ProviderPQScreen from '../ScreensProvider/ProviderPQScreen';
 import UserProfileScreen from '../ScreensAuth/UserProfileScreen';
 import CaregiverAnswerScreen from '../ScreensProvider/CaregiverAnswerScreen';
+import ProviderChatSettingsScreen from '../ScreensProvider/ProviderChatSettingsScreen';
+
 const ProviderHomeStack = createStackNavigator({
   ProviderHome,
   ProviderMessageScreen,
@@ -54,6 +56,7 @@ const ProviderSettingsStack = createStackNavigator({
   ProviderArchiveScreen,
   ProviderMessageScreen,
   ProviderPQScreen,
+  ProviderChatSettingsScreen
 });
 
 ProviderSettingsStack.navigationOptions = {
