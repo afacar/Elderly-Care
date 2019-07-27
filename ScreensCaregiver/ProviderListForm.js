@@ -14,11 +14,12 @@ class ProviderList extends Component {
     headerStyle: {
       backgroundColor: 'white',
     },
-    headerForceInset: {vercical: 'never'},
+    headerForceInset: { vercical: 'never' },
   });
 
   state = { /** List of provider data */
     providers: {}, // { providerId: {profile} }
+    errorMessages:{}
   }
 
   _isMounted = null;
@@ -29,9 +30,17 @@ class ProviderList extends Component {
     );
   }
 
-  _sendProviderRequest = async (providerId) => {
+  _sendProviderRequest = async (providerId, fee) => {
     try {
-      await this.props.send_provider_request(providerId);
+      await this.props.send_provider_request(providerId, fee, (result) => {
+        console.log("Result", result)
+        var errors = this.state.errorMessages;
+        if (result == 'failure')
+          errors[providerId] = "Cüzdanınızda yeterli miktarda para bulunmamaktadır"
+          this.setState({
+            errorMessages: errors
+          })
+      });
     } catch (error) {
       console.error('this.props.send_provider_request(providerId) hatası', error.message);
     }
@@ -66,6 +75,7 @@ class ProviderList extends Component {
       <View>
         <RowItem label="Uzmanlık" content={provider.profession} />
         <ColumnItem label="Biyografi" content={provider.experience} />
+        <RowItem label="Ücret" content={provider.generalFee ? provider.generalFee : "0"} />
       </View>
     );
     let info = (
@@ -74,7 +84,7 @@ class ProviderList extends Component {
         type="clear"
         title='Danışmanlık Talep Et'
         titleStyle={{ color: '#041256' }}
-        onPress={() => this._sendProviderRequest(providerId)} />
+        onPress={() => this._sendProviderRequest(providerId, provider.generalFee ? provider.generalFee : 0)} />
     );
     if (provider.isApproved === true) {
       info = (
@@ -105,6 +115,7 @@ class ProviderList extends Component {
       >
         {content}
         {info}
+        <Text style={{ color: 'red', fontSize: 12 }}>{this.state.errorMessages ? this.state.errorMessages[providerId] : ""}</Text>
       </Card>
     );
   }
