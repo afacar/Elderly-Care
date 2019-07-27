@@ -140,20 +140,27 @@ export const fetchDoctorAnswers = (providerID, caregiverID, callback) => async (
         answers = answerSnapshot.val();
         console.log("Answers", answers);
         var answerArray = [];
-        for (var i = 0; i < questions.length; i++) {
-          answers.forEach(answer => {
-            if (answer.id == i) {
-              if (answer[i] == undefined)
-                answerArray[i] = answer.answer;
-              else
-                answerArray[i] = answerArray[i] + ' ' + answer.answer;
-            }
-          })
-        }
-        for (var i = 0; i < answerArray.length; i++) {
-          if (!answerArray[i])
+        if (answers) {
+          for (var i = 0; i < questions.length; i++) {
+            answers.forEach(answer => {
+              if (answer.id == i) {
+                if (answer[i] == undefined)
+                  answerArray[i] = answer.answer;
+                else
+                  answerArray[i] = answerArray[i] + ' ' + answer.answer;
+              }
+            })
+          }
+          for (var i = 0; i < answerArray.length; i++) {
+            if (!answerArray[i])
+              answerArray[i] = 'Yanıt Yok!'
+          }
+        } else {
+          for (var i = 0; i < questions.length; i++) {
             answerArray[i] = 'Yanıt Yok!'
+          }
         }
+
         callback({ questionArray, answerArray, noQuestion: false })
       })
     } else {
@@ -161,6 +168,55 @@ export const fetchDoctorAnswers = (providerID, caregiverID, callback) => async (
     }
   })
 
+}
+export const fetchChatSettings = (callback) => async (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  const caregiverURL = `providers/${uid}/chats`;
+  await firebase.database().ref(caregiverURL).on('child_added', async (caregiverSnapshot) => {
+    var caregiverID = caregiverSnapshot.key;
+    var caregiver = caregiverSnapshot.val();
+    if (caregiverID !== 'commonchat') {
+      var fee = caregiver.fee;
+      const profileURL = `users/${caregiverID}/profile`;
+      await firebase.database().ref(profileURL).on('value', async (userSnap) => {
+        const user = userSnap.val();
+        console.log("user", user);
+        const { displayName, photoURL } = user;
+        var finalUser = {};
+        finalUser.displayName = displayName;
+        finalUser.photoURL = photoURL;
+        finalUser.fee = fee;
+        finalUser.id = caregiverID;
+        console.log("New C", finalUser);
+        callback(finalUser);
+      });
+    }
+  })
+}
+
+export const fetchGeneralFee = (callback) => async (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  const generalFeeUrl = `providers/${uid}/generalFee`;
+  await firebase.database().ref(generalFeeUrl).on('value', fee => {
+    const generalFee = fee.val();
+    callback(generalFee);
+  })
+}
+
+export const setChatSettings = (caregivers) => async (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  const providerURL = `providers/${uid}/chats`;
+  caregivers.forEach(async (caregiver) => {
+    const caregiverID = caregiver.id;
+    const caregiverURL = providerURL + `/${caregiverID}/fee`;
+    await firebase.database().ref(caregiverURL).set(caregiver.fee);
+  })
+}
+
+export const setGeneralFee = (generalFee) => async (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  const generalFeeUrl = `providers/${uid}/generalFee`;
+  await firebase.database().ref(generalFeeUrl).set(generalFee);
 }
 
 function getUser() {
