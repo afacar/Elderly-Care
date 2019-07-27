@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity, Text, View, Platform, Modal, Image } from 'react-native';
+import { AsyncStorage, TouchableOpacity, Text, View, Platform, Modal, Image, } from 'react-native';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
@@ -17,6 +17,7 @@ import CircleTransition from 'react-native-circle-reveal-view';
 import { AudioUtils, AudioRecorder } from 'react-native-audio';
 import { PermissionsAndroid } from 'react-native';
 import AudioCard from '../components/common/AudioCard';
+import { Icon, Button } from 'react-native-elements';
 
 
 class CaregiverMessageScreen extends React.Component {
@@ -43,6 +44,14 @@ class CaregiverMessageScreen extends React.Component {
   };
   state = {
     messages: [],
+    currentQuestion: 0,
+    preliminaryQuestions: [],
+    preliminaryAnswers: [{
+      /* id: indicates question number
+      answers: []
+      */
+    }],
+    completedPrelim: false,
     images: [],
     imageIndex: 1,
     showImage: false,
@@ -118,7 +127,7 @@ class CaregiverMessageScreen extends React.Component {
             name: this.props.getName(),
             avatar: this.props.getPhotoURL(),
           }}
-          placeholder='Mesaj yazın...'
+          placeholder='Enter your message...'
           renderBubble={this.renderBubble}
           renderSend={this._renderSend}
           renderActions={this.renderActions}
@@ -325,7 +334,7 @@ class CaregiverMessageScreen extends React.Component {
   _renderSend = (props) => {
     return (
       <Send {...props} containerStyle={{ justifyContent: "center" }}>
-        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Gönder</Text>
+        <Text style={{ fontSize: 19, color: 'blue', margin: 5 }}>Send</Text>
       </Send>
     );
   }
@@ -369,17 +378,40 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   sendMessage = async (messages) => {
-    let messagesArray = [];
-    for (let i = 0; i < messages.length; i++) {
-      let message = messages[i];
-      message.createdAt = new Date().getTime();
-      if (!message._id)
-        message._id = this.randIDGenerator();
-      await this.updateState(message);
-      messagesArray.push(message);
+    if (this.state.completedPrelim) {
+      let messagesArray = [];
+      for (let i = 0; i < messages.length; i++) {
+        let message = messages[i];
+        message.createdAt = new Date().getTime();
+        if (!message._id)
+          message._id = this.randIDGenerator();
+        await this.updateState(message);
+        messagesArray.push(message);
+      }
+      const { chatId, userRole, } = this.state;
+      this.props.sendMessage(userRole, messagesArray, chatId);
+    } else {
+      let messagesArray = [];
+      for (let i = 0; i < messages.length; i++) {
+        let message = messages[i];
+        await this.updateState(message);
+        message.createdAt = new Date().getTime();
+        if (!message._id)
+          message._id = this.randIDGenerator();
+        messagesArray.push(message);
+        if (message.text == 'sonraki') {
+          this.loadNextQuestion();
+        }
+        else {
+          this.setState((previousState) => {
+            if (message.text)
+              return { preliminaryAnswers: GiftedChat.append(previousState.preliminaryAnswers, { id: previousState.currentQuestion - 1, answer: message.text }) };
+            else
+              return { preliminaryAnswers: GiftedChat.append(previousState.preliminaryAnswers, { id: previousState.currentQuestion - 1, answer: "Yanıt Yok!" }) };
+          })
+        }
+      }
     }
-    const { chatId, userRole, } = this.state;
-    this.props.sendMessage(userRole, messagesArray, chatId);
   }
 
   updateState(message) {
@@ -413,9 +445,18 @@ class CaregiverMessageScreen extends React.Component {
     //const userid = this.props.navigation.getParam('userid', '');
     const title = this.props.navigation.getParam('title', '');
     const isApproved = this.props.navigation.getParam('isApproved', '');
+    const firstTime = this.props.navigation.getParam('firstTime');
+    console.log("FirstTime", firstTime, isApproved);
     if (chatId) {
       this.setState({ chatId, title, userRole, isApproved });
-      this.load_messages(chatId);
+      if (firstTime && !this.state.completedPrelim) {
+        this.loadQuestions(chatId);
+      } else {
+        this.setState({
+          completedPrelim: true
+        })
+        this.load_messages(chatId);
+      }
     }
 
     // preparation for Audio
@@ -442,6 +483,79 @@ class CaregiverMessageScreen extends React.Component {
     ).then(result => {
       return result === true || result === PermissionsAndroid.RESULTS.GRANTED;
     });
+  }
+
+  loadNextQuestion = () => {
+    if (this.state.currentQuestion == this.state.totalQuestions) {
+      const message = {
+        text: 'Yanıtlarınız başarıyla doktorunuza iletilmiştir.',
+        _id: this.state.totalQuestions,
+        createdAt: new Date().getTime(),
+        user: {
+          _id: this.state.chatId,
+          name: this.state.title
+        }
+
+      }
+      console.log("Chat id 1", this.state.chatId);
+      this.props.sendAnswers(this.state.preliminaryAnswers, this.state.chatId);
+      this.setState((previousState) => {
+        console.log("Last ", message);
+        return { messages: GiftedChat.append(previousState.messages, message), currentQuestion: this.state.currentQuestion + 1, completedPrelim: true };
+      })
+      setTimeout(() => { this.load_messages(this.state.chatId) }, 2500);
+    } else {
+      const message = {
+        text: this.state.preliminaryQuestions[this.state.currentQuestion].text,
+        _id: this.state.preliminaryQuestions[this.state.currentQuestion]._id,
+        createdAt: new Date().getTime(),
+        user: {
+          _id: this.state.chatId,
+          name: this.state.title,
+        }
+      }
+      this.setState((previousState) => {
+        return { messages: GiftedChat.append(previousState.messages, message), currentQuestion: this.state.currentQuestion + 1 };
+      })
+    }
+  }
+  loadQuestions = async (chatId) => {
+    console.log("First question");
+    const message = {
+      text: 'Daha iyi ve hızlı doktor hizmeti için lütfen az sonra ekrana çıkacak olan, doktorunuzun sunduğu ön hazırlık sorularını yanıtlayınız. Bir sonraki soruya geçebilmek için yanıtınızın bittiğine emin olduğunuzda "sonraki" yazıp gönderiniz.',
+      _id: -1,
+      createdAt: new Date().getTime(),
+      user: {
+        _id: this.state.chatId,
+        name: this.state.title
+      }
+    }
+    this.setState((previousState) => {
+      return { messages: GiftedChat.append(previousState.messages, message) };
+    })
+    console.log("First question written");
+    await this.props.fetchDoctorQuestions(chatId, (questionArray) => {
+      var finalQuestions = [];
+      for (var i = 0; i < questionArray.length; i++) {
+        finalQuestions[i] = {
+          text: questionArray[i],
+          _id: i,
+          user: {
+            _id: this.state.chatId,
+            name: this.state.title
+          }
+        }
+      }
+      this.setState({
+        preliminaryQuestions: finalQuestions
+      })
+
+      //TODO edit question array so that each message has user, id, text and createdAt
+      console.log("Questions", finalQuestions)
+      this.setState({
+        totalQuestions: finalQuestions.length
+      })
+    })
   }
 
   load_messages = async (chatId) => {

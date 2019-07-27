@@ -16,9 +16,9 @@ class ChatScreen extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
-    headerForceInset: {vercical: 'never'},
+    headerForceInset: { vercical: 'never' },
     headerRight: (
-     
+
       <TouchableOpacity onPress={() => navigation.navigate('ProviderListScreen')}>
         <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Image
@@ -43,19 +43,22 @@ class ChatScreen extends React.Component {
   }
 
   _setChatRooms = (chat) => {
-    const { chatId, title, lastMessage, status, avatar, unread } = chat;
+    console.log("Chat ", chat)
+    const { chatId, title, lastMessage, status, avatar, unread, firstTime } = chat;
     this.setState(previousState => {
       var { chats } = previousState;
 
-      if (!chats[chatId]) chats[chatId] = {};
+      if (!chats[chatId]) 
+        chats[chatId] = {};
       chats[chatId]['lastMessage'] = lastMessage;
       chats[chatId]['title'] = title;
       chats[chatId]['status'] = status;
       chats[chatId]['unread'] = unread;
       chats[chatId]['avatar'] = avatar;
+      chats[chatId]['firstTime'] = firstTime;
 
       var sortable = [];
-      for ( var chatID in chats){
+      for (var chatID in chats) {
         var chat = chats[chatID];
         chat.chatId = chatID;
         chats[chatID] = chat;
@@ -63,9 +66,9 @@ class ChatScreen extends React.Component {
       }
       var sortedChats = {}
       sortable.sort(this.compareChats);
-      for ( var i = 0; i < sortable.length; i++ ){
+      for (var i = 0; i < sortable.length; i++) {
         var tmpChat = sortable[i];
-        sortedChats[tmpChat.chatId] = tmpChat; 
+        sortedChats[tmpChat.chatId] = tmpChat;
         delete sortedChats[tmpChat.chatId].chatId;
       }
       chats = sortedChats;
@@ -74,9 +77,9 @@ class ChatScreen extends React.Component {
   }
 
   compareChats(chat1, chat2) {
-    if ( chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
+    if (chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
       return -1;
-    if ( chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
+    if (chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
       return 1;
     return 0;
   }
@@ -88,6 +91,7 @@ class ChatScreen extends React.Component {
   }
 
   _onPressItem = (data) => {
+    console.log("Data", data);
     this.props.navigation.navigate('CaregiverMessageScreen', data);
   }
 
@@ -95,8 +99,9 @@ class ChatScreen extends React.Component {
 
     const chatId = item;
     const theChat = this.state.chats[chatId];
+    console.log("theChat", theChat);
     const isApproved = theChat.status;
-    
+
     if (isApproved === false) return;
 
     return (
@@ -121,7 +126,7 @@ class ChatScreen extends React.Component {
   render() {
     /** 2 return cases: loading and, chat list */
     return (
-      <ScrollView  style={styles.containerStyle}>
+      <ScrollView style={styles.containerStyle}>
         <FlatList
           data={Object.keys(this.state.chats)}
           renderItem={this._renderItem}

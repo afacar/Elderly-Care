@@ -86,12 +86,13 @@ export class NumericInput extends Component {
   };
 
   render() {
-    const { label, value, onChangeText, placeholder, errorMessage } = this.props;
+    const { label, value, onChangeText, placeholder, errorMessage,editable } = this.props;
 
     return (
       <Input
         label={label || ''}
         placeholder={placeholder || ''}
+        editable={editable}
         errorMessage={errorMessage}
         keyboardType="numeric"
         maxLength={3}

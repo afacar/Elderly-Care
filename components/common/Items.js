@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import firebase from 'react-native-firebase';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Button } from 'react-native-elements';
 
 import { ErrorLabel, Bold } from './Titles';
+import { RightButton } from './Buttons';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export const RowItem = (props) => {
   return (
@@ -44,6 +46,7 @@ export class ChatItem extends Component {
     const lastMessage = theChat.lastMessage;
     let avatar = theChat.avatar;
     const isApproved = theChat.status;
+    const firstTime = theChat.firstTime;
     let subtitle = '';
     let userName = '';
     let badge = null;
@@ -72,7 +75,7 @@ export class ChatItem extends Component {
     }
 
     return (
-      <TouchableHighlight onPress={() => this.props.onPress({ chatId, title, userRole: 'c', isApproved })}>
+      <TouchableHighlight onPress={() => this.props.onPress({ chatId, title, userRole: 'c', isApproved, firstTime })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 17 }}
@@ -105,6 +108,16 @@ export const LabeledItem = (props) => {
     </View>
   );
 }
+
+export const SettingsItem = (props) => {
+  return (
+    <TouchableOpacity style={{ flexDirection: 'row', flex: 1 }} onPress={props.onPress}>
+      <Text style={{ alignSelf: 'flex-start', color: 'grey', fontSize: 18, paddingLeft:10, padding: 5  }}>{props.text}</Text>
+      <RightButton onPress={props.onPress}/>
+    </TouchableOpacity>
+  )
+}
+
 
 const styles = StyleSheet.create({
   rowStyle: {

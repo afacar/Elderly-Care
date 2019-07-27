@@ -66,11 +66,15 @@ export const send_provider_request = (providerId) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
+  const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
   try {
     // null means pending
     await firebase.database().ref(caregiverurl).set('pending');
     await firebase.database().ref(providerurl).set('pending');
+    await firebase.database().ref(caregiverFirstTimeUrl).set('true');
+    await firebase.database().ref(providerFirstTimeUrl).set('true');
     await firebase.database().ref(providerRequestUrl).transaction(function (value) {
       return (value || 0) + 1;
     })
@@ -85,12 +89,16 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
+  const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
 
   try {
     // Cancel the pending request to Provider
     await firebase.database().ref(caregiverurl).set(null);
     await firebase.database().ref(providerurl).set(null);
+    await firebase.database().ref(caregiverFirstTimeUrl).set(null);
+    await firebase.database().ref(providerFirstTimeUrl).set(null);
     await firebase.database().ref(providerRequestUrl).transaction(function (value) {
       return value - 1;
     })
@@ -153,5 +161,19 @@ export const fetch_caregivers = (callback) => async (dispatch) => {
   } catch (error) {
     console.error('fetch_caregivers hata:', error.message);
   }
-
 }
+
+export const setIBAN = (IBAN) => async (dispatch) => {
+  const { _user } = firebase.auth().currentUser;
+  const url = `users/${_user.uid}/profile/IBAN`;
+  firebase.database().ref(url).set(IBAN);
+}
+
+export const getIBAN = (callback) => async (dispatch) =>{
+  const { _user } = firebase.auth().currentUser;
+  const url = `users/${_user.uid}/profile/IBAN`;
+  firebase.database().ref(url).once('value', (snapshot) => {
+    const IBAN  = snapshot.val();
+    callback(IBAN);
+  });
+} 

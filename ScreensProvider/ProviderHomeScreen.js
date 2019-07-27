@@ -148,7 +148,7 @@ class ProviderHome extends React.Component {
     }
 
     return (
-      <TouchableOpacity onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId })}>
+      <TouchableOpacity onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId, isArchived: false })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 18 }}
