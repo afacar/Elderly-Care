@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { TouchableHighlight } from "react-native";
 import { Button, ButtonGroup } from 'react-native-elements';
-import { GalleryIcon, LogoutIcon, CancelIcon, DeleteIcon, SaveIcon, EditIcon, CameraIcon, AttachmentIcon, MicIcon, PauseIcon, PlayIcon, ResetIcon } from "./Icons";
+import { GalleryIcon, LogoutIcon, CancelIcon, DeleteIcon, SaveIcon, EditIcon, CameraIcon, AttachmentIcon, MicIcon, PauseIcon, PlayIcon, ResetIcon, RightIcon } from "./Icons";
 
 export class SaveButton extends Component {
   render() {
@@ -13,7 +13,7 @@ export class SaveButton extends Component {
         titleStyle={styles.titleStyle}
         containerStyle={styles.buttonStyle}
         icon={<SaveIcon />}
-        buttonStyle={{ backgroundColor: '#397847' }}
+        buttonStyle={{ backgroundColor: '#51A0D5' }}
       />
     );
   }
@@ -58,7 +58,7 @@ export class CancelButton extends Component {
       <Button
         title={this.props.title || "İptal"}
         onPress={this.props.onPress}
-        icon={<CancelIcon />}
+        icon={<CancelIcon color={this.props.color} />}
         titleStyle={styles.titleStyle}
         containerStyle={styles.buttonStyle}
         buttonStyle={{ backgroundColor: '#ee7e68' }}
@@ -166,7 +166,7 @@ export class CameraButton extends Component {
       <Button
         title=""
         onPress={this.props.onPress}
-        icon={<CameraIcon/>}
+        icon={<CameraIcon />}
         containerStyle={styles.buttonStyle}
         buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
       />
@@ -237,8 +237,22 @@ export class ResetButton extends Component {
         title=""
         onPress={this.props.onPress}
         containerStyle={styles.buttonStyle}
-        icon={<ResetIcon />} 
+        icon={<ResetIcon />}
         buttonStyle={{ backgroundColor: 'transparent', padding: 0 }}
+      />
+    );
+  }
+}
+
+export class RightButton extends Component {
+  render() {
+    return (
+      <Button
+        title=""
+        onPress={this.props.onPress}
+        containerStyle={{flex:1, alignItems: 'flex-end'}}
+        icon={<RightIcon />}
+        buttonStyle={{ backgroundColor: 'transparent', padding: 5, paddingEnd: 10 }}
       />
     );
   }

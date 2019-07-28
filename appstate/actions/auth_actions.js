@@ -85,7 +85,7 @@ export const loginWithFacebook = (data) => async (dispatch) => {
 
 export const createNewUserProfile = (userRole, userName) => async (dispatch) => {
   // check newUSer
-  if (userRole === 'p'){
+  if (userRole === 'p') {
     await firebase.auth().currentUser.updateProfile({ displayName: userName });
   }
   const { uid, displayName, photoURL, email, phoneNumber } = firebase.auth().currentUser;
@@ -98,8 +98,10 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
   }
 
   let urlPrefix = `caregivers`;
-  if (userRole === 'p') urlPrefix = 'providers';
-
+  if (userRole === 'p') {
+    urlPrefix = 'providers';
+    await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
+  }
   try {
     // Add user to common chat 
     await firebase.database().ref(`${urlPrefix}/${uid}/chats/commonchat/`).set(true);
@@ -108,6 +110,7 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
   } catch (error) {
     console.log("yeni kullanıcı commonchat'e eklenirken hata:", error.message);
   }
+
 
   try {
     // create user profile
@@ -119,7 +122,10 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
       phoneNumber: phoneNumber || '',
       userRole: userRole
     };
+    if (userRole == 'p')
+      profile.generalFee = 0
     await firebase.database().ref(`users/${uid}/profile/`).set(profile);
+    await firebase.database().ref(`users/${uid}/wallet`).set("0");
     console.log("profile is created for new user");
   } catch (error) {
     console.log("yeni kullanıcı için profil oluşturulurken hata:", error.message);
@@ -137,8 +143,12 @@ export const fetch_profile = (callback, role = '') => async (dispatch) => {
     await firebase.database().ref(url).once('value', async (snapshot) => {
       let profile = snapshot.val();
       //profile = { ...profile, ..._user };
-      console.log("returning profile with callback", profile);
-      callback(profile);
+      await firebase.database().ref(`users/${_user.uid}/wallet`).on('value', (snap) => {
+        const wallet = snap ? snap.val() : 0;
+        console.log("returning profile with callback", profile);
+        callback({ ...profile, wallet});
+      });
+
       //return dispatch({ type: PROFILE_FETCH, payload: profile });
     });
   } catch (error) {
@@ -163,6 +173,7 @@ export const save_profile = (profile) => async (dispatch) => {
     delete profile.path;
   }
   delete profile.newPhoto;
+  delete profile.wallet;
   await firebase.database().ref(url).update(profile);
   console.log('save_profile is updated succesfully!', profile);
   console.log('save_profile is quiting...');

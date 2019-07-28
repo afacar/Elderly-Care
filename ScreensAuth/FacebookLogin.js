@@ -16,9 +16,9 @@ class FacebookLogin extends Component {
             (error, result) => {
               if (error) {
                 console.log(error);
-                this.props.handleLogin({ errorMessage: error.message });
+                // this.props.handleLogin({ errorMessage: error.message });
               } else if (result.isCancelled) {
-                this.props.handleLogin({ errorMessage: "Giriş iptal edildi!" });
+                // this.props.handleLogin({ errorMessage: "Giriş iptal edildi!" });
               } else {
                 AccessToken.getCurrentAccessToken().then(
                   async (data) => {
@@ -34,7 +34,7 @@ class FacebookLogin extends Component {
                       console.log("!Facebook Login Successful");
                     } catch (error) {
                       console.error("Facebook Login Hatası Detayı:", error);
-                      this.props.handleLogin({ errorMessage: "Facebook Login Hatası!" });
+                      // this.props.handleLogin({ errorMessage: "Facebook Login Hatası!" });
                     }
 
                     const { _user } = firebase.auth().currentUser;

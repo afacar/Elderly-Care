@@ -52,7 +52,6 @@ export const fetch_providers = (callback) => async (dispatch) => {
             console.error('error while caregivers providers!', error.message);
           }
         }
-
       });
     });
   } catch (error) {
@@ -61,23 +60,38 @@ export const fetch_providers = (callback) => async (dispatch) => {
 
 }
 
-export const send_provider_request = (providerId) => async (dispatch) => {
+export const send_provider_request = (providerId, providerFee, callback) => async (dispatch) => {
   console.log('send_provider_request is called with providerId', providerId);
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
+  const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
-  try {
-    // null means pending
-    await firebase.database().ref(caregiverurl).set('pending');
-    await firebase.database().ref(providerurl).set('pending');
-    await firebase.database().ref(providerRequestUrl).transaction(function (value) {
-      return (value || 0) + 1;
-    })
-  } catch (error) {
-    console.error('Error while adding provider', error.message);
-  }
-
+  const caregiverWalletUrl = `users/${_user.uid}/wallet`;
+  await firebase.database().ref(caregiverWalletUrl).on('value', async (walletSnap) => {
+    var wallet = 0;
+    wallet = walletSnap.val() ? walletSnap.val() : 0;
+    console.log('Wallet 1', wallet);
+    if (wallet >= providerFee) {
+      try {
+        console.log("Here");
+        // null means pending
+        await firebase.database().ref(caregiverurl).set('pending');
+        await firebase.database().ref(providerurl).set('pending');
+        await firebase.database().ref(caregiverFirstTimeUrl).set('true');
+        await firebase.database().ref(providerFirstTimeUrl).set('true');
+        await firebase.database().ref(providerRequestUrl).transaction(function (value) {
+          return (value || 0) + 1;
+        })
+        callback("success");
+      } catch (error) {
+        console.error('Error while adding provider', error.message);
+      }
+    } else {
+      callback("failure");
+    }
+  })
 }
 
 export const cancel_pending_request = (providerId) => async (dispatch) => {
@@ -85,12 +99,16 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
+  const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
 
   try {
     // Cancel the pending request to Provider
     await firebase.database().ref(caregiverurl).set(null);
     await firebase.database().ref(providerurl).set(null);
+    await firebase.database().ref(caregiverFirstTimeUrl).set(null);
+    await firebase.database().ref(providerFirstTimeUrl).set(null);
     await firebase.database().ref(providerRequestUrl).transaction(function (value) {
       return value - 1;
     })
@@ -153,5 +171,30 @@ export const fetch_caregivers = (callback) => async (dispatch) => {
   } catch (error) {
     console.error('fetch_caregivers hata:', error.message);
   }
+}
 
+export const setIBAN = (IBAN) => async (dispatch) => {
+  const { _user } = firebase.auth().currentUser;
+  const url = `users/${_user.uid}/profile/IBAN`;
+  firebase.database().ref(url).set(IBAN);
+}
+
+export const getIBAN = (callback) => async (dispatch) => {
+  const { _user } = firebase.auth().currentUser;
+  const url = `users/${_user.uid}/profile/IBAN`;
+  firebase.database().ref(url).once('value', (snapshot) => {
+    const IBAN = snapshot.val();
+    callback(IBAN);
+  });
+}
+
+export const getBalance = (callback) => async (dispatch) => {
+  const { _user } = firebase.auth().currentUser;
+  const url = `users/${_user.uid}/wallet`;
+  firebase.database().ref(url).once('value', (snapshot) => {
+    var balance = 0;
+    if (snapshot)
+      balance = snapshot.val();
+    callback(balance);
+  });
 }

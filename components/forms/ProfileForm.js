@@ -2,20 +2,40 @@ import React, { Component } from 'react';
 import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
-import Icon from 'react-native-vector-icons/FontAwesome';
-
-
-import { Input, Text, Card, Button } from 'react-native-elements';
+import { Input, Text, Card, Button, Icon, Overlay } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { CreditCardInput, LiteCreditCardInput } from "react-native-credit-card-input";
 
 import * as actions from '../../appstate/actions';
-import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput } from '../common';
+import {
+  CardItem,
+  DatePicker,
+  SaveButton,
+  LogoutButton,
+  ListPicker,
+  NoteInput,
+  PhoneInput,
+  EmailInput,
+  TextInput,
+  NumericInput,
+  ErrorLabel
+} from '../common';
 import Modal from 'react-native-modal';
 
 class _ProfileForm extends Component {
 
-  state = { profile: {}, loading: false, error: '', disabled: true };
+  state = {
+    profile: {},
+    loading: false,
+    error: '',
+    disabled: true,
+    price: '0',
+    priceError: '',
+    paymentError: '',
+    paymentResult: '',
+    isCardVisible: false,
+  };
+
   _isMounted = false;
 
   _fetchProfile = async () => {
@@ -112,74 +132,47 @@ class _ProfileForm extends Component {
 
   _onCardChange = (card) => this.setState({ card });
 
-
-  // buyer: {
-  //     id: 'BY789',
-  //     name: 'John',
-  //     surname: 'Doe',
-  //     gsmNumber: '+905350000000',
-  //     email: 'email@email.com',
-  //     identityNumber: '74300864791',
-  //     lastLoginDate: '2015-10-05 12:43:35',
-  //     registrationDate: '2013-04-21 15:12:09',
-  //     registrationAddress: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
-  //     ip: '85.34.78.112',
-  //     city: 'Istanbul',
-  //     country: 'Turkey',
-  //     zipCode: '34732'
-  // },
-  // shippingAddress: {
-  //     contactName: 'Jane Doe',
-  //     city: 'Istanbul',
-  //     country: 'Turkey',
-  //     address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
-  //     zipCode: '34742'
-  // },
-  // billingAddress: {
-  //     contactName: 'Jane Doe',
-  //     city: 'Istanbul',
-  //     country: 'Turkey',
-  //     address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
-  //     zipCode: '34742'
-  // },
-  // basketItems: [
-  //     {
-  //         id: 'BI101',
-  //         name: 'Binocular',
-  //         category1: 'Collectibles',
-  //         category2: 'Accessories',
-  //         itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
-  //         price
-  //     }
-  // ]
-
   _confirmPayment = async () => {
-    this.setState({ cardError: '' })
-    const { card } = this.state;
-    const { valid, status, values } = card;
-    if (valid) {
-      console.log('doing payment...');
-      await this.props.do_payment(this.state.card.values);
-      console.log('payment done!');
-    } else {
-      this.setState({ cardError: 'Kard bilgilerini kontrol edin!' })
+    this.setState({ cardError: '', paymentError: {} })
+    const { card, price } = this.state;
+    if (!card) {
+      this.setState({ paymentLoading: false, cardError: 'Kard bilgilerini kontrol edin!' })
+      return;
     }
+    const { valid, status, values } = card;
+    if (!valid) {
+      this.setState({ paymentLoading: false, cardError: 'Kard bilgilerini kontrol edin!' })
+    } else {
+      console.log('doing payment...');
+      this.setState({ paymentLoading: true });
+      this.props.do_payment(card.values, price)
+        .then(paymentResult => {
+          this.setState({ paymentResult, paymentLoading: false, price: '0' });
+          setTimeout(() => {
+            this.setState({ isCardVisible: false });
+          }, 2500);
+        })
+        .catch(paymentError => {
+          console.log('paymentError', paymentError)
+          this.setState({ paymentError, paymentLoading: false })
+        })
+      console.log('payment done!');
+    }
+  }
+
+  _prePayment = () => {
+    if (this.state.price <= 0) {
+      this.setState({ priceError: 'Miktar 0 TL uzeri olmadilir' })
+      return;
+    }
+    this.setState({ isCardVisible: true })
   }
 
   render() {
     console.log('ProfileForm rendered state,', this.state);
     return (
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
-        {/* <TouchableOpacity
-          onPress={this.onImageClicked}>
-          <View>
-            <Image
-              style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-              source={{ uri: this.state.profile.photoURL }}
-            />
-          </View>
-        </TouchableOpacity> */}
-        <View style={{ paddingBottom: 25}}>
+        <View style={{ paddingBottom: 25 }}>
           <ImageBackground style={{ width: 150, height: 150, alignSelf: 'center', justifyContent: 'flex-end' }}
             //imageStyle={{ borderRadius:75 }}
             source={{ uri: this.state.profile.photoURL }}
@@ -200,16 +193,58 @@ class _ProfileForm extends Component {
           </ImageBackground>
         </View>
 
+        <Overlay
+          backdropOpacity={1}
+          isVisible={this.state.isCardVisible}
+          onBackButtonPress={() => this.setState({ isCardVisible: false })} >
+          <>
+            {
+              this.state.paymentResult === '' && (<View>
+                <CreditCardInput
+                  requiresName
+                  requiresCVC
+                  onChange={this._onCardChange} />
+                <ErrorLabel>{this.state.cardError}</ErrorLabel>
+                <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
+                <Button disabled={this.state.paymentLoading} title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
+              </View>)
+            }
+            {
+              this.state.paymentResult !== '' && (<View style={{ alignSelf: 'center' }}>
+                <Icon
+                  name='check'
+                  type='antdesign'
+                  color='green'
+                  size={33}
+                />
+                <Text h4>{'Odeme Basarili!!!'}</Text>
+              </View>)
+            }
+          </>
+        </Overlay>
 
-        <Modal backdropOpacity={0.9} backdropColor='white' isVisible={this.state.isCardVisible} onBackButtonPress={() => this.setState({ isCardVisible: false })}>
-          <CreditCardInput
-            requiresName
-            requiresCVC
-            onChange={this._onCardChange} />
-          <Text>{this.state.cardError}</Text>
-          <Button title='Onayla' onPress={this._confirmPayment} />
-        </Modal>
-        <Button title='Odeme Yap' onPress={() => this.setState({ isCardVisible: true })} />
+        <CardItem>
+          <NumericInput
+            label="Cuzdan"
+            value={this.state.profile.wallet + ''}
+            editable={false}
+            style={{ flex: 1 }}
+          />
+          <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
+        </CardItem>
+        <CardItem>
+          <NumericInput
+            label='Tutar'
+            style={{ flex: 1 }}
+            errorMessage={this.state.priceError}
+            value={this.state.price}
+            onChangeText={(price) => this.setState({ price, priceError: '' })} />
+          <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
+          <Button
+            buttonStyle={{ flex: 1 }}
+            title='Odeme Yap' onPress={this._prePayment}
+          />
+        </CardItem>
 
         <CardItem>
           <TextInput

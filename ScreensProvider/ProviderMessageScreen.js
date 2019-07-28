@@ -1,5 +1,6 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform } from 'react-native';
+import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal } from 'react-native';
+import { Icon, Button } from 'react-native-elements';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
@@ -11,8 +12,14 @@ import { PermissionsAndroid } from 'react-native';
 import AudioCard from '../components/common/AudioCard';
 import Sound from "react-native-sound";
 
-import { ImageButton, AttachmentButton, CameraButton, MicButton } from '../components/common/Buttons.js'
+import { ImageButton, AttachmentButton, CameraButton, MicButton, CancelButton } from '../components/common/Buttons.js'
 import ImagePicker from 'react-native-image-picker';
+
+import firebase from 'react-native-firebase';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import { MODAL } from '../appstate/actions/types';
+
+var RNFS = require('react-native-fs');
 
 class ProviderMessageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -21,22 +28,55 @@ class ProviderMessageScreen extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
+    // headerRight: (
+    //   <View>
+    //     <TouchableOpacity onPress={() => navigation.navigate('PatientScreen', {
+    //       userid: navigation.getParam('userid', '')
+    //     })}>
+    //       <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+    //         <Image
+    //           style={{ width: 40, height: 40 }}
+    //           source={require('../assets/images/patient.png')}
+    //         />
+    //         <Text style={{ fontWeight: 'bold' }}>Hasta Bilgisi</Text>
+    //       </View>
+    //     </TouchableOpacity>
+    //   </View>
+    // <View style={{ flex: 1 }}>
+    //   {() => this.renderArchive(isArchived)}
+    // </View>
+    // )
     headerRight: (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate('PatientScreen', {
-          userid: navigation.getParam('userid', '')
-        })}>
-          <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
-            <Image
-              style={{ width: 40, height: 40 }}
-              source={require('../assets/images/patient.png')}
-            />
-            <Text style={{ fontWeight: 'bold' }}>Hasta Bilgisi</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
+      <Button
+        onPress={() => navigation.navigate('CaregiverAnswerScreen', {
+          chatId: navigation.getParam('chatId')
+        })}
+        title="Hasta Yanıtları"
+        titleStyle={{ color: 'black', fontSize: 12 }}
+        color='transparent'
+        buttonStyle={{ backgroundColor: 'transparent' }}
+        icon={<Icon name='info' type='material' size={30} color='#51A0D5' />} />
+    ),
   });
+
+  renderArchive = (isArchived) => {
+    if (isArchived) {
+      return (
+        <View>
+          <CameraButton />
+          <Text>Arşivden Çıkar</Text>
+        </View>
+      )
+    } else {
+      return (
+        <View>
+          <MicButton />
+          <Text>Arşivden Çıkar</Text>
+        </View>
+      )
+    }
+  }
+
 
   _isMounted = null;
 
@@ -51,6 +91,9 @@ class ProviderMessageScreen extends React.Component {
 
   state = {
     messages: [],
+    images: [],
+    imageIndex: 1,
+    showImage: false,
     isNewMessage: false,
     chatId: null,
     userRole: null,
@@ -69,6 +112,7 @@ class ProviderMessageScreen extends React.Component {
       IncludeBase64: true,
       AudioEncodingBitRate: 32000
     },
+    showAnswers: false
   };
 
   // More info on all the options is below in the API Reference... just some common use cases shown here
@@ -91,35 +135,81 @@ class ProviderMessageScreen extends React.Component {
     })
   }
 
+  openImage = (index) => {
+    console.log("Images", this.state.images);
+    this.setState({
+      showImage: true,
+      currentIndex: index
+    })
+  }
+
+  renderMessageImage = (props) => {
+    const images = [{
+      // Simplest usage.
+      url: props.currentMessage.image,
+      // You can pass props to <Image />.
+    }];
+    return (
+      <TouchableOpacity onPress={() => this.openImage(props.currentMessage.index)}>
+        <Image
+          source={{ uri: props.currentMessage.image }}
+          style={styles.image}
+        />
+      </TouchableOpacity>
+    );
+  }
+
   render() {
     const { chatId, userRole, messages, isApproved } = this.state;
     return (
-      <GiftedChat
-        key={chatId}
-        messages={messages}
-        locale='tr'
-        onSend={(message) => {
-          // TODO: Before sending message to server
-          // Add message to local state
-          /* this.setState(previousState => ({
-            messages: GiftedChat.append(previousState.messages, messages),
-          })) */
-          this.sendMessage(message);
-        }}
-        onInputTextChanged={(text) => { this.changeTypeState(text) }}
-        renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
-        showUserAvatar={true}
-        user={{
-          _id: this.props.getUid(),
-          name: this.props.getName(),
-          avatar: this.props.getPhotoURL(),
-        }}
-        placeholder='Mesaj yazın...'
-        renderSend={this._renderSend}
-        renderBubble={this.renderBubble}
-        renderActions={this.renderActions}
-        onPressAvatar={this.onPressAvatar}
-      />
+      <View style={{ flex: 1 }}>
+        <GiftedChat
+          key={chatId}
+          messages={messages}
+          locale='tr'
+          onSend={(message) => {
+            // TODO: Before sending message to server
+            // Add message to local state
+            /* this.setState(previousState => ({
+              messages: GiftedChat.append(previousState.messages, messages),
+            })) */
+            this.sendMessage(message);
+          }}
+          onInputTextChanged={(text) => { this.changeTypeState(text) }}
+          renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
+          showUserAvatar={false}
+          user={{
+            _id: this.props.getUid(),
+            name: this.props.getName(),
+            avatar: this.props.getPhotoURL(),
+          }}
+          placeholder='Mesaj yazın...'
+          renderSend={this._renderSend}
+          renderBubble={this.renderBubble}
+          renderActions={this.renderActions}
+          onPressAvatar={this.onPressAvatar}
+          renderMessageImage={this.renderMessageImage}
+        />
+        <Modal
+          visible={this.state.showImage}
+          transparent={true}
+        >
+          <ImageViewer
+            imageUrls={this.state.images}
+            onSwipeDown={() => this.setState({ showImage: false })}
+            enableSwipeDown={true}
+            index={this.state.currentIndex - 1}
+          />
+        </Modal>
+        <Modal
+          visible={this.state.showAnswers}
+          transparent={true}>
+          <View style={{ flex: 1, flexDirection: 'column' }}>
+            <Text style={{ alignSelf: 'center' }}>{this.state.QA}</Text>
+            <Button title='Kapat' buttonStyle={{ alignSelf: 'center', backgroundColor: '#51A0D5' }} onPress={() => { this.setState({ showAnswers: false }) }} />
+          </View>
+        </Modal>
+      </View>
     );
   }
 
@@ -260,12 +350,17 @@ class ProviderMessageScreen extends React.Component {
       name: this.props.getName(),
       avatar: this.props.getPhotoURL(),
     }
+
     if (!this.state.startAudio) {
+      var id = this.randIDGenerator();
+      this.setState({
+        lastAudioID: id
+      })
       this.setState({
         startAudio: true
       });
       const audioPath = `${
-        AudioUtils.DocumentDirectoryPath}/${this.randIDGenerator()}test.acc`;
+        AudioUtils.DocumentDirectoryPath}/${id}.acc`;
       await AudioRecorder.prepareRecordingAtPath(
         audioPath,
         this.state.audioSettings
@@ -273,14 +368,13 @@ class ProviderMessageScreen extends React.Component {
       await AudioRecorder.startRecording();
 
     } else {
-      this.setState({ startAudio: false });
-
       const filePath = await AudioRecorder.stopRecording();
       AudioRecorder.onFinished = data => {
         const message = {
           text: '',
-          audio: data.audioFileURL,
-          audioPath: filePath,
+          audio: filePath,
+          audioPath: data.audioFileURL,
+          _id: this.state.lastAudioID,
           image: '',
           user: {
             _id: this.props.getUid(),
@@ -288,6 +382,9 @@ class ProviderMessageScreen extends React.Component {
             avatar: this.props.getPhotoURL(),
           },
         }
+        this.setState({
+          startAudio: false
+        })
         this.sendMessage([message]);
       };
     }
@@ -348,26 +445,29 @@ class ProviderMessageScreen extends React.Component {
     for (let i = 0; i < messages.length; i++) {
       let message = messages[i];
       message.createdAt = new Date().getTime();
-      message._id = this.randIDGenerator();
-      var tmp = message.audio;
-      message.audio = message.audioPath;
-      message.audioPath = tmp;
+      if (!message._id)
+        message._id = this.randIDGenerator();
       await this.updateState(message);
       messagesArray.push(message);
     }
-    messages.forEach(message => {
-      var tmp = message.audio;
-      message.audio = message.audioPath;
-      message.audioPath = tmp;
-    })
     const { chatId, userRole, } = this.state;
     this.props.sendMessage(userRole, messagesArray, chatId);
   }
 
   updateState(message) {
-    this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message) }
-    });
+    if (message.image) {
+      message.index = this.state.imageIndex;
+      this.setState((previousState) => {
+        const image = {
+          url: message.image,
+        }
+        return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true, images: [...this.state.images, image], imageIndex: this.state.imageIndex + 1 };
+      });
+    } else {
+      this.setState((previousState) => {
+        return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true }
+      });
+    }
   }
 
   randIDGenerator = () => {
@@ -426,6 +526,19 @@ class ProviderMessageScreen extends React.Component {
     }
     if (messageData) {
       let messages = await JSON.parse(messageData);
+      console.log("All messages", messages);
+      messages.forEach(message => {
+        if (message.image) {
+          message.index = this.state.imageIndex;
+          const image = {
+            url: message.image,
+          }
+          this.setState({
+            images: [...this.state.images, image],
+            imageIndex: this.state.imageIndex + 1
+          })
+        }
+      })
       this._isMounted && this.setState({ messages });
       this._isMounted && this.fetch_messages();
     } else {
@@ -439,18 +552,102 @@ class ProviderMessageScreen extends React.Component {
     const { chatId, userRole } = this.state;
     this.props.fetchMessages(userRole, localMessageIds, chatId, (message) => {
       /** @callback */
-      this._isMounted && this.setState((previousState) => {
-        var allMessages = this.state.messages;
-        var exists = false;
-        allMessages.forEach(element => {
-          console.log(element);
-          if (element._id === message._id)
-            exists = true;
-        })
-        if (!exists) {
-          return { messages: GiftedChat.append(previousState.messages, message) }
+      var allMessages = this.state.messages;
+      var exists = false;
+      allMessages.forEach(element => {
+        if (element._id === message._id) {
+          console.log("Exists ", element);
+          exists = true;
+          if (message.audio) {
+            var filePath = `${AudioUtils.DocumentDirectoryPath}/${element._id}.acc`;
+            if (!RNFS.exists(filePath)) {
+              var ref = '';
+              var { _user } = firebase.auth().currentUser;
+              if (chatId === 'commonchat')
+                ref = 'chatFiles/commonchat/audio';
+              else if (userRole === 'p') {
+                ref = `chatFiles/${_user.uid}/${chatId}/audio`;
+              }
+              firebase.storage().ref().child(ref).child(message._id).downloadFile(filePath).then((onResolve, onReject) => {
+                if (onResolve) {
+                  if (RNFS.exists(filePath)) {
+                    console.log("Exists and downloaded");
+                    element.audio = filePath;
+                  }
+                  else {
+                    console.log("Exists but not downloaded");
+                    // could not download file
+                  }
+                }
+                else if (onReject)
+                  console.log("File not found");
+              });
+            }
+            else if (element.audio !== filePath) {
+              element.audio = filePath;
+              console.log("Exists and file path changed", element);
+              this.setState({
+                isNewMessage: true
+              })
+            }
+          }
         }
       });
+      if (!exists) {
+        console.log(" Not Exists ");
+        if (message.audio) {
+          var filePath = `${AudioUtils.DocumentDirectoryPath}/${message._id}.acc`;
+          var ref = '';
+          var { _user } = firebase.auth().currentUser;
+          if (chatId === 'commonchat')
+            ref = 'chatFiles/commonchat/audio';
+          else if (userRole === 'p') {
+            ref = `chatFiles/${_user.uid}/${chatId}/audio`;
+          }
+
+          firebase.storage().ref().child(ref).child(message._id).downloadFile(filePath).then((onResolve, onReject) => {
+            if (onResolve) {
+              if (RNFS.exists(filePath)) {
+                message.audio = filePath;
+                console.log(" Not Exists file saved ", message);
+                return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+              }
+              else {
+                // could not download file
+                console.log(" Not Exists  not downloaded");
+              }
+            }
+            else if (onReject)
+              console.log("File not found");
+          })
+            .catch((error) => {
+              console.log("File not found", error);
+            });
+        }
+        else {
+          console.log("File not an audio");
+        }
+      }
+      if (!exists) {
+        this._isMounted && this.setState((previousState) => {
+          console.log("New message", message)
+          if (message.image) {
+            message.index = this.state.imageIndex;
+            const image = {
+              url: message.image,
+            }
+            return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true, images: [...this.state.images, image], imageIndex: this.state.imageIndex + 1 };
+          }
+          else {
+            return { messages: GiftedChat.append(previousState.messages, message), isNewMessage: true };
+          }
+        })
+      } else {
+        console.log("Messages ", allMessages);
+        this.setState({
+          messages: allMessages,
+        })
+      }
     });
   }
 
@@ -475,8 +672,28 @@ class ProviderMessageScreen extends React.Component {
     this._isMounted = false;
   }
 
+  fetchAnswers = () => {
+    console.log("Answer fetch request");
+    const providerID = firebase.auth().currentUser.uid;
+    const caregiverID = this.state.chatId;
+    this.props.fetchDoctorAnswers(providerID, caregiverID, (QA) => {
+      console.log("QA", QA)
+      this.setState({
+        QA: QA,
+        showAnswers: true
+      })
+    })
+  }
 }
-
+const styles = {
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 13,
+    margin: 3,
+    resizeMode: 'cover',
+  },
+};
 /* function mapStateToProps({ chat, common }) {
   return { message: chat.message, common };
 } */

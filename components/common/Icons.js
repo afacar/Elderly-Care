@@ -115,7 +115,7 @@ export const CancelIcon = (props) => {
       onPress={props.onPress || null}
       paddingRight={1}
       size={24}
-      color='white'
+      color={props.color || 'white'}  
     //containerStyle={{ paddingRight: 10 }}
     />
   );
@@ -278,6 +278,18 @@ export const ResetIcon = (props) => {
     onPress={props.onPress || null}
     color ='grey'
     size={18}
+    />
+  );
+}
+
+export const RightIcon = (props) => {
+  return (
+    <Icon
+    name='chevron-right'
+    type='material'
+    onPress={props.onPress || null}
+    color ='grey'
+    size={30}
     />
   );
 }

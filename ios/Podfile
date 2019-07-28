@@ -27,4 +27,6 @@ pod 'GoogleSignIn', '~> 4.4.0'
 
   pod 'react-native-slider', :path => '../node_modules/@react-native-community/slider'
 
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
 end

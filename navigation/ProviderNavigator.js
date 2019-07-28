@@ -8,8 +8,15 @@ import ProviderMessageScreen from '../ScreensProvider/ProviderMessageScreen';
 import ChartScreen from '../ScreensCaregiver/ChartScreen';
 import PatientScreen from "../ScreensCaregiver/PatientScreen";
 import CaregiverList from '../ScreensProvider/CaregiverListScreen';
-import ProviderSettings from '../ScreensProvider/ProviderSettingsScreen';
+import ProviderProfileScreen from '../ScreensProvider/ProviderProfileScreen';
+import ProviderSettingsScreen from '../ScreensProvider/ProviderSettingsScreen';
+import ProviderConsultancySettingsScreen from '../ScreensProvider/ProviderConsultancySettingsScreen';
+import ProviderWalletScreen from '../ScreensProvider/ProviderWalletScreen';
+import ProviderArchiveScreen from '../ScreensProvider/ProviderArchiveScreen';
+import ProviderPQScreen from '../ScreensProvider/ProviderPQScreen';
 import UserProfileScreen from '../ScreensAuth/UserProfileScreen';
+import CaregiverAnswerScreen from '../ScreensProvider/CaregiverAnswerScreen';
+import ProviderChatSettingsScreen from '../ScreensProvider/ProviderChatSettingsScreen';
 
 const ProviderHomeStack = createStackNavigator({
   ProviderHome,
@@ -18,6 +25,7 @@ const ProviderHomeStack = createStackNavigator({
   CaregiverList,
   PatientScreen,
   ChartScreen,
+  CaregiverAnswerScreen
 });
 
 ProviderHomeStack.navigationOptions = {
@@ -31,8 +39,24 @@ ProviderHomeStack.navigationOptions = {
   ),
 };
 
+const ProviderConsultancyStack = createStackNavigator({
+  ProviderConsultancySettingsScreen: {
+    screen: ProviderConsultancySettingsScreen,
+  },
+  // ProviderChatSettingsScreen,
+  // ProviderAppointmentSettingsScreen,
+  // ProviderPQScreen
+});
+
 const ProviderSettingsStack = createStackNavigator({
-  ProviderSettings,
+  ProviderSettingsScreen,
+  ProviderProfileScreen,
+  ProviderConsultancySettingsScreen,
+  ProviderWalletScreen,
+  ProviderArchiveScreen,
+  ProviderMessageScreen,
+  ProviderPQScreen,
+  ProviderChatSettingsScreen
 });
 
 ProviderSettingsStack.navigationOptions = {

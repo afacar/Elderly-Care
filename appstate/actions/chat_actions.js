@@ -118,7 +118,7 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       var metadata = {
         contentType: 'audio/mp3',
       };
-      await firebase.storage().ref(audioUrl).child(message._id).putFile(message.audio, metadata);
+      await firebase.storage().ref(audioUrl).child(message._id).putFile(message.audioPath, metadata);
       audioDownloadUrl = await firebase.storage().ref(audioUrl).child(message._id).getDownloadURL();
     }
 
@@ -168,7 +168,7 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
   await firebase.database().ref(`caregivers/${uid}/chats/`).on('value', async (snapshot) => {
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
-      const { status, unread } = snap.val();
+      const { status, unread, firstTime } = snap.val();
       console.log(`chatId:${chatId} is approved: ${status} for user: ${uid} `);
 
       /** Set url, title, avatar as if it is common chat */
@@ -195,7 +195,7 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
 
         await firebase.database().ref(url).on('value', (snapshot) => {
           const lastMessage = snapshot.val() || '';
-          callback({ chatId, title, lastMessage, status, avatar, unread });
+          callback({ chatId, title, lastMessage, status, avatar, unread, firstTime });
         });
       }
     });
@@ -210,7 +210,7 @@ export const loadProviderChats = (callback) => async (dispatch) => {
     console.log('loadProviderChats snapshot', snapshot.val());
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
-      const { status, unread } = snap.val();
+      const { status, unread, isArchived } = snap.val();
       console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
 
       let url = 'commonchat/lastMessage';
@@ -237,7 +237,8 @@ export const loadProviderChats = (callback) => async (dispatch) => {
           await firebase.database().ref(url).on('value', (snapshot) => {
             console.log('last common message changed', snapshot.val());
             const lastMessage = snapshot.val() || '';
-            callback({ chatId, title, lastMessage, status, unread, avatar });
+            if (!isArchived)
+              callback({ chatId, title, lastMessage, status, unread, avatar });
           });
         } catch (error) {
           console.error('Chat son mesajı okunurken hata oldu', error.message);
@@ -248,7 +249,64 @@ export const loadProviderChats = (callback) => async (dispatch) => {
     });
   });
 }
+
+export const loadProviderArchives = (callback) => async (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+
+  await firebase.database().ref(`providers/${uid}/chats/`).on('value', async (snapshot) => {
+    console.log('loadProviderChats snapshot', snapshot.val());
+    snapshot.forEach(async (snap) => {
+      const chatId = snap.key;
+      const { status, unread, isArchived } = snap.val();
+      console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
+
+      let url = 'commonchat/lastMessage';
+      let title = 'Alzheimer grubu';
+      let avatar = require('../../assets/images/family.png');
+
+      if (chatId && status !== 'pending') {
+        if (chatId !== 'commonchat') {
+          url = `providerchat/${uid}/${chatId}/lastMessage`;
+          try {
+            // chatId is a caregiver id, so fetch the displayName as title
+            await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
+              const profile = snapshot.val();
+              const { photoURL, displayName } = profile;
+              title = displayName || 'İsimsiz Uzman';
+              avatar = photoURL ? { uri: photoURL } : require('../../assets/images/user.png');
+            });
+          } catch (error) {
+            console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
+          }
+        }
+
+        try {
+          await firebase.database().ref(url).on('value', (snapshot) => {
+            console.log('last common message changed', snapshot.val());
+            if (isArchived)
+              callback({ chatId, title, avatar });
+          });
+        } catch (error) {
+          console.error('Chat son mesajı okunurken hata oldu', error.message);
+        }
+
+      }
+
+    });
+  });
+}
+
 // load currently playing chat audio
 export const setAudio = (id) => async (dispatch) => {
-    return dispatch({ type: CHATS_AUDIO, payload: { id } })
+  return dispatch({ type: CHATS_AUDIO, payload: { id } })
+}
+
+export const sendAnswers = (answers, providerID) => async ( dispatch) => {
+  console.log("Answers", answers)
+  const uid = firebase.auth().currentUser.uid;
+  const completedPrelimURL = `providers/${providerID}/chats/${uid}`;
+  firebase.database().ref(completedPrelimURL).child("completedPrelim").set(true);
+  firebase.database().ref(completedPrelimURL).child("firstTime").set(false);
+  firebase.database().ref(`caregivers/${uid}/chats/${providerID}`).child("firstTime").set(false);
+  firebase.database().ref(completedPrelimURL).child("answers").set(answers);
 }
