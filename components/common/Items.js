@@ -103,7 +103,7 @@ export const LabeledItem = (props) => {
     <View style={{ flexDirection: 'row' }}>
       {props.label && <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{props.label}</Text>}
       {
-        props.content && <Text textBreakStrategy='highQuality' style={{ fontSize: 15 }}>{props.onPress}</Text>
+        props.content && <Text textBreakStrategy='highQuality' style={{ fontSize: 15 }}>{props.content}</Text>
       }
     </View>
   );

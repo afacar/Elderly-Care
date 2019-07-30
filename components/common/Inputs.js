@@ -52,7 +52,7 @@ export class TextInput extends Component {
   }
 
   render() {
-    const { label, placeholder, value, onChangeText, errorMessage, editable,multiline } = this.props;
+    const { label, placeholder, value, onChangeText, errorMessage, editable, multiline } = this.props;
 
     return (
       <Input
@@ -74,7 +74,7 @@ export class TextInput extends Component {
     const { value, must } = this.props;
 
     if (!must || value.trim()) return true;
-    
+
     this.input.shake();
     return false;
   }
@@ -86,7 +86,7 @@ export class NumericInput extends Component {
   };
 
   render() {
-    const { label, value, onChangeText, placeholder, errorMessage,editable } = this.props;
+    const { label, value, onChangeText, placeholder, errorMessage, editable, style } = this.props;
 
     return (
       <Input
@@ -95,10 +95,11 @@ export class NumericInput extends Component {
         editable={editable}
         errorMessage={errorMessage}
         keyboardType="numeric"
-        maxLength={3}
+        maxLength={4}
         value={value}
         onChangeText={onChangeText}
         ref={ref => this.input = ref}
+        containerStyle={style}
       />
     );
   }

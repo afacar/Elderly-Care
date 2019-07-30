@@ -2,15 +2,24 @@ import React, { Component } from 'react';
 import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
-import Icon from 'react-native-vector-icons/FontAwesome';
-
-
-import { Input, Text, Card, Button } from 'react-native-elements';
+import { Input, Text, Card, Button, Icon, Overlay } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { CreditCardInput, LiteCreditCardInput } from "react-native-credit-card-input";
 
 import * as actions from '../../appstate/actions';
-import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, PhoneInput, EmailInput, TextInput, NumericInput } from '../common';
+import {
+  CardItem,
+  DatePicker,
+  SaveButton,
+  LogoutButton,
+  ListPicker,
+  NoteInput,
+  PhoneInput,
+  EmailInput,
+  TextInput,
+  NumericInput,
+  ErrorLabel
+} from '../common';
 import Modal from 'react-native-modal';
 
 class _ProfileForm extends Component {
@@ -24,6 +33,7 @@ class _ProfileForm extends Component {
     priceError: '',
     paymentError: '',
     paymentResult: '',
+    isCardVisible: false,
   };
 
   _isMounted = false;
@@ -125,6 +135,10 @@ class _ProfileForm extends Component {
   _confirmPayment = async () => {
     this.setState({ cardError: '', paymentError: {} })
     const { card, price } = this.state;
+    if (!card) {
+      this.setState({ paymentLoading: false, cardError: 'Kard bilgilerini kontrol edin!' })
+      return;
+    }
     const { valid, status, values } = card;
     if (!valid) {
       this.setState({ paymentLoading: false, cardError: 'Kard bilgilerini kontrol edin!' })
@@ -133,9 +147,13 @@ class _ProfileForm extends Component {
       this.setState({ paymentLoading: true });
       this.props.do_payment(card.values, price)
         .then(paymentResult => {
-          this.setState({ paymentResult, paymentLoading: false });
+          this.setState({ paymentResult, paymentLoading: false, price: '0' });
+          setTimeout(() => {
+            this.setState({ isCardVisible: false });
+          }, 2500);
         })
         .catch(paymentError => {
+          console.log('paymentError', paymentError)
           this.setState({ paymentError, paymentLoading: false })
         })
       console.log('payment done!');
@@ -175,25 +193,58 @@ class _ProfileForm extends Component {
           </ImageBackground>
         </View>
 
+        <Overlay
+          backdropOpacity={1}
+          isVisible={this.state.isCardVisible}
+          onBackButtonPress={() => this.setState({ isCardVisible: false })} >
+          <>
+            {
+              this.state.paymentResult === '' && (<View>
+                <CreditCardInput
+                  requiresName
+                  requiresCVC
+                  onChange={this._onCardChange} />
+                <ErrorLabel>{this.state.cardError}</ErrorLabel>
+                <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
+                <Button disabled={this.state.paymentLoading} title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
+              </View>)
+            }
+            {
+              this.state.paymentResult !== '' && (<View style={{ alignSelf: 'center' }}>
+                <Icon
+                  name='check'
+                  type='antdesign'
+                  color='green'
+                  size={33}
+                />
+                <Text h4>{'Odeme Basarili!!!'}</Text>
+              </View>)
+            }
+          </>
+        </Overlay>
 
-        <Modal backdropOpacity={0.9} backdropColor='white' isVisible={this.state.isCardVisible} onBackButtonPress={() => this.setState({ isCardVisible: false })}>
-          <CreditCardInput
-            requiresName
-            requiresCVC
-            onChange={this._onCardChange} />
-          <Text>{this.state.cardError}</Text>
-          <Text>{this.state.paymentResult && 'Odeme Basarili :>'}</Text>
-          <Text>{this.state.paymentError.message}</Text>
-          <Button disabled={this.state.paymentLoading} title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
-        </Modal>
-
-
-        <NumericInput
-          label='Tutar'
-          errorMessage={this.state.priceError}
-          value={this.state.price}
-          onChangeText={(price) => this.setState({ price, priceError: '' })} />
-        <Button title='Odeme Yap' onPress={this._prePayment} />
+        <CardItem>
+          <NumericInput
+            label="Cuzdan"
+            value={this.state.profile.wallet + ''}
+            editable={false}
+            style={{ flex: 1 }}
+          />
+          <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
+        </CardItem>
+        <CardItem>
+          <NumericInput
+            label='Tutar'
+            style={{ flex: 1 }}
+            errorMessage={this.state.priceError}
+            value={this.state.price}
+            onChangeText={(price) => this.setState({ price, priceError: '' })} />
+          <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
+          <Button
+            buttonStyle={{ flex: 1 }}
+            title='Odeme Yap' onPress={this._prePayment}
+          />
+        </CardItem>
 
         <CardItem>
           <TextInput
