@@ -307,9 +307,15 @@ class CaregiverMessageScreen extends React.Component {
       await AudioRecorder.startRecording();
 
     } else {
-      const filePath = await AudioRecorder.stopRecording();
-      console.log("FilePath", filePath);
+      var filePath = await AudioRecorder.stopRecording();
+
       AudioRecorder.onFinished = data => {
+        var audioPath = data.audioFileURL;
+        console.log("audioPath", audioPath);
+        if (Platform.OS == 'ios') {
+          filePath = audioPath
+        }
+        console.log("FilePath", filePath);
         const message = {
           text: '',
           audio: filePath,
@@ -378,12 +384,13 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   sendMessage = async (messages) => {
+    console.log("Prelim", this.state.completedPrelim)
     if (this.state.completedPrelim) {
       let messagesArray = [];
       for (let i = 0; i < messages.length; i++) {
         let message = messages[i];
         message.createdAt = new Date().getTime();
-        if (!message._id)
+        if ( !message._id)
           message._id = this.randIDGenerator();
         await this.updateState(message);
         messagesArray.push(message);
@@ -604,6 +611,8 @@ class CaregiverMessageScreen extends React.Component {
           exists = true;
           if (message.audio) {
             var filePath = `${AudioUtils.DocumentDirectoryPath}/${element._id}.acc`;
+            if (Platform.OS == 'ios')
+              filePath = 'file://' + filePath;
             if (!RNFS.exists(filePath)) {
               var ref = '';
               var { _user } = firebase.auth().currentUser;
@@ -641,6 +650,8 @@ class CaregiverMessageScreen extends React.Component {
         console.log(" Not Exists ");
         if (message.audio) {
           var filePath = `${AudioUtils.DocumentDirectoryPath}/${message._id}.acc`;
+          if (Platform.OS == 'ios')
+              filePath = 'file://' + filePath;
           var ref = '';
           var { _user } = firebase.auth().currentUser;
           if (chatId === 'commonchat')
