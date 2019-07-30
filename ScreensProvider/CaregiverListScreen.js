@@ -112,6 +112,8 @@ class CaregiverList extends Component {
         </View>
       );
     } else if (caregiver.status === true) {
+      // If this is an ongoing consulting,
+      // it shouldnt be listed here
       subtitle = (
         <RowItem>
           <Text>Danışmanlık alıyor!</Text>
@@ -119,6 +121,7 @@ class CaregiverList extends Component {
         </RowItem>
       );
     } else if (caregiver.status === false) {
+      // Rejected request also should be removed
       subtitle = (
         <RowItem>
           <Text>Danışmanlık reddedildi!</Text>
@@ -126,6 +129,7 @@ class CaregiverList extends Component {
         </RowItem>
       );
     } else if (caregiver.status === 'pause') {
+      // There is no pause 
       subtitle = (
         <RowItem>
           <Text>Danışmanlık durduldu!</Text>
@@ -170,12 +174,11 @@ class CaregiverList extends Component {
 
           if (!caregivers[caregiverId]) caregivers[caregiverId] = {};
           caregivers[caregiverId] = profile;
-          console.log('!Returning new state ', caregivers);
           return { caregivers };
         });
       });
     } catch (error) {
-      console.error('CaregiverList didMount has error:', error.message);
+      console.log('CaregiverList didMount has error:', error.message);
     }
   }
 
