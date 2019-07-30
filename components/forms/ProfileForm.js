@@ -20,7 +20,6 @@ import {
   NumericInput,
   ErrorLabel
 } from '../common';
-import Modal from 'react-native-modal';
 
 class _ProfileForm extends Component {
 
@@ -32,8 +31,10 @@ class _ProfileForm extends Component {
     price: '0',
     priceError: '',
     paymentError: '',
-    paymentResult: '',
+    paymentResult: null,
     isCardVisible: false,
+    isPaying: false,
+    isPriceSet: false,
   };
 
   _isMounted = false;
@@ -149,7 +150,7 @@ class _ProfileForm extends Component {
         .then(paymentResult => {
           this.setState({ paymentResult, paymentLoading: false, price: '0' });
           setTimeout(() => {
-            this.setState({ isCardVisible: false });
+            this.setState({ isCardVisible: false, paymentResult: null, isPriceSet: false });
           }, 2500);
         })
         .catch(paymentError => {
@@ -165,7 +166,7 @@ class _ProfileForm extends Component {
       this.setState({ priceError: 'Miktar 0 TL uzeri olmadilir' })
       return;
     }
-    this.setState({ isCardVisible: true })
+    this.setState({ isPaying: true, isPriceSet: true });
   }
 
   render() {
@@ -196,29 +197,52 @@ class _ProfileForm extends Component {
         <Overlay
           backdropOpacity={1}
           isVisible={this.state.isCardVisible}
-          onBackButtonPress={() => this.setState({ isCardVisible: false })} >
+          onBackdropPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })} >
           <>
             {
-              this.state.paymentResult === '' && (<View>
-                <CreditCardInput
-                  requiresName
-                  requiresCVC
-                  onChange={this._onCardChange} />
-                <ErrorLabel>{this.state.cardError}</ErrorLabel>
-                <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
-                <Button disabled={this.state.paymentLoading} title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
-              </View>)
+              !this.state.isPriceSet && (
+                <CardItem>
+                  <NumericInput
+                    label='Tutar'
+                    style={{ flex: 1 }}
+                    errorMessage={this.state.priceError}
+                    value={this.state.price}
+                    onChangeText={(price) => this.setState({ price, priceError: '' })} />
+                  <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
+                  <Button
+                    buttonStyle={{ flex: 1 }}
+                    title='Odeme Yap' onPress={this._prePayment}
+                  />
+                </CardItem>
+              )
             }
             {
-              this.state.paymentResult !== '' && (<View style={{ alignSelf: 'center' }}>
-                <Icon
-                  name='check'
-                  type='antdesign'
-                  color='green'
-                  size={33}
-                />
-                <Text h4>{'Odeme Basarili!!!'}</Text>
-              </View>)
+              (this.state.isPriceSet && this.state.paymentResult === '') && (
+                <View>
+                  <CreditCardInput
+                    requiresName
+                    requiresCVC
+                    onChange={this._onCardChange} />
+                  <ErrorLabel>{this.state.cardError}</ErrorLabel>
+                  <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
+                  <Button 
+                    disabled={this.state.paymentLoading} 
+                    title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
+                </View>
+              )
+            }
+            {
+              (this.state.isPriceSet && this.state.paymentResult !== '') && (
+                <View style={{ alignSelf: 'center' }}>
+                  <Icon
+                    name='check'
+                    type='antdesign'
+                    color='green'
+                    size={33}
+                  />
+                  <Text h4>Ödeme Başarılı!</Text>
+                </View>
+              )
             }
           </>
         </Overlay>
@@ -231,18 +255,10 @@ class _ProfileForm extends Component {
             style={{ flex: 1 }}
           />
           <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
-        </CardItem>
-        <CardItem>
-          <NumericInput
-            label='Tutar'
-            style={{ flex: 1 }}
-            errorMessage={this.state.priceError}
-            value={this.state.price}
-            onChangeText={(price) => this.setState({ price, priceError: '' })} />
-          <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
           <Button
             buttonStyle={{ flex: 1 }}
-            title='Odeme Yap' onPress={this._prePayment}
+            type='outline'
+            title='Kredi Al' onPress={() => this.setState({ isCardVisible: true, paymentResult: '' })}
           />
         </CardItem>
 
