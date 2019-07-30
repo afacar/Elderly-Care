@@ -1,10 +1,10 @@
 import React from 'react';
 import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text, Image } from 'react-native';
-import { ListItem, Badge } from 'react-native-elements';
+import { ListItem, Badge, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
 import * as actions from '../appstate/actions';
-import { Icon } from '../components/common';
+import { CardItem } from '../components/common';
 
 class ProviderHome extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -61,6 +61,7 @@ class ProviderHome extends React.Component {
 
   _setChats = (chat) => {
     const { chatId, title, lastMessage, status, unread, avatar } = chat;
+    console.log('new lastMessage', lastMessage)
     this._isMounted && this.setState(previousState => {
       var { chats } = previousState;
 
@@ -99,16 +100,17 @@ class ProviderHome extends React.Component {
     return 0;
   }
 
-  async componentDidMount() {
-    console.log('ProviderHomeScreen Mounted!');
-    this._isMounted = true;
-    // Load the chatRooms with lastMessages
-    await this.props.loadProviderChats(this._setChats);
-  }
-
   _onPressItem = (data) => {
     console.log("We now navigate to MessageScreen with key", data);
     this.props.navigation.navigate('ProviderMessageScreen', data);
+  }
+
+  respondResquest = async (caregiverId, response) => {
+    try {
+      await this.props.respond_caregiver_request(caregiverId, response);
+    } catch (error) {
+      console.error('_approveCaregiverRequest hatası', error.message);
+    }
   }
 
   _renderItem = ({ item }) => {
@@ -116,6 +118,7 @@ class ProviderHome extends React.Component {
     const theChat = this.state.chats[chatId]
     /** item is a chatRoom object -> chatRoom1: { lastMessage: {...} } */
     console.log('RenderItem theChat', theChat);
+    const uid = firebase.auth().currentUser._user.uid
     const title = theChat.title;
     const lastMessage = theChat.lastMessage;
     let avatar = theChat.avatar;
@@ -126,14 +129,26 @@ class ProviderHome extends React.Component {
     let badge = null;
 
     if (isApproved === false) return;
-
+    subtitle = <Text>{userName + ' sesli mesaj'}</Text>;
     if (isApproved === 'pause') {
       subtitle = <Text style={{ color: 'red' }}>Hizmet durduruldu!</Text>
+    } else if (isApproved === 'pending') {
+      subtitle = (
+        <CardItem>
+          <Text> Yeni danismanlik talebi</Text>
+          <Icon
+            type='material-community' name='close' color='red' size={34}
+            onPress={() => this.respondResquest(chatId, false)} />
+          <Icon
+            type='material-community' name='check-all' color='green' size={34}
+            onPress={() => this.respondResquest(chatId, true)} />
+        </CardItem>
+      )
     } else if (lastMessage) {
       if (chatId === 'commonchat') {
-        userName = (lastMessage.user._id === firebase.auth().currentUser._user.uid) ? 'Siz:' : lastMessage.user.name + ':';
+        userName = (lastMessage.user._id === uid) ? 'Siz:' : lastMessage.user.name + ':';
       } else {
-        userName = (lastMessage.user._id === firebase.auth().currentUser._user.uid) ? 'Siz:' : '';
+        userName = (lastMessage.user._id === uid) ? 'Siz:' : '';
       }
       if (lastMessage.text)
         subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
@@ -188,6 +203,12 @@ class ProviderHome extends React.Component {
         />
       </ScrollView>
     );
+  }
+
+  async componentDidMount() {
+    this._isMounted = true;
+    // Load the chatRooms with lastMessages
+    await this.props.loadProviderChats(this._setChats);
   }
 
   componentWillUnmount() {

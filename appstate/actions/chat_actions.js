@@ -217,9 +217,8 @@ export const loadProviderChats = (callback) => async (dispatch) => {
       let title = 'Alzheimer grubu';
       let avatar = require('../../assets/images/family.png');
 
-      if (chatId && status !== 'pending') {
+      if (chatId) {
         if (chatId !== 'commonchat') {
-          url = `providerchat/${uid}/${chatId}/lastMessage`;
           try {
             // chatId is a caregiver id, so fetch the displayName as title
             await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
@@ -233,9 +232,9 @@ export const loadProviderChats = (callback) => async (dispatch) => {
           }
         }
 
+        url = `providerchat/${uid}/${chatId}/lastMessage`;
         try {
           await firebase.database().ref(url).on('value', (snapshot) => {
-            console.log('last common message changed', snapshot.val());
             const lastMessage = snapshot.val() || '';
             if (!isArchived)
               callback({ chatId, title, lastMessage, status, unread, avatar });

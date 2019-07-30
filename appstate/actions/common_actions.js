@@ -62,14 +62,25 @@ export const fetch_providers = (callback) => async (dispatch) => {
 
 export const send_provider_request = (providerId, providerFee, callback) => async (dispatch) => {
   console.log('1 send_provider_request is called with providerId', providerId);
-  const { _user } = firebase.auth().currentUser;
-  const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
-  const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
-  const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
-  const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
+  const { uid, photoURL, displayName } = firebase.auth().currentUser;
+  const caregiverurl = `caregivers/${uid}/chats/${providerId}/`;
+  const providerurl = `providers/${providerId}/chats/${uid}/`;
+  const chaturl = `providerchat/${providerId}/${uid}/`;
+  const providerFirstTimeUrl = `providers/${providerId}/chats/${uid}/firstTime`;
+  const caregiverFirstTimeUrl = `caregivers/${uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
-  const caregiverWalletUrl = `wallets/${_user.uid}/`;
-  const suspendMoneyUrl = `pendingTransactions/${_user.uid}/${providerId}/`;
+  const caregiverWalletUrl = `wallets/${uid}/`;
+  const suspendMoneyUrl = `pendingTransactions/${uid}/${providerId}/`;
+
+  const firstMessage = {
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    text: '',
+    user: {
+      _id: uid,
+      avatar: photoURL,
+      name: displayName,
+    }
+  }
 
   await firebase.database().ref(caregiverWalletUrl).once('value', async (walletSnap) => {
     var wallet = 0;
@@ -79,10 +90,11 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
       try {
         console.log('3 send_provider_request wallet is enough');
         // null means pending
-        await firebase.database().ref(caregiverurl).set('pending');
-        await firebase.database().ref(providerurl).set('pending');
-        await firebase.database().ref(caregiverFirstTimeUrl).set('true');
-        await firebase.database().ref(providerFirstTimeUrl).set('true');
+        await firebase.database().ref(caregiverurl).child('status').set('pending');
+        await firebase.database().ref(providerurl).child('status').set('pending');
+        await firebase.database().ref(chaturl).child('lastMessage').set(firstMessage);
+        await firebase.database().ref(caregiverurl).child('firstTime').set('true');
+        await firebase.database().ref(providerurl).child('firstTime').set('true');
         await firebase.database().ref(providerRequestUrl).transaction(function (value) {
           return (value || 0) + 1;
         });
@@ -102,10 +114,11 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
 export const cancel_pending_request = (providerId) => async (dispatch) => {
   console.log('cancel_pending_request is called with providerId', providerId);
   const { _user } = firebase.auth().currentUser;
-  const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
-  const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/`;
+  const providerurl = `providers/${providerId}/chats/${_user.uid}/`;
+  const chaturl = `providerchat/${providerId}/${_user.uid}/`;
   const pendingTransactionUrl = `pendingTransactions/${_user.uid}/${providerId}/`;
-  
+
   const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
   const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
@@ -115,8 +128,9 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
     // Cancel the pending request to Provider
     await firebase.database().ref(caregiverurl).set(null);
     await firebase.database().ref(providerurl).set(null);
-    await firebase.database().ref(caregiverFirstTimeUrl).set(null);
-    await firebase.database().ref(providerFirstTimeUrl).set(null);
+    await firebase.database().ref(chaturl).child('lastMessage').set(null);
+    //await firebase.database().ref(caregiverFirstTimeUrl).set(null);
+    //await firebase.database().ref(providerFirstTimeUrl).set(null);
     await firebase.database().ref(pendingTransactionUrl).set(null);
     await firebase.database().ref(providerRequestUrl).transaction(function (value) {
       return value - 1;
