@@ -61,21 +61,23 @@ export const fetch_providers = (callback) => async (dispatch) => {
 }
 
 export const send_provider_request = (providerId, providerFee, callback) => async (dispatch) => {
-  console.log('send_provider_request is called with providerId', providerId);
+  console.log('1 send_provider_request is called with providerId', providerId);
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
   const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
   const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
-  const caregiverWalletUrl = `users/${_user.uid}/wallet`;
-  await firebase.database().ref(caregiverWalletUrl).on('value', async (walletSnap) => {
+  const caregiverWalletUrl = `wallets/${_user.uid}/`;
+  const suspendMoneyUrl = `pendingTransactions/${_user.uid}/${providerId}/`;
+
+  await firebase.database().ref(caregiverWalletUrl).once('value', async (walletSnap) => {
     var wallet = 0;
     wallet = walletSnap.val() ? walletSnap.val() : 0;
-    console.log('Wallet 1', wallet);
+    console.log('2 send_provider_request wallet balance=>', wallet);
     if (wallet >= providerFee) {
       try {
-        console.log("Here");
+        console.log('3 send_provider_request wallet is enough');
         // null means pending
         await firebase.database().ref(caregiverurl).set('pending');
         await firebase.database().ref(providerurl).set('pending');
@@ -83,10 +85,13 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
         await firebase.database().ref(providerFirstTimeUrl).set('true');
         await firebase.database().ref(providerRequestUrl).transaction(function (value) {
           return (value || 0) + 1;
-        })
+        });
+        await firebase.database().ref(suspendMoneyUrl).set({ providerFee });
+        console.log('4 send_provider_request providerFee is transfered to pendingTransactions');
         callback("success");
       } catch (error) {
-        console.error('Error while adding provider', error.message);
+        console.error('5 send_provider_request Error while sending to provider', error.message);
+        callback("failure");
       }
     } else {
       callback("failure");
@@ -99,9 +104,12 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/status`;
   const providerurl = `providers/${providerId}/chats/${_user.uid}/status`;
+  const pendingTransactionUrl = `pendingTransactions/${_user.uid}/${providerId}/`;
+  
   const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
   const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
+
 
   try {
     // Cancel the pending request to Provider
@@ -109,6 +117,7 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
     await firebase.database().ref(providerurl).set(null);
     await firebase.database().ref(caregiverFirstTimeUrl).set(null);
     await firebase.database().ref(providerFirstTimeUrl).set(null);
+    await firebase.database().ref(pendingTransactionUrl).set(null);
     await firebase.database().ref(providerRequestUrl).transaction(function (value) {
       return value - 1;
     })
