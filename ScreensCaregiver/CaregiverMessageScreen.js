@@ -521,40 +521,41 @@ class CaregiverMessageScreen extends React.Component {
   }
   loadQuestions = async (chatId) => {
     console.log("First question");
-    const message = {
-      text: 'Daha iyi ve hızlı doktor hizmeti için lütfen az sonra ekrana çıkacak olan, doktorunuzun sunduğu ön hazırlık sorularını yanıtlayınız. Bir sonraki soruya geçebilmek için yanıtınızın bittiğine emin olduğunuzda "sonraki" yazıp gönderiniz.',
-      _id: -1,
-      createdAt: new Date().getTime(),
-      user: {
-        _id: this.state.chatId,
-        name: this.state.title
-      }
-    }
-    this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message) };
-    })
-    console.log("First question written");
     await this.props.fetchDoctorQuestions(chatId, (questionArray) => {
       var finalQuestions = [];
-      for (var i = 0; i < questionArray.length; i++) {
-        finalQuestions[i] = {
-          text: questionArray[i],
-          _id: i,
+      if (questionArray) {
+        const message = {
+          text: 'Daha iyi ve hızlı doktor hizmeti için lütfen az sonra ekrana çıkacak olan, doktorunuzun sunduğu ön hazırlık sorularını yanıtlayınız. Bir sonraki soruya geçebilmek için yanıtınızın bittiğine emin olduğunuzda "sonraki" yazıp gönderiniz.',
+          _id: -1,
+          createdAt: new Date().getTime(),
           user: {
             _id: this.state.chatId,
             name: this.state.title
           }
         }
-      }
-      this.setState({
-        preliminaryQuestions: finalQuestions
-      })
+        this.setState((previousState) => {
+          return { messages: GiftedChat.append(previousState.messages, message) };
+        })
+        for (var i = 0; i < questionArray.length; i++) {
+          finalQuestions[i] = {
+            text: questionArray[i],
+            _id: i,
+            user: {
+              _id: this.state.chatId,
+              name: this.state.title
+            }
+          }
+        }
+        this.setState({
+          preliminaryQuestions: finalQuestions
+        })
 
-      //TODO edit question array so that each message has user, id, text and createdAt
-      console.log("Questions", finalQuestions)
-      this.setState({
-        totalQuestions: finalQuestions.length
-      })
+        //TODO edit question array so that each message has user, id, text and createdAt
+        console.log("Questions", finalQuestions)
+        this.setState({
+          totalQuestions: finalQuestions.length
+        })
+      }
     })
   }
 

@@ -13,7 +13,7 @@ class ProviderChatSettingsScreen extends Component {
     }
 
     state = {
-        caregivers:[],
+        caregivers: [],
         generalFee: 0,
         noOfCaregivers: 0,
         saveButtonText: 'Kaydet',
@@ -68,7 +68,7 @@ class ProviderChatSettingsScreen extends Component {
         const caregiver = this.state.caregivers[item];
         console.log("Item", item)
         var { displayName, photoUrl, fee } = caregiver;
-        if ( !fee)
+        if (!fee)
             fee = caregiver.generalFee
         return (
             <View style={styles.chatItemStyle}>
@@ -84,7 +84,10 @@ class ProviderChatSettingsScreen extends Component {
 
     setNewFee = (newFee, caregiverIndex) => {
         const caregivers = this.state.caregivers;
-        caregivers[caregiverIndex].fee = newFee;
+        if (newFee)
+            caregivers[caregiverIndex].fee = newFee;
+        else
+            caregivers[caregiverIndex].fee = " ";
         this.setState({
             caregivers: caregivers,
             disabled: false
@@ -93,7 +96,7 @@ class ProviderChatSettingsScreen extends Component {
 
     setGeneralFee = (newFee) => {
         this.state.caregivers.forEach(caregiver => {
-            if ( caregiver.generalFee)
+            if (caregiver.generalFee)
                 caregiver.generalFee = newFee
         })
         this.setState({
