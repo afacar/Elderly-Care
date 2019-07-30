@@ -143,9 +143,14 @@ export const fetch_profile = (callback, role = '') => async (dispatch) => {
     await firebase.database().ref(url).once('value', async (snapshot) => {
       let profile = snapshot.val();
       //profile = { ...profile, ..._user };
-      await firebase.database().ref(`users/${_user.uid}/wallet`).on('value', (snap) => {
-        const wallet = snap ? snap.val() : 0;
-        console.log("returning profile with callback", profile);
+      await firebase.database().ref(`wallets/${_user.uid}/`).on('value', (snap) => {
+        console.log("snap", snap);
+        console.log("snap val", snap.val());
+        let wallet = 0;
+        if (snap !== null && snap.val() !== null) {
+          wallet = snap.val();
+        }
+        console.log("wallet", wallet);
         callback({ ...profile, wallet});
       });
 
