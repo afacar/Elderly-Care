@@ -59,7 +59,7 @@ class ProviderHome extends React.Component {
     }
   }
 
-  _fetchChatRooms = (chat) => {
+  _setChats = (chat) => {
     const { chatId, title, lastMessage, status, unread, avatar } = chat;
     this._isMounted && this.setState(previousState => {
       var { chats } = previousState;
@@ -87,7 +87,7 @@ class ProviderHome extends React.Component {
         delete sortedChats[tmpChat.chatId].chatId;
       }
       chats = sortedChats;
-      return { chats }
+      return { chats };
     });
   }
 
@@ -103,7 +103,7 @@ class ProviderHome extends React.Component {
     console.log('ProviderHomeScreen Mounted!');
     this._isMounted = true;
     // Load the chatRooms with lastMessages
-    await this.props.loadProviderChats(this._fetchChatRooms);
+    await this.props.loadProviderChats(this._setChats);
   }
 
   _onPressItem = (data) => {
