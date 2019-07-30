@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import { ListItem, Text, Badge } from 'react-native-elements';
+import { ListItem, Text, Badge, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
 import "moment/locale/tr";
@@ -12,20 +12,18 @@ import { SafeAreaView } from 'react-navigation';
 class ChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: `İletişim`,
-    headerTitleStyle: { textAlign: 'center', alignSelf: 'center' },
+    //headerTitleStyle: { textAlign: 'center' },
     headerStyle: {
       backgroundColor: 'white',
     },
     headerForceInset: { vercical: 'never' },
     headerRight: (
-
       <TouchableOpacity onPress={() => navigation.navigate('ProviderListScreen')}>
-        <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
-          <Image
-            style={{ width: 25, height: 25 }}
-            source={require('../assets/images/doctor2.png')}
-          />
-          <Text style={{ fontWeight: 'bold' }}>Uzman Ekle</Text>
+        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+          <Text style={{marginRight: 10, fontWeight: 'bold' }}>Uzman Bul</Text>
+          <Icon
+            type='material-community'
+            name='account-search' />
         </View>
       </TouchableOpacity>
     ),
