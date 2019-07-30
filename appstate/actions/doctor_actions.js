@@ -216,7 +216,10 @@ export const setChatSettings = (caregivers) => async (dispatch) => {
 export const setGeneralFee = (generalFee) => async (dispatch) => {
   const uid = firebase.auth().currentUser.uid;
   const generalFeeUrl = `providers/${uid}/generalFee`;
-  await firebase.database().ref(generalFeeUrl).set(generalFee);
+  const generalFeeUrl2 = `users/${uid}/profile/generalFee`;
+  const fee = parseFloat(generalFee);
+  await firebase.database().ref(generalFeeUrl).set(fee);
+  await firebase.database().ref(generalFeeUrl2).set(fee);
 }
 
 function getUser() {
