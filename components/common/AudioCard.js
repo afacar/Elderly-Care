@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Platform } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { PlayIcon, PauseIcon } from './Icons';
@@ -8,7 +8,7 @@ import { PauseButton, PlayButton, ResetButton } from './Buttons';
 import Sound from "react-native-sound";
 import * as actions from '../../appstate/actions/chat_actions';
 import { connect } from 'react-redux';
-import { Icon } from 'react-native-elements';
+import { Icon, Button } from 'react-native-elements';
 
 class AudioCard extends Component {
 
@@ -45,7 +45,7 @@ class AudioCard extends Component {
                 })
             }
             else {
-                console.log("Hata var", this.props.audio );
+                console.log("Hata var", this.props.audio);
             }
         })
     }
@@ -76,17 +76,17 @@ class AudioCard extends Component {
                     justifyContent: 'center',
                     padding: 8
                 }}>
-                    <TouchableHighlight style={{ backgroundColor: 'transparent', flex: 1, alignItems: "center" }}>
+                    <View style={{ backgroundColor: 'transparent', flex: 1, alignItems: "center" }}>
                         <View style={{ justifyContent: 'center', flex: 1 }}>
                             {this.renderPlayPause()}
                         </View>
-                    </TouchableHighlight>
+                    </View>
                     <View style={{
                         flex: 5,
                         justifyContent: 'center',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
                     }}>
-                        <View style={{ flex: 10, flexDirection: 'column', justifyContent: "center"}}>
+                        <View style={{ flex: 4, flexDirection: 'column', justifyContent: "center", borderWidth: 1 }}>
                             <Slider
                                 step={1}
                                 minimumValue={0}
@@ -94,8 +94,9 @@ class AudioCard extends Component {
                                 value={this.state.currentDuration}
                                 minimumTrackTintColor="#2fb4dc"
                                 thumbTintColor='#2fb4dc'
+
                                 onValueChange={(ChangedValue) => { this.SliderValueChanged(ChangedValue) }}
-                                style={{ marginLeft: 4, alignSelf: 'flex-end', width: '100%'}}
+                                style={{ marginLeft: 4, alignSelf: 'flex-end', width: '100%' }}
                             />
                             {/* <ProgressBar
                                 style={{ marginLeft: 4, alignSelf: 'flex-end' }}
@@ -153,6 +154,7 @@ class AudioCard extends Component {
     // }
 
     renderPlayPause = () => {
+        console.log("Here");
         if (this.props.currentAudio) {
             if (this.props.currentAudio.id === this.props.id) {
                 return <PauseButton onPress={this.stopPlaying} />
@@ -172,6 +174,7 @@ class AudioCard extends Component {
 
 
     startPlaying = () => {
+        console.log("Here 1");
         this.props.setAudio(this.props.id);
         this.setState({
             playing: true

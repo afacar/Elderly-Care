@@ -307,9 +307,15 @@ class CaregiverMessageScreen extends React.Component {
       await AudioRecorder.startRecording();
 
     } else {
-      const filePath = await AudioRecorder.stopRecording();
-      console.log("FilePath", filePath);
+      var filePath = await AudioRecorder.stopRecording();
+
       AudioRecorder.onFinished = data => {
+        var audioPath = data.audioFileURL;
+        console.log("audioPath", audioPath);
+        if (Platform.OS == 'ios') {
+          filePath = audioPath
+        }
+        console.log("FilePath", filePath);
         const message = {
           text: '',
           audio: filePath,
@@ -378,12 +384,13 @@ class CaregiverMessageScreen extends React.Component {
   }
 
   sendMessage = async (messages) => {
+    console.log("Prelim", this.state.completedPrelim)
     if (this.state.completedPrelim) {
       let messagesArray = [];
       for (let i = 0; i < messages.length; i++) {
         let message = messages[i];
         message.createdAt = new Date().getTime();
-        if (!message._id)
+        if ( !message._id)
           message._id = this.randIDGenerator();
         await this.updateState(message);
         messagesArray.push(message);
@@ -521,40 +528,41 @@ class CaregiverMessageScreen extends React.Component {
   }
   loadQuestions = async (chatId) => {
     console.log("First question");
-    const message = {
-      text: 'Daha iyi ve hızlı doktor hizmeti için lütfen az sonra ekrana çıkacak olan, doktorunuzun sunduğu ön hazırlık sorularını yanıtlayınız. Bir sonraki soruya geçebilmek için yanıtınızın bittiğine emin olduğunuzda "sonraki" yazıp gönderiniz.',
-      _id: -1,
-      createdAt: new Date().getTime(),
-      user: {
-        _id: this.state.chatId,
-        name: this.state.title
-      }
-    }
-    this.setState((previousState) => {
-      return { messages: GiftedChat.append(previousState.messages, message) };
-    })
-    console.log("First question written");
     await this.props.fetchDoctorQuestions(chatId, (questionArray) => {
       var finalQuestions = [];
-      for (var i = 0; i < questionArray.length; i++) {
-        finalQuestions[i] = {
-          text: questionArray[i],
-          _id: i,
+      if (questionArray) {
+        const message = {
+          text: 'Daha iyi ve hızlı doktor hizmeti için lütfen az sonra ekrana çıkacak olan, doktorunuzun sunduğu ön hazırlık sorularını yanıtlayınız. Bir sonraki soruya geçebilmek için yanıtınızın bittiğine emin olduğunuzda "sonraki" yazıp gönderiniz.',
+          _id: -1,
+          createdAt: new Date().getTime(),
           user: {
             _id: this.state.chatId,
             name: this.state.title
           }
         }
-      }
-      this.setState({
-        preliminaryQuestions: finalQuestions
-      })
+        this.setState((previousState) => {
+          return { messages: GiftedChat.append(previousState.messages, message) };
+        })
+        for (var i = 0; i < questionArray.length; i++) {
+          finalQuestions[i] = {
+            text: questionArray[i],
+            _id: i,
+            user: {
+              _id: this.state.chatId,
+              name: this.state.title
+            }
+          }
+        }
+        this.setState({
+          preliminaryQuestions: finalQuestions
+        })
 
-      //TODO edit question array so that each message has user, id, text and createdAt
-      console.log("Questions", finalQuestions)
-      this.setState({
-        totalQuestions: finalQuestions.length
-      })
+        //TODO edit question array so that each message has user, id, text and createdAt
+        console.log("Questions", finalQuestions)
+        this.setState({
+          totalQuestions: finalQuestions.length
+        })
+      }
     })
   }
 
@@ -603,6 +611,8 @@ class CaregiverMessageScreen extends React.Component {
           exists = true;
           if (message.audio) {
             var filePath = `${AudioUtils.DocumentDirectoryPath}/${element._id}.acc`;
+            if (Platform.OS == 'ios')
+              filePath = 'file://' + filePath;
             if (!RNFS.exists(filePath)) {
               var ref = '';
               var { _user } = firebase.auth().currentUser;
@@ -640,6 +650,8 @@ class CaregiverMessageScreen extends React.Component {
         console.log(" Not Exists ");
         if (message.audio) {
           var filePath = `${AudioUtils.DocumentDirectoryPath}/${message._id}.acc`;
+          if (Platform.OS == 'ios')
+              filePath = 'file://' + filePath;
           var ref = '';
           var { _user } = firebase.auth().currentUser;
           if (chatId === 'commonchat')

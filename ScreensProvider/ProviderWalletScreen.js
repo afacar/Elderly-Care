@@ -5,7 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { TextInput, CardItem, SaveButton } from '../components/common';
 import { Card, Input } from 'react-native-elements';
 import * as actions from '../appstate/actions/common_actions'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 class ProviderWalletScreen extends Component {
     static navigationOptions = {
@@ -14,30 +14,44 @@ class ProviderWalletScreen extends Component {
 
 
     getIBAN = () => {
-        this.props.getIBAN( (IBAN) => {
+        this.props.getIBAN((IBAN) => {
             this.setState({
                 IBAN: IBAN
             })
         })
-    } 
+    }
 
     state = {
         IBAN: "",
         balance: "0",
+        saveButtonText: 'Kaydet',
         disabled: true
     }
-    async componentDidMount () {
-        this.props.getIBAN( (IBAN) => {
+    async componentDidMount() {
+        this.props.getIBAN((IBAN) => {
             console.log(IBAN);
             this.setState({
-                IBAN:IBAN
+                IBAN: IBAN
             })
         });
-        this.props.getBalance( balance => {
+        this.props.getBalance(balance => {
             this.setState({
                 balance: balance,
-                disabled: false
             })
+        })
+    }
+
+    saveChatSettings = async () => {
+        this.setState({
+            disabled: true,
+            saveButtonText: 'Kaydediliyor',
+            loading: true
+        })
+
+        await this.props.setIBAN(this.state.IBAN) ;
+        this.setState({
+            saveButtonText: 'Kaydedildi',
+            loading: false
         })
     }
     render() {
@@ -63,6 +77,8 @@ class ProviderWalletScreen extends Component {
                             multiline={false}
                             onChangeText={(text) => {
                                 this.setState({
+                                    disabled: false,
+                                    saveButtonText: 'Kaydet',
                                     IBAN: text
                                 })
                             }}
@@ -70,9 +86,7 @@ class ProviderWalletScreen extends Component {
                     </CardItem>
                 </Card>
                 <CardItem>
-                    <SaveButton disabled={this.state.disabled} onPress={() => {
-                        this.props.setIBAN(this.state.IBAN)
-                    }} />
+                    <SaveButton title={this.state.loading ? 'Kaydediliyor' : this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
                 </CardItem>
             </View>
         )

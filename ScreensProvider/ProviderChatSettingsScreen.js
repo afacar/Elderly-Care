@@ -90,7 +90,10 @@ class ProviderChatSettingsScreen extends Component {
 
     setNewFee = (newFee, caregiverIndex) => {
         const caregivers = this.state.caregivers;
-        caregivers[caregiverIndex].fee = newFee;
+        if (newFee)
+            caregivers[caregiverIndex].fee = newFee;
+        else
+            caregivers[caregiverIndex].fee = " ";
         this.setState({
             caregivers: caregivers,
             disabled: false

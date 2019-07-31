@@ -368,8 +368,15 @@ class ProviderMessageScreen extends React.Component {
       await AudioRecorder.startRecording();
 
     } else {
-      const filePath = await AudioRecorder.stopRecording();
+      var filePath = await AudioRecorder.stopRecording();
+
       AudioRecorder.onFinished = data => {
+        var audioPath = data.audioFileURL;
+        console.log("audioPath", audioPath);
+        if (Platform.OS == 'ios') {
+          filePath = audioPath
+        }
+        console.log("FilePath", filePath);
         const message = {
           text: '',
           audio: filePath,
@@ -560,6 +567,8 @@ class ProviderMessageScreen extends React.Component {
           exists = true;
           if (message.audio) {
             var filePath = `${AudioUtils.DocumentDirectoryPath}/${element._id}.acc`;
+            if (Platform.OS == 'ios')
+              filePath = 'file://' + filePath;
             if (!RNFS.exists(filePath)) {
               var ref = '';
               var { _user } = firebase.auth().currentUser;
@@ -597,7 +606,8 @@ class ProviderMessageScreen extends React.Component {
         console.log(" Not Exists ");
         if (message.audio) {
           var filePath = `${AudioUtils.DocumentDirectoryPath}/${message._id}.acc`;
-          var ref = '';
+          if (Platform.OS == 'ios')
+            filePath = 'file://' + filePath; var ref = '';
           var { _user } = firebase.auth().currentUser;
           if (chatId === 'commonchat')
             ref = 'chatFiles/commonchat/audio';
