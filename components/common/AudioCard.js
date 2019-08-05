@@ -25,7 +25,11 @@ class AudioCard extends Component {
     }
 
     timer;
+    is_mounted = false;
 
+    componentDidMount() {
+        this.is_mounted = true;
+    }
     constructor(props) {
         super(props);
         const date = new Date(this.props.createdAt);
@@ -37,12 +41,14 @@ class AudioCard extends Component {
         const sound = new Sound(this.props.audio, "", error => {
             var duration = sound.getDuration();
             if (!error) {
-                this.setState({
-                    sound: sound,
-                    createdAt: dateh + ':' + datem,
-                    duration: duration,
-                    loading: false
-                })
+                if (this.is_mounted) {
+                    this.setState({
+                        sound: sound,
+                        createdAt: dateh + ':' + datem,
+                        duration: duration + 2,
+                        loading: false
+                    })
+                }
             }
             else {
                 console.log("Hata var", this.props.audio);
@@ -70,7 +76,7 @@ class AudioCard extends Component {
                 <View style={{
                     flexDirection: "row",
                     backgroundColor: 'rgb(220,220,220)',
-                    height: 60,
+                    height: Platform.OS == 'ios' ? 80 : 60,
                     width: "100%",
                     borderRadius: 4,
                     justifyContent: 'center',
@@ -86,7 +92,7 @@ class AudioCard extends Component {
                         justifyContent: 'center',
                         flexDirection: 'column',
                     }}>
-                        <View style={{ flex: 4, flexDirection: 'column', justifyContent: "center", borderWidth: 1 }}>
+                        <View style={{ flex: Platform.OS == 'ios' ? 4 : 9, flexDirection: 'column', justifyContent: Platform.OS == 'ios' ? "flex-end" : 'center' }}>
                             <Slider
                                 step={1}
                                 minimumValue={0}
@@ -94,7 +100,6 @@ class AudioCard extends Component {
                                 value={this.state.currentDuration}
                                 minimumTrackTintColor="#2fb4dc"
                                 thumbTintColor='#2fb4dc'
-
                                 onValueChange={(ChangedValue) => { this.SliderValueChanged(ChangedValue) }}
                                 style={{ marginLeft: 4, alignSelf: 'flex-end', width: '100%' }}
                             />
@@ -115,7 +120,9 @@ class AudioCard extends Component {
     }
 
     SliderValueChanged = (ChangedValue) => {
-        this.setState({ currentDuration: ChangedValue });
+        if (this.is_mounted) {
+            this.setState({ currentDuration: ChangedValue });
+        }
         this.state.sound.setCurrentTime(ChangedValue);
     }
 
@@ -176,9 +183,11 @@ class AudioCard extends Component {
     startPlaying = () => {
         console.log("Here 1");
         this.props.setAudio(this.props.id);
-        this.setState({
-            playing: true
-        })
+        if (this.is_mounted) {
+            this.setState({
+                playing: true
+            })
+        }
         const sound = this.state.sound;
         if (sound) {
             this.timer = setInterval(this.incrementTimer, 1000);
