@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground } from 'react-native';
+import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground, WebView } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button, Icon, Overlay } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { CreditCardInput, LiteCreditCardInput } from "react-native-credit-card-input";
-
 import * as actions from '../../appstate/actions';
+import IyziPaymentErrors from '../../constants/Errors'
 import {
   CardItem,
   DatePicker,
@@ -20,10 +20,12 @@ import {
   NumericInput,
   ErrorLabel
 } from '../common';
+import Base64 from '../common/Base64';
+import firebase from 'react-native-firebase';
 
 class _ProfileForm extends Component {
-
   state = {
+    conversationId: '',
     profile: {},
     loading: false,
     error: '',
@@ -35,6 +37,8 @@ class _ProfileForm extends Component {
     isCardVisible: false,
     isPaying: false,
     isPriceSet: false,
+    showFinalResult: false,
+    paymentSuccesfull: false
   };
 
   _isMounted = false;
@@ -145,13 +149,12 @@ class _ProfileForm extends Component {
       this.setState({ paymentLoading: false, cardError: 'Kard bilgilerini kontrol edin!' })
     } else {
       console.log('doing payment...');
-      this.setState({ paymentLoading: true });
-      this.props.do_payment(card.values, price)
+      var conversationId = await firebase.auth().currentUser.uid + "_" + (new Date().getTime());
+      this.setState({ paymentLoading: true, conversationId });
+      this.props.do_payment(card.values, conversationId, price)
         .then(paymentResult => {
-          this.setState({ paymentResult, paymentLoading: false, price: '0' });
-          setTimeout(() => {
-            this.setState({ isCardVisible: false, paymentResult: null, isPriceSet: false });
-          }, 2500);
+          console.log("Base 64", Base64.atob(paymentResult.data.htmlContent));
+          this.setState({ paymentResult, paymentLoading: false, showthreeds: true });
         })
         .catch(paymentError => {
           console.log('paymentError', paymentError)
@@ -225,22 +228,31 @@ class _ProfileForm extends Component {
                     onChange={this._onCardChange} />
                   <ErrorLabel>{this.state.cardError}</ErrorLabel>
                   <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
-                  <Button 
-                    disabled={this.state.paymentLoading} 
+                  <Button
+                    disabled={this.state.paymentLoading}
                     title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
                 </View>
               )
             }
             {
-              (this.state.isPriceSet && this.state.paymentResult !== '') && (
+              (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showthreeds) && (
+                <View style={{ alignSelf: 'center' }}>
+                  <WebView source={{ html: Base64.atob(this.state.paymentResult.data.htmlContent) }} />
+                  <Text h4>Numaranıza gelen kodu girin!</Text>
+                </View>
+              )
+            }
+            {
+              (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showFinalResult) && (
                 <View style={{ alignSelf: 'center' }}>
                   <Icon
-                    name='check'
+                    name={this.state.paymentSuccesfull == true ? 'check' : 'close'}
                     type='antdesign'
-                    color='green'
+                    color={this.state.paymentSuccesfull == true ? 'green' : 'red'}
                     size={33}
                   />
-                  <Text h4>Ödeme Başarılı!</Text>
+                  <Text h4>{this.state.paymentSuccesfull == true ? "Ödeme Başarılı" : "Hata oluştu"} </Text>
+                  <Text h4>{this.state.paymentErrorMessage ? this.state.paymentErrorMessage : ""}</Text>
                 </View>
               )
             }
@@ -321,8 +333,57 @@ class _ProfileForm extends Component {
     );
   }
 
-  async componentDidMount() {
+  resetState = () => {
+    if (this._isMounted) {
+      this.setState({
+        conversationId: '',
+        loading: false,
+        error: '',
+        price: '0',
+        priceError: '',
+        paymentError: '',
+        paymentResult: null,
+        isCardVisible: false,
+        isPaying: false,
+        isPriceSet: false,
+        showFinalResult: false
+      })
+    }
+  }
+
+  componentDidMount() {
     this._isMounted = true;
+    this.props.checkNewPayment(newPayment => {
+      console.log("New Payment", newPayment);
+      var result = newPayment.result
+      console.log("New Payment Result", result);
+      if (result) {
+        if (result.conversationId == this.state.conversationId) {
+          if (result.status === 'success') {
+            console.log("Here");
+            this.setState({
+              profile: { ...this.state.profile, wallet: this.state.profile.wallet + this.state.price },
+              showFinalResult: true,
+              showthreeds: false,
+              paymentSuccesfull: true
+            })
+            setTimeout(this.resetState, 2500)
+          } else {
+            console.log("Here1");
+            const mdStatus = result.mdStatus;
+            var errorMessage = IyziPaymentErrors.IyziPaymentErrors[mdStatus];            
+            this.setState({
+              profile: { ...this.state.profile, wallet: this.state.profile.wallet + this.state.price },
+              showFinalResult: true,
+              showthreeds: false,
+              paymentErrorMessage: errorMessage,
+              paymentSuccesfull: false
+            })
+            setTimeout(this.resetState, 2500)
+          }
+        }
+      }
+    })
     this._fetchProfile();
   }
 

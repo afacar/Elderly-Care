@@ -1,7 +1,7 @@
 import firebase from 'react-native-firebase';
 import { Translations } from '../../constants/Translations';
 
-export const do_payment = (cardData, price) => async (dispatch) => {
+export const do_payment = (cardData, conversationId, price) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const url = `users/${_user.uid}/payments`;
 
@@ -12,8 +12,9 @@ export const do_payment = (cardData, price) => async (dispatch) => {
     expireMonth: cardData.expiry.split('/')[0],
     expireYear: '20' + cardData.expiry.split('/')[1],
     cvc: cardData.cvc,
+    conversationId: conversationId,
     buyer: {
-      id: 'BY789',
+      id: _user.uid,
       name: 'John',
       surname: 'Doe',
       gsmNumber: '+905350000000',
@@ -28,7 +29,7 @@ export const do_payment = (cardData, price) => async (dispatch) => {
       zipCode: '34732'
     },
     buyerAddress: {
-      contactName: 'Jane Doe',
+      contactName: cardData.name,
       city: 'Istanbul',
       country: 'Turkey',
       address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
@@ -62,3 +63,12 @@ export const do_payment = (cardData, price) => async (dispatch) => {
   });
 
 };
+
+export const checkNewPayment = (callback) => async(dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  console.log("Inside new payments",uid);
+  await firebase.database().ref('payments/results').child(uid).on("child_added", newPayment => {
+    console.log("New payment", newPayment.val());
+    callback(newPayment.val())
+  })
+}
