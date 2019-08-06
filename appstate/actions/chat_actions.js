@@ -70,7 +70,7 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
 
 // send the message to the Backend
 export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
-  console.log("Message 3", messages[0]);
+  console.log("sendMessage 3",userRole, messages, chatId);
   const uid = firebase.auth().currentUser.uid;
   let url = `commonchat/`;
   var downloadUrl = "";
@@ -78,6 +78,7 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
   var unreadRef = "";
   var audioUrl = "";
   var audioDownloadUrl = "";
+
   for (let i = 0; i < messages.length; i++) {
     let message = messages[i];
     if (chatId === 'commonchat') {
@@ -124,7 +125,6 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
 
     console.log(`sendMessage will send message to ${url} with chatID (${chatId}) and uid (${uid})`);
     const messagesRef = firebase.database().ref(url + 'messages').child(message._id);
-    const lastMessageRef = firebase.database().ref(url + 'lastMessage');
     // It was all beacause of this line
     console.log(downloadUrl.toString());
 
@@ -136,8 +136,21 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       audio: audioDownloadUrl
     };
 
+    const lastMessage = {};
+
+    if (userRole === 'c') {
+      lastMessage[`providers/${chatId}/chats/${uid}/lastMessage`] = messageData;
+      lastMessage[`caregivers/${uid}/chats/${chatId}/lastMessage`] = messageData;
+    }
+    else if (userRole === 'p') {
+      lastMessage[`providers/${uid}/chats/${chatId}/lastMessage`] = messageData;
+      lastMessage[`caregivers/${chatId}/chats/${uid}/lastMessage`] = messageData;
+    }
+
     messagesRef.set(messageData);
-    lastMessageRef.set(messageData);
+    // Multiple update for lastMessage
+    let ref = firebase.database().ref();
+    ref.update(lastMessage, error => { console.log('lastMessage set error', error) });
   }
 }
 
@@ -168,35 +181,18 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
   await firebase.database().ref(`caregivers/${uid}/chats/`).on('value', async (snapshot) => {
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
-      const { status, unread, firstTime } = snap.val();
+      let { status, unread, firstTime, lastMessage, title, avatar } = snap.val();
       console.log(`chatId:${chatId} is approved: ${status} for user: ${uid} `);
-
-      /** Set url, title, avatar as if it is common chat */
-      let url = 'commonchat/lastMessage';
-      let title = 'Alzheimer grubu';
-      let avatar = require('../../assets/images/family.png');
 
       if (chatId && status !== 'pending') {
         if (chatId !== 'commonchat') {
-          // if it is not common chat, it is a provider chat 
-          url = `providerchat/${chatId}/${uid}/lastMessage`;
-          try {
-            // So fetch the provider profile
-            await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
-              const profile = snapshot.val();
-              const { photoURL, displayName } = profile;
-              title = displayName || 'İsimsiz Uzman';
-              avatar = photoURL ? { uri: photoURL } : require('../../assets/images/doctor.png');
-            });
-          } catch (error) {
-            console.error(`provider profile url (${url}) okunurken hata:`, error.message);
-          }
+          title = title || 'isim yok';
+          avatar = avatar ? { uri: avatar } : await require('../../assets/images/user.png');
+        } else {
+          title = 'Alzheimer grubu';
+          avatar = await require('../../assets/images/family.png');
         }
-
-        await firebase.database().ref(url).on('value', (snapshot) => {
-          const lastMessage = snapshot.val() || '';
-          callback({ chatId, title, lastMessage, status, avatar, unread, firstTime });
-        });
+        callback({ chatId, title, lastMessage, status, avatar, unread, firstTime });
       }
     });
   });
@@ -210,39 +206,17 @@ export const loadProviderChats = (callback) => async (dispatch) => {
     console.log('loadProviderChats snapshot', snapshot.val());
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
-      const { status, unread, isArchived } = snap.val();
-      console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
-
-      let url = 'commonchat/lastMessage';
-      let title = 'Alzheimer grubu';
-      let avatar = require('../../assets/images/family.png');
+      let { status, unread, isArchived, lastMessage, title, avatar } = snap.val();
 
       if (chatId) {
         if (chatId !== 'commonchat') {
-          try {
-            // chatId is a caregiver id, so fetch the displayName as title
-            await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
-              const profile = snapshot.val();
-              const { photoURL, displayName } = profile;
-              title = displayName || 'İsimsiz Uzman';
-              avatar = photoURL ? { uri: photoURL } : require('../../assets/images/user.png');
-            });
-          } catch (error) {
-            console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
-          }
+          title = title || 'isim yok';
+          avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
+        } else {
+          title = 'Alzheimer grubu';
+          avatar = await require('../../assets/images/family.png');
         }
-
-        url = `providerchat/${uid}/${chatId}/lastMessage`;
-        try {
-          await firebase.database().ref(url).on('value', (snapshot) => {
-            const lastMessage = snapshot.val() || '';
-            if (!isArchived)
-              callback({ chatId, title, lastMessage, status, unread, avatar });
-          });
-        } catch (error) {
-          console.error('Chat son mesajı okunurken hata oldu', error.message);
-        }
-
+        callback({ chatId, title, lastMessage, status, unread, avatar });
       }
 
     });
@@ -300,7 +274,7 @@ export const setAudio = (id) => async (dispatch) => {
   return dispatch({ type: CHATS_AUDIO, payload: { id } })
 }
 
-export const sendAnswers = (answers, providerID) => async ( dispatch) => {
+export const sendAnswers = (answers, providerID) => async (dispatch) => {
   console.log("Answers", answers)
   const uid = firebase.auth().currentUser.uid;
   const completedPrelimURL = `providers/${providerID}/chats/${uid}`;

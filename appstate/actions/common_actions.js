@@ -63,24 +63,31 @@ export const fetch_providers = (callback) => async (dispatch) => {
 export const send_provider_request = (providerId, providerFee, callback) => async (dispatch) => {
   console.log('1 send_provider_request is called with providerId', providerId);
   const { uid, photoURL, displayName } = firebase.auth().currentUser;
-  const caregiverurl = `caregivers/${uid}/chats/${providerId}/`;
-  const providerurl = `providers/${providerId}/chats/${uid}/`;
-  const chaturl = `providerchat/${providerId}/${uid}/`;
-  const providerFirstTimeUrl = `providers/${providerId}/chats/${uid}/firstTime`;
-  const caregiverFirstTimeUrl = `caregivers/${uid}/chats/${providerId}/firstTime`;
+  console.log('provider profile fetching...');
+  let provider = await getUserProfile(providerId);
+  console.log('provider profile fetched', provider);
   const providerRequestUrl = `providers/${providerId}/newRequests`;
   const caregiverWalletUrl = `wallets/${uid}/`;
   const suspendMoneyUrl = `pendingTransactions/${uid}/${providerId}/`;
 
+  const request = {};
+
   const firstMessage = {
-    createdAt: firebase.database.ServerValue.TIMESTAMP,
-    text: '',
-    user: {
-      _id: uid,
-      avatar: photoURL,
-      name: displayName,
+    status: 'pending',
+    firstTime: true,
+    lastMessage: {
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      text: '',
+      user: {
+        _id: uid,
+        avatar: photoURL,
+        name: displayName,
+      }
     }
   }
+
+  request[`caregivers/${uid}/chats/${providerId}/`] = {...firstMessage, title: provider.displayName, avatar: provider.photoURL };
+  request[`providers/${providerId}/chats/${uid}/`] = {...firstMessage, title: displayName, avatar: photoURL };
 
   await firebase.database().ref(caregiverWalletUrl).once('value', async (walletSnap) => {
     var wallet = 0;
@@ -89,16 +96,9 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
     if (wallet >= providerFee) {
       try {
         console.log('3 send_provider_request wallet is enough');
-        // null means pending
-        await firebase.database().ref(caregiverurl).child('status').set('pending');
-        await firebase.database().ref(providerurl).child('status').set('pending');
-        await firebase.database().ref(chaturl).child('lastMessage').set(firstMessage);
-        await firebase.database().ref(caregiverurl).child('firstTime').set('true');
-        await firebase.database().ref(providerurl).child('firstTime').set('true');
-        await firebase.database().ref(providerRequestUrl).transaction(function (value) {
-          return (value || 0) + 1;
-        });
+        await firebase.database().ref(providerRequestUrl).transaction((value) => { return (value || 0) + 1; });
         await firebase.database().ref(suspendMoneyUrl).set({ providerFee });
+        await firebase.database().ref().update(request);
         console.log('4 send_provider_request providerFee is transfered to pendingTransactions');
         callback("success");
       } catch (error) {
@@ -113,30 +113,22 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
 
 export const cancel_pending_request = (providerId) => async (dispatch) => {
   console.log('cancel_pending_request is called with providerId', providerId);
-  const { _user } = firebase.auth().currentUser;
-  const caregiverurl = `caregivers/${_user.uid}/chats/${providerId}/`;
-  const providerurl = `providers/${providerId}/chats/${_user.uid}/`;
-  const chaturl = `providerchat/${providerId}/${_user.uid}/`;
-  const pendingTransactionUrl = `pendingTransactions/${_user.uid}/${providerId}/`;
+  const uid = firebase.auth().currentUser.uid;
+  
+  const request = {};
+  request[`caregivers/${uid}/chats/${providerId}/`] = null;
+  request[`providers/${providerId}/chats/${uid}/`] = null;
 
-  const providerFirstTimeUrl = `providers/${providerId}/chats/${_user.uid}/firstTime`;
-  const caregiverFirstTimeUrl = `caregivers/${_user.uid}/chats/${providerId}/firstTime`;
+  const pendingTransactionUrl = `pendingTransactions/${uid}/${providerId}/`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
-
 
   try {
     // Cancel the pending request to Provider
-    await firebase.database().ref(caregiverurl).set(null);
-    await firebase.database().ref(providerurl).set(null);
-    await firebase.database().ref(chaturl).child('lastMessage').set(null);
-    //await firebase.database().ref(caregiverFirstTimeUrl).set(null);
-    //await firebase.database().ref(providerFirstTimeUrl).set(null);
+    await firebase.database().ref().update(request);
     await firebase.database().ref(pendingTransactionUrl).set(null);
-    await firebase.database().ref(providerRequestUrl).transaction(function (value) {
-      return value - 1;
-    })
+    await firebase.database().ref(providerRequestUrl).transaction((value) => { return value - 1; })
   } catch (error) {
-    console.error('Error while adding provider', error.message);
+    console.error('Error while canceling request', error.message);
   }
 
 }
@@ -210,6 +202,15 @@ export const getIBAN = (callback) => async (dispatch) => {
     callback(IBAN);
   });
 }
+
+const getUserProfile = async (uid) => {
+  return new Promise((resolve, reject) => {
+    firebase.database().ref(`users/${uid}/profile`).once('value', snap => {
+      snap.val() ? resolve(snap.val()): reject('No such user or profile');
+    })
+  })
+}
+
 
 export const getBalance = (callback) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;

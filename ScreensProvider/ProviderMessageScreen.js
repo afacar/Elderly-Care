@@ -508,7 +508,7 @@ class ProviderMessageScreen extends React.Component {
     const chatId = this.props.navigation.getParam('chatId', '');
     const title = this.props.navigation.getParam('title', '');
     const isApproved = this.props.navigation.getParam('isApproved', '');
-    console.log(`MessageScreen Mounted with chatId: ${chatId} and title: ${title}`);
+    console.log(`MessageScreen Mounted with chatId: ${chatId} and title: ${title} and userRole ${userRole}`);
     if (chatId) {
       this.setState({ chatId, title, userRole, isApproved });
       this.load_messages(chatId);

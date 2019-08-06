@@ -47,6 +47,8 @@ export class ChatItem extends Component {
     let avatar = theChat.avatar;
     const isApproved = theChat.status;
     const firstTime = theChat.firstTime;
+    const userRole = theChat.userRole;
+
     let subtitle = '';
     let userName = '';
     let badge = null;
@@ -75,7 +77,7 @@ export class ChatItem extends Component {
     }
 
     return (
-      <TouchableHighlight onPress={() => this.props.onPress({ chatId, title, userRole: 'c', isApproved, firstTime })}>
+      <TouchableHighlight onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 17 }}
@@ -85,7 +87,7 @@ export class ChatItem extends Component {
             source: avatar,
             title: 'avatar title',
             //showEditButton: true,
-            size: 'large',
+            size: 'medium',
           }}
           badge={badge}
           containerStyle={{ borderBottomWidth: 1 }}

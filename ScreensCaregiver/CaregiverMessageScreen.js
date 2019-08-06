@@ -390,7 +390,7 @@ class CaregiverMessageScreen extends React.Component {
       for (let i = 0; i < messages.length; i++) {
         let message = messages[i];
         message.createdAt = new Date().getTime();
-        if ( !message._id)
+        if (!message._id)
           message._id = this.randIDGenerator();
         await this.updateState(message);
         messagesArray.push(message);

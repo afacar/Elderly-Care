@@ -4,7 +4,7 @@ import { ListItem, Badge, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
 import * as actions from '../appstate/actions';
-import { CardItem } from '../components/common';
+import { CardItem, ChatItem } from '../components/common';
 
 class ProviderHome extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -61,7 +61,7 @@ class ProviderHome extends React.Component {
 
   _setChats = (chat) => {
     const { chatId, title, lastMessage, status, unread, avatar } = chat;
-    console.log('new lastMessage', lastMessage)
+    console.log('new chat', chat);
     this._isMounted && this.setState(previousState => {
       var { chats } = previousState;
 
@@ -100,8 +100,9 @@ class ProviderHome extends React.Component {
     return 0;
   }
 
-  _onPressItem = (data) => {
+  _onPressItem = (chatdata) => {
     console.log("We now navigate to MessageScreen with key", data);
+    const data = {...chatdata, userRole: 'p'};
     this.props.navigation.navigate('ProviderMessageScreen', data);
   }
 
@@ -114,72 +115,21 @@ class ProviderHome extends React.Component {
   }
 
   _renderItem = ({ item }) => {
+
     const chatId = item;
-    const theChat = this.state.chats[chatId]
-    /** item is a chatRoom object -> chatRoom1: { lastMessage: {...} } */
-    console.log('RenderItem theChat', theChat);
-    const uid = firebase.auth().currentUser._user.uid
-    const title = theChat.title;
-    const lastMessage = theChat.lastMessage;
-    let avatar = theChat.avatar;
+    const theChat = this.state.chats[chatId];
+    console.log("theChat", theChat);
     const isApproved = theChat.status;
-    const unread = theChat.unread;
-    let subtitle = '';
-    let userName = '';
-    let badge = null;
 
     if (isApproved === false) return;
-    subtitle = <Text>{userName + ' sesli mesaj'}</Text>;
-    if (isApproved === 'pause') {
-      subtitle = <Text style={{ color: 'red' }}>Hizmet durduruldu!</Text>
-    } else if (isApproved === 'pending') {
-      subtitle = (
-        <CardItem>
-          <Text> Yeni danismanlik talebi</Text>
-          <Icon
-            type='material-community' name='close' color='red' size={34}
-            onPress={() => this.respondResquest(chatId, false)} />
-          <Icon
-            type='material-community' name='check-all' color='green' size={34}
-            onPress={() => this.respondResquest(chatId, true)} />
-        </CardItem>
-      )
-    } else if (lastMessage) {
-      if (chatId === 'commonchat') {
-        userName = (lastMessage.user._id === uid) ? 'Siz:' : lastMessage.user.name + ':';
-      } else {
-        userName = (lastMessage.user._id === uid) ? 'Siz:' : '';
-      }
-      if (lastMessage.text)
-        subtitle = <Text>{userName + ' ' + lastMessage.text}</Text>;
-      else if (lastMessage.image)
-        subtitle = <Text>{userName + ' resim'}</Text>;
-      else if (lastMessage.audio)
-        subtitle = <Text>{userName + ' sesli mesaj'}</Text>;
-
-      if (unread > 0) badge = { value: unread, status: 'primary', textStyle: { fontSize: 18 } }
-    } else {
-      subtitle = "Mesaj yok! İlk mesajı siz yazın."
-    }
 
     return (
-      <TouchableOpacity onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved, userid: chatId, isArchived: false })}>
-        <ListItem
-          title={title}
-          titleStyle={{ fontWeight: 'bold', fontSize: 18 }}
-          subtitle={subtitle}
-          key={chatId}
-          leftAvatar={{
-            source: avatar,
-            title: 'avatar title',
-            //showEditButton: true,
-            size: 'large',
-          }}
-          containerStyle={{ borderBottomWidth: 1, }}
-          badge={badge}
-        />
-      </TouchableOpacity>
-    );
+      <ChatItem
+        onPress={this._onPressItem}
+        key={chatId}
+        chatId={chatId}
+        data={theChat} />
+    )
   }
 
   _renderEmptyItem = () => {
