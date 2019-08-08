@@ -2,9 +2,10 @@ import React from 'react';
 import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text, Image } from 'react-native';
 import { ListItem, Badge, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import firebase from 'react-native-firebase';
 import * as actions from '../appstate/actions';
-import { CardItem, ChatItem } from '../components/common';
+import { ChatItem } from '../components/common';
 
 class ProviderHome extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -61,7 +62,7 @@ class ProviderHome extends React.Component {
 
   _setChats = (chat) => {
     const { chatId, title, lastMessage, status, unread, avatar } = chat;
-    console.log('new chat', chat);
+    console.log('_setChats at ProviderHomeScreen', chat);
     this._isMounted && this.setState(previousState => {
       var { chats } = previousState;
 
@@ -106,27 +107,35 @@ class ProviderHome extends React.Component {
     this.props.navigation.navigate('ProviderMessageScreen', data);
   }
 
-  respondResquest = async (caregiverId, response) => {
+  _handleRequest = async (caregiverId, response) => {
+    console.log('respondResquest caregiverId', caregiverId, response);
+    console.log('respondResquest caregiverId', caregiverId, response);
     try {
       await this.props.respond_caregiver_request(caregiverId, response);
     } catch (error) {
-      console.error('_approveCaregiverRequest hatası', error.message);
+      console.log('this.props.respond_caregiver_request hatası', error.message);
     }
   }
 
-  _renderItem = ({ item }) => {
+   _renderItem = ({ item }) => {
 
     const chatId = item;
     const theChat = this.state.chats[chatId];
-    console.log("theChat", theChat);
+    console.log("_renderItem", theChat);
     const isApproved = theChat.status;
 
     if (isApproved === false) return;
 
+    console.log('_renderItem2');
     return (
+      /* <ListItem
+        title={theChat.title + ' ' + theChat.unread}
+        subtitle={theChat.lastMessage.text}
+      /> */
       <ChatItem
         onPress={this._onPressItem}
-        key={chatId}
+        //key={chatId}
+        handleRequest={this._handleRequest}
         chatId={chatId}
         data={theChat} />
     )
@@ -143,6 +152,7 @@ class ProviderHome extends React.Component {
   }
 
   render() {
+    console.log('ProviderHomeScreen Rerendering...');
     return (
       <ScrollView style={styles.containerStyle}>
         <FlatList
@@ -153,6 +163,7 @@ class ProviderHome extends React.Component {
         />
       </ScrollView>
     );
+    
   }
 
   async componentDidMount() {

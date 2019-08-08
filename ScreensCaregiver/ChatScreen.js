@@ -20,7 +20,7 @@ class ChatScreen extends React.Component {
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('ProviderListScreen')}>
         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
-          <Text style={{marginRight: 10, fontWeight: 'bold' }}>Uzman Bul</Text>
+          <Text style={{ marginRight: 10, fontWeight: 'bold' }}>Uzman Bul</Text>
           <Icon
             type='material-community'
             name='account-search' />
@@ -41,13 +41,14 @@ class ChatScreen extends React.Component {
   }
 
   _setChatRooms = (chat) => {
-    console.log("Chat ", chat)
+    console.log("_setChatRooms at ChatScreen", chat);
     const { chatId, title, lastMessage, status, avatar, unread, firstTime } = chat;
+
     this.setState(previousState => {
       var { chats } = previousState;
 
-      if (!chats[chatId]) 
-        chats[chatId] = {};
+      if (!chats[chatId]) chats[chatId] = {};
+
       chats[chatId]['lastMessage'] = lastMessage;
       chats[chatId]['title'] = title;
       chats[chatId]['status'] = status;
@@ -90,7 +91,7 @@ class ChatScreen extends React.Component {
 
   _onPressItem = (chatdata) => {
     console.log("Data", data);
-    const data = {...chatdata, userRole: 'c'};
+    const data = { ...chatdata, userRole: 'c' };
     this.props.navigation.navigate('CaregiverMessageScreen', data);
   }
 

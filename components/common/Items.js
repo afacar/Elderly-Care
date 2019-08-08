@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import firebase from 'react-native-firebase';
-import { ListItem, Button } from 'react-native-elements';
-
+import { ListItem, Icon } from 'react-native-elements';
+import { respond_caregiver_request } from '../../appstate/actions';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import _ from 'lodash';
 import { ErrorLabel, Bold } from './Titles';
 import { RightButton } from './Buttons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { CardItem } from './CardItem';
 
 export const RowItem = (props) => {
   return (
@@ -32,15 +34,14 @@ export const ColumnItem = (props) => {
 }
 
 
-
 export class ChatItem extends Component {
   uid = firebase.auth().currentUser._user.uid;
 
   render() {
     const chatId = this.props.chatId;
     const theChat = this.props.data;
-    console.log('chatId', chatId);
-    console.log('theChat', theChat);
+    //console.log('chatId', chatId);
+    console.log('ChatItem render->', theChat);
     /** item is a chatRoom object -> chatRoom1: { lastMessage: {...} } */
     const title = theChat.title;
     const lastMessage = theChat.lastMessage;
@@ -57,6 +58,18 @@ export class ChatItem extends Component {
 
     if (isApproved === 'pause') {
       subtitle = <ErrorLabel>Hizmet durduruldu!</ErrorLabel>
+    } else if (isApproved === 'pending') {
+      subtitle = (
+        <CardItem>
+          <Text> Yeni danismanlik talebi</Text>
+          <Icon
+            type='material-community' name='close' color='red' size={36}
+            onPress={() => this.props.handleRequest(chatId, false)} />
+          <Icon
+            type='material-community' name='check-all' color='green' size={36}
+            onPress={() => this.props.handleRequest(chatId, true)} />
+        </CardItem>
+      )
     } else if (lastMessage) {
       if (chatId === 'commonchat') {
         userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : lastMessage.user.name + ': ';
@@ -70,8 +83,6 @@ export class ChatItem extends Component {
         subtitle = userName + ' resim';
       else if (lastMessage.audio)
         subtitle = userName + ' sesli mesaj';
-
-
     } else {
       subtitle = "Mesaj yok! İlk mesajı siz yazın.";
     }
@@ -82,22 +93,19 @@ export class ChatItem extends Component {
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 17 }}
           subtitle={subtitle}
-          key={chatId}
           leftAvatar={{
             source: avatar,
-            title: 'avatar title',
+            title,
             //showEditButton: true,
             size: 'medium',
           }}
           badge={badge}
-          containerStyle={{ borderBottomWidth: 1 }}
+          containerStyle={{ borderBottomWidth: 0.5, borderBottomEndRadius: 50, borderBottomStartRadius:100 }}
         />
       </TouchableHighlight>
     );
   }
-
 }
-
 
 export const LabeledItem = (props) => {
   console.log('labeledItem props', props);
@@ -114,8 +122,8 @@ export const LabeledItem = (props) => {
 export const SettingsItem = (props) => {
   return (
     <TouchableOpacity style={{ flexDirection: 'row', flex: 1 }} onPress={props.onPress}>
-      <Text style={{ alignSelf: 'flex-start', color: 'grey', fontSize: 18, paddingLeft:10, padding: 5  }}>{props.text}</Text>
-      <RightButton onPress={props.onPress}/>
+      <Text style={{ alignSelf: 'flex-start', color: 'grey', fontSize: 18, paddingLeft: 10, padding: 5 }}>{props.text}</Text>
+      <RightButton onPress={props.onPress} />
     </TouchableOpacity>
   )
 }

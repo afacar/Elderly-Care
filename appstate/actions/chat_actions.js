@@ -73,6 +73,7 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
   console.log("sendMessage 3",userRole, messages, chatId);
   const uid = firebase.auth().currentUser.uid;
   let url = `commonchat/`;
+  let unreadURL = '';
   var downloadUrl = "";
   var uploadUrl = "";
   var unreadRef = "";
@@ -90,30 +91,26 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
     }
     else if (userRole === 'c') {
       url = `providerchat/${chatId}/${uid}/`;
+      unreadURL = `providers/${chatId}/chats/${uid}/unread`;
       if (message.image) {
         uploadUrl = `chatFiles/${chatId}/${uid}/image`;
       } else if (message.audio) {
         audioUrl = `chatFiles/${chatId}/${uid}/audio`;
       }
-      unreadRef = firebase.database().ref(`providers/${chatId}/chats/${uid}/`);
 
     } else if (userRole === 'p') {
       url = `providerchat/${uid}/${chatId}/`;
-
+      unreadURL = `caregivers/${chatId}/chats/${uid}/unread`;
       if (message.image) {
         uploadUrl = `chatFiles/${uid}/${chatId}/image`;
       } else if (message.audio) {
         audioUrl = `chatFiles/${uid}/${chatId}/audio`;
       }
-      unreadRef = firebase.database().ref(`caregivers/${chatId}/chats/${uid}/`);
     }
 
     if (uploadUrl) {
       await firebase.storage().ref(uploadUrl).child(message._id).putFile(message.path);
       downloadUrl = await firebase.storage().ref(uploadUrl).child(message._id).getDownloadURL();
-    }
-    if (unreadRef) {
-      await unreadRef.child('unread').transaction((unread) => { return (unread || 0) + 1 });
     }
     if (audioUrl) {
       var metadata = {
@@ -124,7 +121,8 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
     }
 
     console.log(`sendMessage will send message to ${url} with chatID (${chatId}) and uid (${uid})`);
-    const messagesRef = firebase.database().ref(url + 'messages').child(message._id);
+    const messagesURL = url + 'messages/' + message._id;
+    console.log(`sendMessage will be pushed to messagesURL=>`, messagesURL);
     // It was all beacause of this line
     console.log(downloadUrl.toString());
 
@@ -136,8 +134,15 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       audio: audioDownloadUrl
     };
 
+    console.log('unread fetching...');
+    let unread = await readFromFirebase(unreadURL);
+    console.log('unread fetched', unread);
+
     const lastMessage = {};
 
+    lastMessage[unreadURL] = (unread || 0) + 1;
+    lastMessage[messagesURL] = messageData;
+    
     if (userRole === 'c') {
       lastMessage[`providers/${chatId}/chats/${uid}/lastMessage`] = messageData;
       lastMessage[`caregivers/${uid}/chats/${chatId}/lastMessage`] = messageData;
@@ -147,11 +152,21 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       lastMessage[`caregivers/${chatId}/chats/${uid}/lastMessage`] = messageData;
     }
 
-    messagesRef.set(messageData);
+    //messagesRef.set(messageData);
     // Multiple update for lastMessage
     let ref = firebase.database().ref();
     ref.update(lastMessage, error => { console.log('lastMessage set error', error) });
   }
+}
+
+const readFromFirebase = (url) => {
+  return new Promise((resolve, reject) => {
+    firebase.database().ref(url).on('value', snap=> {
+      resolve(snap.val());
+    }, error => {
+      reject('readFromFirebase Error:'+ error.message)
+    })
+  })
 }
 
 // close the connection to the Backend
