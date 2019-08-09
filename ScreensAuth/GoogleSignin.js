@@ -23,6 +23,8 @@ class GoogleSignin extends Component {
      // this.props.handleLogin({ loading: false, errorMessage: `Google Login Hatası: ${error.message}` });
     }
 
+    if(!firebase.auth().currentUser) return;
+    
     const { _user } = firebase.auth().currentUser;
 
     if (!_user.uid) throw new Error('HATA: Google NOT logged in!');

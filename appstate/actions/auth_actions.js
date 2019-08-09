@@ -41,6 +41,8 @@ export const loginWithGoogle = () => async (dispatch) => {
     //console.info("curretUser info from firebase.auth()", JSON.stringify(currentUser.user.toJSON()));
     //dispatch({ type: LOGIN, payload: currentUser });
   } catch (error) {
+    console.log('Google Error=>', error);
+    
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       // user cancelled the login flow
       throw new Error("Google girişi iptal edildi!");
