@@ -207,7 +207,11 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
       let { status, unread, firstTime, lastMessage, title, avatar } = snap.val();
-      console.log(`chatId:${chatId} is approved: ${status} for user: ${uid} `);
+      console.log(`loadCaregiverChats snapshot => `, snapshot.val());
+      
+      if(!avatar && uid !== lastMessage.user._id) {
+        avatar = lastMessage.user.avatar;
+      }
 
       if (chatId && status !== 'pending') {
         if (chatId !== 'commonchat') {
@@ -215,7 +219,7 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
           avatar = avatar ? { uri: avatar } : await require('../../assets/images/user.png');
         } else {
           title = 'Alzheimer grubu';
-          avatar = await require('../../assets/images/family.png');
+          avatar = await require('../../assets/images/groupchat.png');
         }
         callback({ chatId, title, lastMessage, status, avatar, unread, firstTime });
       }
@@ -239,7 +243,7 @@ export const loadProviderChats = (callback) => async (dispatch) => {
           avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
         } else {
           title = 'Alzheimer grubu';
-          avatar = await require('../../assets/images/family.png');
+          avatar = await require('../../assets/images/groupchat.png');
         }
         callback({ chatId, title, lastMessage, status, unread, avatar });
       }
@@ -260,7 +264,7 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
 
       let url = 'commonchat/lastMessage';
       let title = 'Alzheimer grubu';
-      let avatar = require('../../assets/images/family.png');
+      let avatar = require('../../assets/images/groupchat.png');
 
       if (chatId && status !== 'pending') {
         if (chatId !== 'commonchat') {
