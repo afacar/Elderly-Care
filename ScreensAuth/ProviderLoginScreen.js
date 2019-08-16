@@ -178,6 +178,10 @@ class ProviderLogin extends Component {
             <Input
               key='displayname'
               label='Ad Soyad'
+              leftIcon={{
+                name:'account',
+                type:'material-community'
+              }}
               placeholder='Ör. Ahmet Yılmaz'
               onChangeText={value => this.setState({ displayName: value })}
               value={displayName}
@@ -188,6 +192,10 @@ class ProviderLogin extends Component {
             <Input
               label="Telefon numarası"
               keyboardType='phone-pad'
+              leftIcon={{
+                name:'phone',
+                type:'material-community'
+              }}
               style={{ height: 40, marginTop: 15, marginBottom: 15 }}
               onChangeText={value => this.setState({ phoneNumber: value })}
               placeholder={'+90 55... '}
@@ -209,6 +217,10 @@ class ProviderLogin extends Component {
           <CardItem>
             <Input
               label="Telefon numarası"
+              leftIcon={{
+                name:'phone',
+                type:'material-community'
+              }}
               keyboardType='phone-pad'
               style={{ height: 40, marginTop: 15, marginBottom: 15 }}
               onChangeText={value => this.setState({ phoneNumber: value })}
