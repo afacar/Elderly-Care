@@ -92,7 +92,7 @@ class ProviderLogin extends Component {
     if (phoneNumber.length < 10) {
       this.setState({ message: 'Geçerli bir numara giriniz...' });
     }
-    else if (displayName.length < 6 || !displayName)
+    else if ( this.state.newUser && (displayName.length < 6 || !displayName))
       this.setState({ message: 'Geçerli bir isim giriniz...' });
     else {
       if (!this.state.newUser) {
