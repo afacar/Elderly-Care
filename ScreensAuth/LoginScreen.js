@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { ScrollView, Text, NetInfo, ActivityIndicator, Image, View } from 'react-native';
 import { Card, Button } from 'react-native-elements';
 import { connect } from 'react-redux';
-import Toast, { DURATION } from 'react-native-easy-toast';
 import { SafeAreaView } from 'react-navigation';
-
 import * as actions from '../appstate/actions';
 import FacebookLoginButton from './FacebookLogin';
 import GoogleLoginButton from "./GoogleSignin";
@@ -34,13 +32,6 @@ class LoginScreen extends Component {
   handleLogin = ({ loading = false, errorMessage = '', successMessage = '' }) => {
     const loadingIcon = <ActivityIndicator />;
     if (this._mounted) this.setState({ loading, errorMessage, successMessage });
-    if (this._mounted && loading) {
-      console.log("Opening Toast");
-      // this.refs.toast.show(loadingIcon, DURATION.FOREVER);
-    } else if (this._mounted) {
-      console.log("Closing Toast");
-      // this.refs.toast.close(loadingIcon, 0);
-    }
   }
 
   render() {
@@ -53,61 +44,53 @@ class LoginScreen extends Component {
     }
     const { navigate } = this.props.navigation;
     return (
-      <ScrollView style={{ backgroundColor: 'white' }}>
-        <SafeAreaView>
-        <CardItem style={[styles.cardItemStyle, { marginTop: 15 }]}>
-          <Image
-            style={styles.stretch}
-            source={require('../assets/images/akilli_ajanda_logo.png')}
-          />
-        </CardItem>
-        </SafeAreaView>
-        <Card title="Bakıcı Girişi" titleStyle={{ fontSize: 23 }} style={styles.loginContainer}>
-          <Toast ref="toast" position='top' />
-          <Text style={styles.labelStyle}>{this.state.errorMessage}</Text>
-          <CardItem style={styles.cardItemStyle}>
-            <Image
+      <ScrollView style={{ flex:1 }}>
+        <View style={{ marginTop: '20%', alignItems: "center", flex:1, backgroundColor: 'white', justifyContent: 'center' }}>
+          <SafeAreaView>
+            <CardItem style={[styles.cardItemStyle, { marginTop: 15 }]}>
+              <Image
+                style={styles.stretch}
+                source={require('../assets/images/akilli_ajanda_logo.png')}
+              />
+            </CardItem>
+          </SafeAreaView>
+          <Card title="Uzmandan ikinci görüş alın" titleStyle={{ fontSize: 23 }} style={styles.loginContainer}>
+            <Text style={styles.labelStyle}>{this.state.errorMessage}</Text>
+            <CardItem style={styles.cardItemStyle}>
+              {/*             <Image
               style={{ width: 70, height: 70 }}
               source={require('../assets/images/family2.png')}
-            />
-          </CardItem>
-          <CardItem style={styles.cardItemStyle}>
-            <FacebookLoginButton
-              disabled={!this.state.isConnected}
-              handleLogin={this.handleLogin}
-              navigate={navigate}
-            />
-          </CardItem>
-          <CardItem style={styles.cardItemStyle}>
-            <GoogleLoginButton
-              //style={{ width: 192, height: 48 }}
-              disabled={!this.state.isConnected}
-              handleLogin={this.handleLogin}
-              navigate={navigate}
-            />
-          </CardItem>
-        </Card>
-
-        <Card title="Uzman Girişi" titleStyle={{ fontSize: 23 }} containerStyle={{ marginBottom: 15 }}>
-          <CardItem style={styles.cardItemStyle}>
-            <Image
-              style={{ width: 70, height: 70 }}
-              source={require('../assets/images/doctor2.png')}
-            />
-          </CardItem>
-          <CardItem style={styles.cardItemStyle}>
+            /> */}
+            </CardItem>
+            <CardItem style={styles.cardItemStyle}>
+              <FacebookLoginButton
+                disabled={!this.state.isConnected}
+                handleLogin={this.handleLogin}
+                navigate={navigate}
+              />
+            </CardItem>
+            <CardItem style={styles.cardItemStyle}>
+              <GoogleLoginButton
+                //style={{ width: 192, height: 48 }}
+                disabled={!this.state.isConnected}
+                handleLogin={this.handleLogin}
+                navigate={navigate}
+              />
+            </CardItem>
+          </Card>
+          <Card>
             <Button
               icon={{
                 type: 'material-community',
-                name: 'cellphone-message',
+                name: 'stethoscope',
                 size: 21,
               }}
               type='clear'
               disabled={!this.state.isConnected}
-              title='SMS ile Giriş'
+              title='Uzman Girişi'
               onPress={() => navigate('ProviderLoginScreen')} />
-          </CardItem>
-        </Card>
+          </Card>
+        </View>
       </ScrollView>
     );
   }
