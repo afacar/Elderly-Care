@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground, WebView } from 'react-native';
+import { View, Modal, Platform, ImageBackground, WebView } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button, Icon, Overlay } from 'react-native-elements';
@@ -18,7 +18,8 @@ import {
   EmailInput,
   TextInput,
   NumericInput,
-  ErrorLabel
+  ErrorLabel,
+  ColumnItem
 } from '../common';
 import Base64 from '../common/Base64';
 import firebase from 'react-native-firebase';
@@ -198,30 +199,58 @@ class _ProfileForm extends Component {
         </View>
 
         <Overlay
-          backdropOpacity={1}
+          //backdropOpacity={1}
           isVisible={this.state.isCardVisible}
+          containerStyle={{ marginHorizontal: 1 }}
+          animationType='slide'
           onBackdropPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })} >
           <>
             {
               !this.state.isPriceSet && (
-                <CardItem>
-                  <NumericInput
-                    label='Tutar'
-                    style={{ flex: 1 }}
-                    errorMessage={this.state.priceError}
-                    value={this.state.price}
-                    onChangeText={(price) => this.setState({ price, priceError: '' })} />
-                  <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
-                  <Button
-                    buttonStyle={{ flex: 1 }}
-                    title='Odeme Yap' onPress={this._prePayment}
-                  />
-                </CardItem>
+                <View style={{ borderWidth: 1, flex: 1, justifyContent: 'center' }}>
+                  <CardItem style={{ alignitems: 'center', justifyContent: 'center' }}>
+                    <NumericInput
+                      //onFocus={() => this.setState({ price: '' })}
+                      label='Yuklemek Istediginiz Tutar'
+                      style={{ flex: 1, marginHorizontal: 15 }}
+                      rightIcon={{
+                        type: 'material-community',
+                        name:'currency-try',
+                        size: 21
+                      }}
+                      errorMessage={this.state.priceError}
+                      value={this.state.price}
+                      onChangeText={(price) => this.setState({ price, priceError: '' })} />
+                  </CardItem>
+                  <View style={{ flexDirection: 'column' }}>
+                    <Button
+                      type='clear'
+                      icon={{
+                        name: "cancel",
+                        type: 'material',
+                        size: 21,
+                        color: 'red'
+                      }}
+                      //containerStyle={{ flex: 1 }}
+                      title='Iptal' onPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })}
+                    />
+                    <Button
+                      type='clear'
+                      icon={{
+                        name: "credit-card",
+                        type: 'material',
+                        size: 21,
+                      }}
+                      //containerStyle={{ flex: 2 }}
+                      title='Kard Bilgilerini Giriniz' onPress={this._prePayment}
+                    />
+                  </View>
+                </View>
               )
             }
             {
               (this.state.isPriceSet && this.state.paymentResult === '') && (
-                <View>
+                <View style={{ borderWidth: 1, justifyContent: 'center' }}>
                   <CreditCardInput
                     requiresName
                     requiresCVC
@@ -229,6 +258,7 @@ class _ProfileForm extends Component {
                   <ErrorLabel>{this.state.cardError}</ErrorLabel>
                   <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
                   <Button
+                    type='outline'
                     disabled={this.state.paymentLoading}
                     title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
                 </View>
@@ -236,7 +266,7 @@ class _ProfileForm extends Component {
             }
             {
               (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showthreeds) && (
-                <View style={{ alignSelf: 'center' }}>
+                <View style={{ justifyContent: 'center' }}>
                   <WebView source={{ html: Base64.atob(this.state.paymentResult.data.htmlContent) }} />
                   <Text h4>Numaranıza gelen kodu girin!</Text>
                 </View>
@@ -244,7 +274,7 @@ class _ProfileForm extends Component {
             }
             {
               (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showFinalResult) && (
-                <View style={{ alignSelf: 'center' }}>
+                <View style={{ justifyContent: 'center' }}>
                   <Icon
                     name={this.state.paymentSuccesfull == true ? 'check' : 'close'}
                     type='antdesign'
@@ -371,7 +401,7 @@ class _ProfileForm extends Component {
           } else {
             console.log("Here1");
             const mdStatus = result.mdStatus;
-            var errorMessage = IyziPaymentErrors.IyziPaymentErrors[mdStatus];            
+            var errorMessage = IyziPaymentErrors.IyziPaymentErrors[mdStatus];
             this.setState({
               profile: { ...this.state.profile, wallet: this.state.profile.wallet + this.state.price },
               showFinalResult: true,

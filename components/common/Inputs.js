@@ -86,10 +86,11 @@ export class NumericInput extends Component {
   };
 
   render() {
-    const { label, value, onChangeText, placeholder, errorMessage, editable, style } = this.props;
+    const { label, value, onChangeText, placeholder, errorMessage, editable, style, rightIcon } = this.props;
 
     return (
       <Input
+        rightIcon={rightIcon || null}
         label={label || ''}
         placeholder={placeholder || ''}
         editable={editable}
