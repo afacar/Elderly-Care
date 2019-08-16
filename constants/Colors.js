@@ -2,6 +2,7 @@ const tintColor = '#2f95dc';
 /** Pull other colors here to */
 export default {
   tintColor,
+  mayaBlue: '#5FC9F8',
   tabIconDefault: '#ccc',
   tabIconSelected: tintColor,
   tabBar: '#fefefe',
