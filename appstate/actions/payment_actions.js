@@ -1,9 +1,19 @@
 import firebase from 'react-native-firebase';
 import { Translations } from '../../constants/Translations';
+import { getFormattedDateTime } from '../../components/functions';
 
 export const start_payment = (cardData, conversationId, price) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
-  const tempName = _user.displayName.split(' ');
+  console.log('_user', _user);
+  let { displayName, email, phoneNumber, metadata } = _user;
+  const { creationTime, lastSignInTime } = metadata;
+  const lastLoginDate = getFormattedDateTime(lastSignInTime);
+  const registrationDate = getFormattedDateTime(creationTime);
+
+  console.log('lastLoginDate', lastLoginDate);
+  console.log('registrationDate', registrationDate);
+
+  const tempName = displayName.split(' ');
   let name = tempName[0];
   let surname = tempName[1];
   const nameLength = tempName.length;
@@ -16,6 +26,8 @@ export const start_payment = (cardData, conversationId, price) => async (dispatc
     surname = tempName[0];
   }
 
+  email = email || 'info@afacar.com';
+  const gsmNumber = phoneNumber || '+905554443322';
   //const url = `users/${_user.uid}/payments`;
 
   let data = {
@@ -31,11 +43,11 @@ export const start_payment = (cardData, conversationId, price) => async (dispatc
       id: _user.uid,
       name,
       surname,
-      gsmNumber: '+905350000000',
-      email: 'email@email.com',
+      gsmNumber,
+      email,
       identityNumber: '74300864791',
-      lastLoginDate: '2015-10-05 12:43:35',
-      registrationDate: '2013-04-21 15:12:09',
+      lastLoginDate,
+      registrationDate,
       registrationAddress: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
       ip: '85.34.78.112',
       city: 'Istanbul',
@@ -52,9 +64,9 @@ export const start_payment = (cardData, conversationId, price) => async (dispatc
     items: [
       {
         id: 'BI101',
-        name: 'Binocular',
+        name: 'Evde Bakim Uygulamasi Kredisi',
         category1: 'Collectibles',
-        category2: 'Accessories',
+        //category2: 'Accessories',
         itemType: `Iyzipay.BASKET_ITEM_TYPE.VIRTUAL`,
         price: parseFloat(price)
       }

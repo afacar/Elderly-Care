@@ -386,7 +386,7 @@ class _ProfileForm extends Component {
         conversationId: '',
         loading: false,
         error: '',
-        price: 0,
+        price: '0',
         priceError: '',
         paymentError: '',
         paymentResult: null,
