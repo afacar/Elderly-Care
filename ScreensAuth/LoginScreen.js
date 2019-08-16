@@ -101,11 +101,10 @@ class LoginScreen extends Component {
                 type: 'material-community',
                 name: 'cellphone-message',
                 size: 21,
-                color: 'white'
               }}
+              type='clear'
               disabled={!this.state.isConnected}
-              buttonStyle={{width:192, height:40, backgroundColor:'#074684'}}
-              name='phone' title='Sms ile Giriş'
+              title='SMS ile Giriş'
               onPress={() => navigate('ProviderLoginScreen')} />
           </CardItem>
         </Card>

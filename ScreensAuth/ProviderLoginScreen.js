@@ -9,7 +9,7 @@ import { TextInput, CardItem } from '../components/common/';
 
 const successImageUri = 'https://cdn.pixabay.com/photo/2015/06/09/16/12/icon-803718_1280.png';
 
-const registerTitle = 'Kayıt ol';
+const registerTitle = 'Yeni Kullanıcı';
 const signInTitle = 'Giriş yap'
 class ProviderLogin extends Component {
   constructor(props) {
@@ -92,13 +92,13 @@ class ProviderLogin extends Component {
     if (phoneNumber.length < 10) {
       this.setState({ message: 'Geçerli bir numara giriniz...' });
     }
-    else if ( this.state.newUser && (displayName.length < 6 || !displayName))
+    else if (this.state.newUser && (displayName.length < 6 || !displayName))
       this.setState({ message: 'Geçerli bir isim giriniz...' });
     else {
       if (!this.state.newUser) {
-        this.setState({disabled: true})
+        this.setState({ disabled: true })
         await firebase.database().ref(`phoneNumbers/${phoneNumber}`).once('value', snapshot => {
-          this.setState({disabled: false})
+          this.setState({ disabled: false })
           if (!snapshot.exists()) {
             this.setState({ message: "Girdiğiniz numaraya kayıtlı kullanıcı bulunamadı" })
           } else {
@@ -111,9 +111,9 @@ class ProviderLogin extends Component {
           }
         })
       } else {
-        this.setState({disabled: true})
+        this.setState({ disabled: true })
         await firebase.database().ref(`phoneNumbers/${phoneNumber}`).once('value', snapshot => {
-          this.setState({disabled: false})
+          this.setState({ disabled: false })
           if (snapshot.exists()) {
             this.setState({ message: "Kayıtlı numara girdiniz. Giriş yapmayı deneyin", newUser: false })
           } else {
@@ -155,21 +155,23 @@ class ProviderLogin extends Component {
   }
 
   renderButtons() {
+    const { newUser } = this.state;
+
     return (
       <View style={{ flexDirection: 'row', width: '100%' }}>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <Button title={registerTitle} onPress={() => this.changeUserState(true)} buttonStyle={{ margin: 10 }} disabled={this.state.disabled} />
+        <View style={{ flex: 1, justifyContent: 'center', borderBottomWidth: newUser ? 3 : 0, borderBottomColor: 'blue', borderBottomStartRadius: 25 }}>
+          <Button type='clear' title={registerTitle} onPress={() => this.changeUserState(true)} buttonStyle={{ margin: 10 }} disabled={this.state.disabled} />
         </View>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <Button title={signInTitle} onPress={() => this.changeUserState(false)} buttonStyle={{ margin: 10 }} disabled={this.state.disabled} />
+        <View style={{ flex: 1, justifyContent: 'center', borderBottomWidth: newUser ? 0 : 3, borderBottomColor: 'blue', borderBottomRightRadius: 25 }}>
+          <Button type='clear' title={signInTitle} onPress={() => this.changeUserState(false)} buttonStyle={{ margin: 10 }} disabled={this.state.disabled} />
         </View>
       </View>
     )
   }
 
   renderPhoneNumberInput() {
-    const { phoneNumber, displayName } = this.state;
-    if (this.state.newUser == true) {
+    const { phoneNumber, displayName, newUser } = this.state;
+    if (newUser) {
       return (
         <Card style={{ padding: 25 }}>
           <CardItem>
@@ -194,11 +196,10 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-            <Button title={registerTitle} color="green" onPress={this.signIn} />
+            <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
           </View>
-
           <View style={styles.buttonStyle}>
-            <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled}/>
+            <Button title='Kayıt ol' color="green" onPress={this.signIn} />
           </View>
         </Card>
       );
@@ -217,11 +218,10 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-            <Button title={signInTitle} color="green" onPress={this.signIn} disabled={this.state.disabled}/>
-          </View>
-
-          <View style={styles.buttonStyle}>
             <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+          </View>
+          <View style={styles.buttonStyle}>
+            <Button title={signInTitle} color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
         </Card>
       );
