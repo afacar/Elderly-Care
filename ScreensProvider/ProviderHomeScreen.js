@@ -94,6 +94,10 @@ class ProviderHome extends React.Component {
   }
 
   compareChats(chat1, chat2) {
+    if (!chat1.lastMessage)
+      return 1;
+    if (!chat2.lastMessage)
+      return -1;
     if (chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
       return -1;
     if (chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
@@ -103,7 +107,7 @@ class ProviderHome extends React.Component {
 
   _onPressItem = (chatdata) => {
     console.log("We now navigate to MessageScreen with key", data);
-    const data = {...chatdata, userRole: 'p'};
+    const data = { ...chatdata, userRole: 'p' };
     this.props.navigation.navigate('ProviderMessageScreen', data);
   }
 
@@ -117,7 +121,7 @@ class ProviderHome extends React.Component {
     }
   }
 
-   _renderItem = ({ item }) => {
+  _renderItem = ({ item }) => {
 
     const chatId = item;
     const theChat = this.state.chats[chatId];
@@ -163,7 +167,7 @@ class ProviderHome extends React.Component {
         />
       </ScrollView>
     );
-    
+
   }
 
   async componentDidMount() {
