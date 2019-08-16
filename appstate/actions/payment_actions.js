@@ -64,11 +64,19 @@ export const start_payment = (cardData, conversationId, price) => async (dispatc
   });
 };
 
-export const finalize_payment = ((paymentObject) => async(dispatch) => {
+export const finalize_payment = ((paymentObject) => async (dispatch) => {
   var finalizePayment = firebase.functions().httpsCallable('finalizePayment');
-  let result = await finalizePayment(paymentObject);
-  console.log("RESULT", result)
-  return result;
+  return new Promise((resolve, reject) => {
+    finalizePayment(paymentObject)
+      .then((result) => {
+        console.log("RESULT", result)
+        resolve(result)
+      })
+      .catch(err => {
+        console.log('finalizepayment rejects =>', err);
+        reject(err);
+      });
+  });
 });
 
 export const checkNewPayment = (callback) => async (dispatch) => {

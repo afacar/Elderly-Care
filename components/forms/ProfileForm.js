@@ -23,6 +23,7 @@ import {
 import Base64 from '../common/Base64';
 import firebase from 'react-native-firebase';
 
+const timeout = 5000;
 class _ProfileForm extends Component {
   state = {
     conversationId: '',
@@ -160,8 +161,8 @@ class _ProfileForm extends Component {
         })
         .catch((paymentError) => {
           console.log('paymentError', paymentError)
-          this.setState({ paymentError, paymentLoading: false, threedsPaymentLoading: false, showFinalResult: true, paymentResult: false })
-          setTimeout(this.resetState, 2500);
+          this.setState({ paymentErrorMessage: paymentError[Error], paymentLoading: false, threedsPaymentLoading: false, showFinalResult: true, paymentResult: false })
+          setTimeout(this.resetState, timeout);
         })
       console.log('payment done!');
     }
@@ -398,17 +399,17 @@ class _ProfileForm extends Component {
                   paymentSuccesfull: true,
                   threedsPaymentLoading: false,
                 })
-                setTimeout(this.resetState, 2500)
+                setTimeout(this.resetState, timeout)
               })
               .catch((paymentError) => {
                 console.log("finalize payment error", paymentError)
                 this.setState({
                   showFinalResult: true,
                   showthreeds: false,
-                  paymentErrorMessage: paymentError.errorMessage,
+                  paymentErrorMessage: paymentError,
                   paymentSuccesfull: false
                 })
-                setTimeout(this.resetState, 2500)
+                setTimeout(this.resetState, timeout)
               });
 
           } else {
@@ -421,7 +422,7 @@ class _ProfileForm extends Component {
               paymentErrorMessage: errorMessage,
               paymentSuccesfull: false
             })
-            setTimeout(this.resetState, 2500)
+            setTimeout(this.resetState, timeout)
           }
         }
       }
