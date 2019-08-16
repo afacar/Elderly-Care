@@ -1,7 +1,7 @@
 import firebase from 'react-native-firebase';
 import { Translations } from '../../constants/Translations';
 
-export const do_payment = (cardData, conversationId, price) => async (dispatch) => {
+export const start_payment = (cardData, conversationId, price) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
   const url = `users/${_user.uid}/payments`;
 
@@ -13,6 +13,7 @@ export const do_payment = (cardData, conversationId, price) => async (dispatch) 
     expireYear: '20' + cardData.expiry.split('/')[1],
     cvc: cardData.cvc,
     conversationId: conversationId,
+    conversationData: _user.displayName + "-" + conversationId,
     buyer: {
       id: _user.uid,
       name: 'John',
@@ -61,12 +62,26 @@ export const do_payment = (cardData, conversationId, price) => async (dispatch) 
         reject(err);
       });
   });
-
 };
 
-export const checkNewPayment = (callback) => async(dispatch) => {
+export const finalize_payment = ((paymentObject) => async (dispatch) => {
+  var finalizePayment = firebase.functions().httpsCallable('finalizePayment');
+  return new Promise((resolve, reject) => {
+    finalizePayment(paymentObject)
+      .then((result) => {
+        console.log("RESULT", result)
+        resolve(result)
+      })
+      .catch(err => {
+        console.log('finalizepayment rejects =>', err);
+        reject(err);
+      });
+  });
+});
+
+export const checkNewPayment = (callback) => async (dispatch) => {
   const uid = firebase.auth().currentUser.uid;
-  console.log("Inside new payments",uid);
+  console.log("Inside new payments", uid);
   await firebase.database().ref('payments/results').child(uid).on("child_added", newPayment => {
     console.log("New payment", newPayment.val());
     callback(newPayment.val())

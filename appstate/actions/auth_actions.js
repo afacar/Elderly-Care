@@ -99,6 +99,11 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     throw new Error('Invalid userRole parameter to _createNewUserProfile: send p or c as userRole!');
   }
 
+  if ( phoneNumber) {
+    let phoneNumberUrl = `phoneNumbers/${phoneNumber}`;
+    await firebase.database().ref(`${phoneNumberUrl}`).set(phoneNumber);
+  }
+
   let urlPrefix = `caregivers`;
   if (userRole === 'p') {
     urlPrefix = 'providers';

@@ -45,7 +45,7 @@ class AudioCard extends Component {
                     this.setState({
                         sound: sound,
                         createdAt: dateh + ':' + datem,
-                        duration: duration + 2,
+                        duration: duration + 1,
                         loading: false
                     })
                 }

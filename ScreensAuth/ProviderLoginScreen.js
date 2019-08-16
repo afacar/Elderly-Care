@@ -9,6 +9,8 @@ import { TextInput, CardItem } from '../components/common/';
 
 const successImageUri = 'https://cdn.pixabay.com/photo/2015/06/09/16/12/icon-803718_1280.png';
 
+const registerTitle = 'Kayıt ol';
+const signInTitle = 'Giriş yap'
 class ProviderLogin extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +21,9 @@ class ProviderLogin extends Component {
       codeInput: '',
       phoneNumber: '',
       confirmResult: null,
-      displayName: ''
+      newUser: true,
+      displayName: '',
+      disabled: false
     };
   }
 
@@ -83,20 +87,45 @@ class ProviderLogin extends Component {
     console.log(`ProviderLogin will unmount!`);
   }
 
-  signIn = () => {
+  signIn = async () => {
     const { phoneNumber, displayName } = this.state;
     if (phoneNumber.length < 10) {
       this.setState({ message: 'Geçerli bir numara giriniz...' });
     }
-    else if (displayName.length < 6 || !displayName)
+    else if ( this.state.newUser && (displayName.length < 6 || !displayName))
       this.setState({ message: 'Geçerli bir isim giriniz...' });
     else {
-      this.setState({ message: 'Kod SMS ile yollanıyor ...' });
-      firebase.auth().signInWithPhoneNumber(phoneNumber)
-        .then(confirmResult => {
-          this._isMounted && this.setState({ confirmResult, message: 'Kod yollandı!' })
+      if (!this.state.newUser) {
+        this.setState({disabled: true})
+        await firebase.database().ref(`phoneNumbers/${phoneNumber}`).once('value', snapshot => {
+          this.setState({disabled: false})
+          if (!snapshot.exists()) {
+            this.setState({ message: "Girdiğiniz numaraya kayıtlı kullanıcı bulunamadı" })
+          } else {
+            this.setState({ message: 'Kod SMS ile yollanıyor ...' });
+            firebase.auth().signInWithPhoneNumber(phoneNumber)
+              .then(confirmResult => {
+                this._isMounted && this.setState({ confirmResult, message: 'Kod yollandı!' })
+              })
+              .catch(error => this.setState({ message: `Telefon numarası Hata mesajı: ${error.message}` }));
+          }
         })
-        .catch(error => this.setState({ message: `Telefon numarası Hata mesajı: ${error.message}` }));
+      } else {
+        this.setState({disabled: true})
+        await firebase.database().ref(`phoneNumbers/${phoneNumber}`).once('value', snapshot => {
+          this.setState({disabled: false})
+          if (snapshot.exists()) {
+            this.setState({ message: "Kayıtlı numara girdiniz. Giriş yapmayı deneyin", newUser: false })
+          } else {
+            this.setState({ message: 'Kod SMS ile yollanıyor ...' });
+            firebase.auth().signInWithPhoneNumber(phoneNumber)
+              .then(confirmResult => {
+                this._isMounted && this.setState({ confirmResult, message: 'Kod yollandı!' })
+              })
+              .catch(error => this.setState({ message: `Telefon numarası Hata mesajı: ${error.message}` }));
+          }
+        })
+      }
     }
   };
 
@@ -117,42 +146,86 @@ class ProviderLogin extends Component {
     firebase.auth().signOut();
   }
 
+  changeUserState = (newUser) => {
+    if (this._isMounted) {
+      this.setState({
+        newUser: newUser
+      })
+    }
+  }
+
+  renderButtons() {
+    return (
+      <View style={{ flexDirection: 'row', width: '100%' }}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <Button title={registerTitle} onPress={() => this.changeUserState(true)} buttonStyle={{ margin: 10 }} disabled={this.state.disabled} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <Button title={signInTitle} onPress={() => this.changeUserState(false)} buttonStyle={{ margin: 10 }} disabled={this.state.disabled} />
+        </View>
+      </View>
+    )
+  }
+
   renderPhoneNumberInput() {
     const { phoneNumber, displayName } = this.state;
+    if (this.state.newUser == true) {
+      return (
+        <Card style={{ padding: 25 }}>
+          <CardItem>
+            <Input
+              key='displayname'
+              label='Ad Soyad'
+              placeholder='Ör. Ahmet Yılmaz'
+              onChangeText={value => this.setState({ displayName: value })}
+              value={displayName}
+            />
+          </CardItem>
 
-    return (
-      <Card style={{ padding: 25 }}>
-        <CardItem>
-          <Input
-            key='displayname'
-            label='Ad Soyad'
-            placeholder='Ör. Ahmet Yılmaz'
-            onChangeText={value => this.setState({ displayName: value })}
-            value={displayName}
-          />
-        </CardItem>
+          <CardItem>
+            <Input
+              label="Telefon numarası"
+              keyboardType='phone-pad'
+              style={{ height: 40, marginTop: 15, marginBottom: 15 }}
+              onChangeText={value => this.setState({ phoneNumber: value })}
+              placeholder={'+90 55... '}
+              value={phoneNumber}
+            />
+          </CardItem>
 
+          <View style={styles.buttonStyle}>
+            <Button title={registerTitle} color="green" onPress={this.signIn} />
+          </View>
 
-        <CardItem>
-          <Input
-            label="Telefon numarası"
-            keyboardType='phone-pad'
-            style={{ height: 40, marginTop: 15, marginBottom: 15 }}
-            onChangeText={value => this.setState({ phoneNumber: value })}
-            placeholder={'+90 55... '}
-            value={phoneNumber}
-          />
-        </CardItem>
+          <View style={styles.buttonStyle}>
+            <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled}/>
+          </View>
+        </Card>
+      );
+    } else {
+      return (
+        <Card style={{ padding: 25 }}>
+          <CardItem>
+            <Input
+              label="Telefon numarası"
+              keyboardType='phone-pad'
+              style={{ height: 40, marginTop: 15, marginBottom: 15 }}
+              onChangeText={value => this.setState({ phoneNumber: value })}
+              placeholder={'+90 55... '}
+              value={phoneNumber}
+            />
+          </CardItem>
 
-        <View style={styles.buttonStyle}>
-          <Button title="Giriş yap" color="green" onPress={this.signIn} />
-        </View>
+          <View style={styles.buttonStyle}>
+            <Button title={signInTitle} color="green" onPress={this.signIn} disabled={this.state.disabled}/>
+          </View>
 
-        <View style={styles.buttonStyle}>
-          <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
-        </View>
-      </Card>
-    );
+          <View style={styles.buttonStyle}>
+            <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+          </View>
+        </Card>
+      );
+    }
   }
 
   renderMessage() {
@@ -190,6 +263,8 @@ class ProviderLogin extends Component {
     const { user, confirmResult } = this.state;
     return (
       <View style={{ flex: 1 }}>
+
+        {!user && !confirmResult && this.renderButtons()}
 
         {!user && !confirmResult && this.renderPhoneNumberInput()}
 

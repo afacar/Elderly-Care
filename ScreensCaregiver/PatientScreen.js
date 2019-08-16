@@ -11,7 +11,7 @@ class PatientScreen extends React.Component {
     headerForceInset: {vercical: 'never'},
     headerRight: (
       <View>
-      <TouchableHighlight onPress={() => navigation.navigate('ChartScreen', {
+      <TouchableOpacity onPress={() => navigation.navigate('ChartScreen', {
         userid: navigation.getParam('userid', '')
       })}
       >
@@ -22,7 +22,7 @@ class PatientScreen extends React.Component {
           />
           <Text style={{ fontWeight: 'bold' }}>Ölçümler</Text>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
       </View>
     )
   });

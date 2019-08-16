@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Modal, Platform, ImageBackground, WebView } from 'react-native';
+import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground, WebView, ActivityIndicator } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button, Icon, Overlay } from 'react-native-elements';
@@ -24,6 +24,7 @@ import {
 import Base64 from '../common/Base64';
 import firebase from 'react-native-firebase';
 
+const timeout = 5000;
 class _ProfileForm extends Component {
   state = {
     conversationId: '',
@@ -31,7 +32,7 @@ class _ProfileForm extends Component {
     loading: false,
     error: '',
     disabled: true,
-    price: '0',
+    price: 0,
     priceError: '',
     paymentError: '',
     paymentResult: null,
@@ -39,7 +40,9 @@ class _ProfileForm extends Component {
     isPaying: false,
     isPriceSet: false,
     showFinalResult: false,
-    paymentSuccesfull: false
+    paymentSuccesfull: false,
+    threedsPaymentLoading: false,
+    threedsCodeText: ''
   };
 
   _isMounted = false;
@@ -151,26 +154,36 @@ class _ProfileForm extends Component {
     } else {
       console.log('doing payment...');
       var conversationId = await firebase.auth().currentUser.uid + "_" + (new Date().getTime());
-      this.setState({ paymentLoading: true, conversationId });
-      this.props.do_payment(card.values, conversationId, price)
+      this.setState({ paymentLoading: true, conversationId, threedsPaymentLoading: true });
+      this.props.start_payment(card.values, conversationId, price)
         .then(paymentResult => {
           console.log("Base 64", Base64.atob(paymentResult.data.htmlContent));
-          this.setState({ paymentResult, paymentLoading: false, showthreeds: true });
+          this.setState({ paymentResult, paymentLoading: false, threedsPaymentLoading: false, showthreeds: true });
         })
-        .catch(paymentError => {
+        .catch((paymentError) => {
           console.log('paymentError', paymentError)
-          this.setState({ paymentError, paymentLoading: false })
+          this.setState({ paymentErrorMessage: paymentError[Error], paymentLoading: false, threedsPaymentLoading: false, showFinalResult: true, paymentResult: false })
+          setTimeout(this.resetState, timeout);
         })
       console.log('payment done!');
     }
   }
 
   _prePayment = () => {
-    if (this.state.price <= 0) {
-      this.setState({ priceError: 'Miktar 0 TL uzeri olmadilir' })
+    if (parseInt(this.state.price) <= 0) {
+      this.setState({ priceError: 'Miktar 0 TL uzeri olmalıdır' })
       return;
     }
     this.setState({ isPaying: true, isPriceSet: true });
+  }
+
+  showthreedsCodeText = () => {
+    if (this._isMounted) {
+      this.setState({
+        threedsPaymentLoading: true,
+        threedsCodeText: 'Numaranıza gelen kodu girin!'
+      })
+    }
   }
 
   render() {
@@ -215,7 +228,7 @@ class _ProfileForm extends Component {
                       style={{ flex: 1, marginHorizontal: 15 }}
                       rightIcon={{
                         type: 'material-community',
-                        name:'currency-try',
+                        name: 'currency-try',
                         size: 21
                       }}
                       errorMessage={this.state.priceError}
@@ -232,7 +245,8 @@ class _ProfileForm extends Component {
                         color: 'red'
                       }}
                       //containerStyle={{ flex: 1 }}
-                      title='Iptal' onPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })}
+                      title='Iptal'
+                      onPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })}
                     />
                     <Button
                       type='clear'
@@ -242,9 +256,23 @@ class _ProfileForm extends Component {
                         size: 21,
                       }}
                       //containerStyle={{ flex: 2 }}
-                      title='Kard Bilgilerini Giriniz' onPress={this._prePayment}
+                      title='Kard Bilgilerini Giriniz'
+                      onPress={this._prePayment}
                     />
                   </View>
+                  <CardItem>
+                    <NumericInput
+                      label='Tutar'
+                      style={{ flex: 1 }}
+                      errorMessage={this.state.priceError}
+                      value={this.state.price + ''}
+                      onChangeText={(price) => this.setState({ price, priceError: '' })} />
+                    <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
+                    <Button
+                      buttonStyle={{ flex: 1 }}
+                      title='Odeme Yap' onPress={this._prePayment}
+                    />
+                  </CardItem>
                 </View>
               )
             }
@@ -256,25 +284,29 @@ class _ProfileForm extends Component {
                     requiresCVC
                     onChange={this._onCardChange} />
                   <ErrorLabel>{this.state.cardError}</ErrorLabel>
-                  <ErrorLabel>{this.state.paymentError.message}</ErrorLabel>
+                  <ErrorLabel>{this.state.paymentError.message == "INTERNAL" ? "Internet bağlantısı hatası oluştu" : this.state.paymentError.message}</ErrorLabel>
                   <Button
                     type='outline'
                     disabled={this.state.paymentLoading}
-                    title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${this.state.price} TRY ONAYLA`} onPress={this._confirmPayment} />
+                    title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${parseInt(this.state.price)} TRY ONAYLA`} onPress={this._confirmPayment} />
                 </View>
               )
             }
             {
               (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showthreeds) && (
-                <View style={{ justifyContent: 'center' }}>
-                  <WebView source={{ html: Base64.atob(this.state.paymentResult.data.htmlContent) }} />
-                  <Text h4>Numaranıza gelen kodu girin!</Text>
+                <View style={{ alignSelf: 'center' }}>
+                  <WebView
+                    onLoad={this.showthreedsCodeText}
+                    source={{ html: Base64.atob(this.state.paymentResult.data.htmlContent) }}
+                    onTouchCancel={this.resetState} />
+                  <ActivityIndicator animating={this.state.threedsPaymentLoading} size='large' color='#5FC9F8' style={{ alignSelf: 'center' }} />
+                  <Text h4 style={{ alignSelf: 'center', textAlign: 'center', color: 'black' }}>{this.state.threedsCodeText ? this.state.threedsCodeText : 'Sunucu yanıtı bekleniyor'}</Text>
                 </View>
               )
             }
             {
               (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showFinalResult) && (
-                <View style={{ justifyContent: 'center' }}>
+                <View style={{ alignSelf: 'center', alignContent: 'center' }}>
                   <Icon
                     name={this.state.paymentSuccesfull == true ? 'check' : 'close'}
                     type='antdesign'
@@ -292,7 +324,7 @@ class _ProfileForm extends Component {
         <CardItem>
           <NumericInput
             label="Cuzdan"
-            value={this.state.profile.wallet + ''}
+            value={parseInt(this.state.profile.wallet) + ''}
             editable={false}
             style={{ flex: 1 }}
           />
@@ -369,14 +401,16 @@ class _ProfileForm extends Component {
         conversationId: '',
         loading: false,
         error: '',
-        price: '0',
+        price: 0,
         priceError: '',
         paymentError: '',
         paymentResult: null,
         isCardVisible: false,
         isPaying: false,
         isPriceSet: false,
-        showFinalResult: false
+        showFinalResult: false,
+        threedsCodeText: '',
+        threedsPaymentLoading: false
       })
     }
   }
@@ -389,27 +423,51 @@ class _ProfileForm extends Component {
       console.log("New Payment Result", result);
       if (result) {
         if (result.conversationId == this.state.conversationId) {
-          if (result.status === 'success') {
+          if (result.status === 'success' && result.mdStatus == 1) {
             console.log("Here");
+            var paymentObject = {
+              conversationId: result.conversationId,
+              paymentId: result.paymentId,
+              conversationData: result.conversationData
+            }
             this.setState({
-              profile: { ...this.state.profile, wallet: this.state.profile.wallet + this.state.price },
-              showFinalResult: true,
-              showthreeds: false,
-              paymentSuccesfull: true
+              threedsPaymentLoading: true,
+              threedsCodeText: 'Ödeme alınıyor'
             })
-            setTimeout(this.resetState, 2500)
+            this.props.finalize_payment(paymentObject)
+              .then((paymentResult) => {
+                console.log("finalize payment no error")
+                this.setState({
+                  profile: { ...this.state.profile, wallet: parseInt(this.state.profile.wallet) + parseInt(this.state.price) },
+                  showFinalResult: true,
+                  showthreeds: false,
+                  paymentSuccesfull: true,
+                  threedsPaymentLoading: false,
+                })
+                setTimeout(this.resetState, timeout)
+              })
+              .catch((paymentError) => {
+                console.log("finalize payment error", paymentError)
+                this.setState({
+                  showFinalResult: true,
+                  showthreeds: false,
+                  paymentErrorMessage: paymentError,
+                  paymentSuccesfull: false
+                })
+                setTimeout(this.resetState, timeout)
+              });
+
           } else {
             console.log("Here1");
             const mdStatus = result.mdStatus;
             var errorMessage = IyziPaymentErrors.IyziPaymentErrors[mdStatus];
             this.setState({
-              profile: { ...this.state.profile, wallet: this.state.profile.wallet + this.state.price },
               showFinalResult: true,
               showthreeds: false,
               paymentErrorMessage: errorMessage,
               paymentSuccesfull: false
             })
-            setTimeout(this.resetState, 2500)
+            setTimeout(this.resetState, timeout)
           }
         }
       }

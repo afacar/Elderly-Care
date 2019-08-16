@@ -88,7 +88,7 @@ export class ChatItem extends Component {
     }
 
     return (
-      <TouchableHighlight onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}>
+      <TouchableOpacity onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 17 }}
@@ -102,7 +102,7 @@ export class ChatItem extends Component {
           badge={badge}
           containerStyle={{ borderBottomWidth: 0.5, borderBottomEndRadius: 50, borderBottomStartRadius:100 }}
         />
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 }
