@@ -36,6 +36,8 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
 
       try {
         const message = snapshot.val();
+        console.log('fetch_message got new message=>', message);
+
         const newMessage = {
           _id: key,
           audio: message.audio,
@@ -48,6 +50,7 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
             avatar: message.user.avatar,
           },
         };
+
         if (userRole === 'c') {
           firebase.database().ref(`caregivers/${uid}/chats/${chatId}/unread`).set(0);
         }
@@ -70,19 +73,21 @@ export const fetchMessages = (userRole, localMessageIds, chatId, callback) => as
 
 // send the message to the Backend
 export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
-  console.log("sendMessage 3",userRole, messages, chatId);
+  console.log("sendMessage 3", userRole, messages, chatId);
   const uid = firebase.auth().currentUser.uid;
-  let url = `commonchat/`;
+  let url = '';
   let unreadURL = '';
-  var downloadUrl = "";
-  var uploadUrl = "";
-  var unreadRef = "";
-  var audioUrl = "";
-  var audioDownloadUrl = "";
+  var downloadUrl = '';
+  var uploadUrl = '';
+  var audioUrl = '';
+  var audioDownloadUrl = '';
+  let messagesURL = '';
 
   for (let i = 0; i < messages.length; i++) {
     let message = messages[i];
     if (chatId === 'commonchat') {
+      url = 'commonchat/';
+      messagesURL = url + 'messages/' + message._id;
       if (message.image) {
         uploadUrl = "chatFiles/commonchat/image";
       } else if (message.audio) {
@@ -92,6 +97,7 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
     else if (userRole === 'c') {
       url = `providerchat/${chatId}/${uid}/`;
       unreadURL = `providers/${chatId}/chats/${uid}/unread`;
+      messagesURL = url + 'messages/' + message._id;
       if (message.image) {
         uploadUrl = `chatFiles/${chatId}/${uid}/image`;
       } else if (message.audio) {
@@ -101,6 +107,8 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
     } else if (userRole === 'p') {
       url = `providerchat/${uid}/${chatId}/`;
       unreadURL = `caregivers/${chatId}/chats/${uid}/unread`;
+      messagesURL = url + 'messages/' + message._id;
+
       if (message.image) {
         uploadUrl = `chatFiles/${uid}/${chatId}/image`;
       } else if (message.audio) {
@@ -121,7 +129,7 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
     }
 
     console.log(`sendMessage will send message to ${url} with chatID (${chatId}) and uid (${uid})`);
-    const messagesURL = url + 'messages/' + message._id;
+    //const messagesURL = url + 'messages/' + message._id;
     console.log(`sendMessage will be pushed to messagesURL=>`, messagesURL);
     // It was all beacause of this line
     console.log(downloadUrl.toString());
@@ -134,15 +142,17 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       audio: audioDownloadUrl
     };
 
-    console.log('unread fetching...');
-    let unread = await readFromFirebase(unreadURL);
-    console.log('unread fetched', unread);
-
     const lastMessage = {};
 
-    lastMessage[unreadURL] = (unread || 0) + 1;
+    if (chatId !== 'commonchat') {
+      console.log('unread fetching...');
+      let unread = await readFromFirebase(unreadURL);
+      console.log('unread fetched', unread);
+      lastMessage[unreadURL] = (unread || 0) + 1;
+    }
+
     lastMessage[messagesURL] = messageData;
-    
+
     if (userRole === 'c') {
       lastMessage[`providers/${chatId}/chats/${uid}/lastMessage`] = messageData;
       lastMessage[`caregivers/${uid}/chats/${chatId}/lastMessage`] = messageData;
@@ -161,10 +171,10 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
 
 const readFromFirebase = (url) => {
   return new Promise((resolve, reject) => {
-    firebase.database().ref(url).on('value', snap=> {
+    firebase.database().ref(url).on('value', snap => {
       resolve(snap.val());
     }, error => {
-      reject('readFromFirebase Error:'+ error.message)
+      reject('readFromFirebase Error:' + error.message)
     })
   })
 }
