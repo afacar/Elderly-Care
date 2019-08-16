@@ -3,7 +3,20 @@ import { Translations } from '../../constants/Translations';
 
 export const start_payment = (cardData, conversationId, price) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
-  const url = `users/${_user.uid}/payments`;
+  const tempName = _user.displayName.split(' ');
+  let name = tempName[0];
+  let surname = tempName[1];
+  const nameLength = tempName.length;
+  
+  if (nameLength === 3) {
+    name = tempName[0] + ' ' + tempName[1];
+    surname = tempName[nameLength-1];
+  } else if (nameLength === 1) {
+    name = tempName[0];
+    surname = tempName[0];
+  }
+
+  //const url = `users/${_user.uid}/payments`;
 
   let data = {
     price: parseFloat(price),
@@ -16,8 +29,8 @@ export const start_payment = (cardData, conversationId, price) => async (dispatc
     conversationData: _user.displayName + "-" + conversationId,
     buyer: {
       id: _user.uid,
-      name: 'John',
-      surname: 'Doe',
+      name,
+      surname,
       gsmNumber: '+905350000000',
       email: 'email@email.com',
       identityNumber: '74300864791',

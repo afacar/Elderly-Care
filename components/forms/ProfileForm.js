@@ -32,7 +32,7 @@ class _ProfileForm extends Component {
     loading: false,
     error: '',
     disabled: true,
-    price: 0,
+    price: '0',
     priceError: '',
     paymentError: '',
     paymentResult: null,
@@ -244,7 +244,6 @@ class _ProfileForm extends Component {
                         size: 21,
                         color: 'red'
                       }}
-                      //containerStyle={{ flex: 1 }}
                       title='Iptal'
                       onPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })}
                     />
@@ -255,24 +254,10 @@ class _ProfileForm extends Component {
                         type: 'material',
                         size: 21,
                       }}
-                      //containerStyle={{ flex: 2 }}
                       title='Kard Bilgilerini Giriniz'
                       onPress={this._prePayment}
                     />
                   </View>
-                  <CardItem>
-                    <NumericInput
-                      label='Tutar'
-                      style={{ flex: 1 }}
-                      errorMessage={this.state.priceError}
-                      value={this.state.price + ''}
-                      onChangeText={(price) => this.setState({ price, priceError: '' })} />
-                    <Text style={{ flex: 1, fontSize: 21, alignSelf: 'flex-end' }}>TRY</Text>
-                    <Button
-                      buttonStyle={{ flex: 1 }}
-                      title='Odeme Yap' onPress={this._prePayment}
-                    />
-                  </CardItem>
                 </View>
               )
             }
