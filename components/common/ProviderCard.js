@@ -60,7 +60,6 @@ class ProviderCard extends Component {
         <Text h3 style={{ textAlign: 'center', paddingBottom: 5 }}>{provider.displayName || 'Adı yok'}</Text>
         <RowItem label="Uzmanlık" content={provider.profession} />
         <ColumnItem label="Biyografi" content={provider.experience} />
-        <RowItem label="Ücret" content={provider.generalFee ? provider.generalFee : "0"} />
       </View>
     );
     let info = (
@@ -99,7 +98,7 @@ class ProviderCard extends Component {
         imageStyle={{ borderRadius: 50 }}
         titleStyle={{ fontSize: 21 }}
         containerStyle={{
-          backgroundColor: '#e9fce9',
+          //backgroundColor: '#e9fce9',
           margin: 3,
           borderWidth: 3,
           borderColor: 'black',
