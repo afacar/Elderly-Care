@@ -38,6 +38,8 @@ class GoogleSignin extends Component {
     let isNewUser = (lastSignInTime - creationTime) < 500;
     console.log('isNewUser:', membershipTime);
 
+    this.props.navigate('SplashScreen', { isNewUser, role: userRole });
+
     try {
       console.log('Setting caregiver role to Google user...', userRole);
       // set users Role 
@@ -56,9 +58,7 @@ class GoogleSignin extends Component {
         console.log('Yeni Google kullanıcısına yeni profil oluştururken hata :', error.message);
       }
     }
-
-    this.props.navigate('SplashScreen', { isNewUser, role: userRole });
-    // this.props.handleLogin({ loading: false });
+    
   }
 
   render() {

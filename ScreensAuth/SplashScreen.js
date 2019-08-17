@@ -5,35 +5,70 @@ import {
   View,
   Alert,
   AsyncStorage,
+  Image,
+  Text,
 } from 'react-native';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
 
 import * as actions from '../appstate/actions';
 
+const styles = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
+};
+
 class SplashScreen extends React.Component {
-  _user = null;
-  // Render any loading content that you like here
+  //_user = null;
+
   render() {
-    // NOTE: Return an Splash screen instead of ActivityIndicator 
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="red" />
-        <StatusBar barStyle="default" />
+        <Image
+          source={require('../assets/images/akilli_ajanda_logo.png')}
+          style={{ width: '100%', height: '20%', resizeMode: 'contain' }}
+        />
+        <Text
+          style={{
+            fontSize: 32,
+            fontStyle: 'italic',
+            color: 'black',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            fontFamily: 'Impact'
+          }}>
+          Evde Bakım Desteği
+        </Text>
       </View>
     );
   }
 
   async componentDidMount() {
-    console.log("SplashScreen didMount");
+    console.log("SplashScreen didMount...");
     const isNewUser = this.props.navigation.getParam('isNewUser', '');
     const role = this.props.navigation.getParam('role', '');
+
+    //await this.performTimeConsumingTask();
+
     if (firebase.auth().currentUser) {
       // this._user = firebase.auth().currentUser._user;
       await this._routeUser(isNewUser, role);
     } else {
       this.props.navigation.navigate('Auth');
     }
+  }
+
+
+  performTimeConsumingTask = async () => {
+    return new Promise((resolve) =>
+      setTimeout(
+        () => { resolve('result') },
+        2000
+      )
+    );
   }
 
   /** 
@@ -44,6 +79,7 @@ class SplashScreen extends React.Component {
    */
   _routeUser = async (isNewUser, role) => {
     // Check Permissions, getToken that is InstanceId for FCM
+
     const { _user } = firebase.auth().currentUser;
     let userRole = role;
     console.log('_user', _user);
@@ -261,13 +297,6 @@ class SplashScreen extends React.Component {
   }
 
 }
-
-const styles = {
-  container: {
-    flex: 1,
-    justifyContent: 'center'
-  }
-};
 
 function mapStateToProps({ auth }) {
   return { user: auth.user };

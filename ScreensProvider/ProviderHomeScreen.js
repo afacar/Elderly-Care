@@ -16,15 +16,9 @@ class ProviderHome extends React.Component {
     },
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('CaregiverList')}>
-        <View style={{ alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            <Image
-              style={{ width: 40, height: 40 }}
-              source={require('../assets/images/family.png')}
-            />
-            <Badge status="primary" value={navigation.getParam('newRequests', 0)} />
-          </View>
-          <Text style={{ fontWeight: 'bold' }}>Danışmanlık Talepleri</Text>
+        <View style={{ flexDirection:'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+          <Text style={{ fontWeight: 'bold' }}>Yeni Talepler  </Text>
+          <Badge status="primary" value={navigation.getParam('newRequests', 0)} />
         </View>
       </TouchableOpacity>
     )

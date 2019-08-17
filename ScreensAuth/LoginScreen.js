@@ -57,25 +57,16 @@ class LoginScreen extends Component {
           <Card title="Uzmandan ikinci görüş alın" titleStyle={{ fontSize: 23 }} style={styles.loginContainer}>
             <Text style={styles.labelStyle}>{this.state.errorMessage}</Text>
             <CardItem style={styles.cardItemStyle}>
-              {/*             <Image
-              style={{ width: 70, height: 70 }}
-              source={require('../assets/images/family2.png')}
-            /> */}
-            </CardItem>
-            <CardItem style={styles.cardItemStyle}>
               <FacebookLoginButton
                 disabled={!this.state.isConnected}
                 handleLogin={this.handleLogin}
-                navigate={navigate}
-              />
+                navigate={navigate} />
             </CardItem>
             <CardItem style={styles.cardItemStyle}>
               <GoogleLoginButton
-                //style={{ width: 192, height: 48 }}
                 disabled={!this.state.isConnected}
                 handleLogin={this.handleLogin}
-                navigate={navigate}
-              />
+                navigate={navigate} />
             </CardItem>
           </Card>
           <Card>
