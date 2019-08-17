@@ -1,9 +1,7 @@
 import React from 'react';
-import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text, Image } from 'react-native';
-import { ListItem, Badge, Icon } from 'react-native-elements';
+import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text } from 'react-native';
+import { ListItem, Badge } from 'react-native-elements';
 import { connect } from 'react-redux';
-import _ from 'lodash';
-import firebase from 'react-native-firebase';
 import * as actions from '../appstate/actions';
 import { ChatItem } from '../components/common';
 
@@ -106,8 +104,6 @@ class ProviderHome extends React.Component {
   }
 
   _handleRequest = async (caregiverId, response) => {
-    console.log('respondResquest caregiverId', caregiverId, response);
-    console.log('respondResquest caregiverId', caregiverId, response);
     try {
       await this.props.respond_caregiver_request(caregiverId, response);
     } catch (error) {
@@ -116,23 +112,16 @@ class ProviderHome extends React.Component {
   }
 
   _renderItem = ({ item }) => {
-
     const chatId = item;
     const theChat = this.state.chats[chatId];
-    console.log("_renderItem", theChat);
     const isApproved = theChat.status;
 
     if (isApproved === false) return;
 
-    console.log('_renderItem2');
     return (
-      /* <ListItem
-        title={theChat.title + ' ' + theChat.unread}
-        subtitle={theChat.lastMessage.text}
-      /> */
       <ChatItem
         onPress={this._onPressItem}
-        //key={chatId}
+        key={chatId}
         handleRequest={this._handleRequest}
         chatId={chatId}
         data={theChat} />
