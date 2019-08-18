@@ -54,20 +54,12 @@ export class ChatItem extends Component {
     let userName = '';
     let badge = null;
 
-    if (isApproved === false) return;
-
-    if (isApproved === 'pause') {
-      subtitle = <ErrorLabel>Hizmet durduruldu!</ErrorLabel>
-    } else if (isApproved === 'pending') {
+    if (isApproved === 'End') {
+      subtitle = <ErrorLabel>Oturum bitti!</ErrorLabel>
+    } else if (isApproved === 'Pending') {
       subtitle = (
         <CardItem>
-          <Text> Yeni danismanlik talebi</Text>
-          <Icon
-            type='material-community' name='close' color='red' size={36}
-            onPress={() => this.props.handleRequest(chatId, false)} />
-          <Icon
-            type='material-community' name='check-all' color='green' size={36}
-            onPress={() => this.props.handleRequest(chatId, true)} />
+          <Text>Yeni danismanlik talebi onay bekliyor!</Text>
         </CardItem>
       )
     } else if (lastMessage) {
@@ -80,9 +72,9 @@ export class ChatItem extends Component {
       if (lastMessage.text)
         subtitle = userName + lastMessage.text;
       else if (lastMessage.image)
-        subtitle = userName + ' resim';
+        subtitle = userName + '📷 Resim';
       else if (lastMessage.audio)
-        subtitle = userName + ' sesli mesaj';
+        subtitle = userName + '🎤 Sesli mesaj';
     } else {
       subtitle = "Mesaj yok! İlk mesajı siz yazın.";
     }
@@ -100,7 +92,7 @@ export class ChatItem extends Component {
             size: 'medium',
           }}
           badge={badge}
-          containerStyle={{ borderBottomWidth: 0.5, borderBottomEndRadius: 50, borderBottomStartRadius:100 }}
+          containerStyle={{ borderBottomWidth: 0.5, borderBottomEndRadius: 50, borderBottomStartRadius: 100 }}
         />
       </TouchableOpacity>
     );

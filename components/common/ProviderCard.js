@@ -70,7 +70,7 @@ class ProviderCard extends Component {
         titleStyle={{ color: '#041256' }}
         onPress={() => this._sendProviderRequest(providerId, provider.generalFee ? provider.generalFee : 0)} />
     );
-    if (provider.isApproved === true) {
+    if (provider.isApproved === 'Approve') {
       info = (
         <Button
           disabled
@@ -78,19 +78,17 @@ class ProviderCard extends Component {
           type="clear"
           icon={<CheckIcon />}
           disabledTitleStyle={{ color: 'green' }} />);
-    } else if (provider.isApproved === 'pending') {
+    } else if (provider.isApproved === 'Pending') {
       info = (
         <Button
           icon={<RequestIcon color='#041256' />}
           type='clear'
           title='Onay Bekliyor... Talebi İptal Et!'
           titleStyle={{ color: '#041256' }}
-          onPress={() => this._cancelRequest(providerId)} />);
-    } else if (provider.isApproved === false) {
-      info = (<Text style={{ color: 'red', fontWeight: 'bold', alignSelf: 'center' }}>Uzman Reddetti!</Text>);
-    } else if (provider.isApproved === 'pause') {
-      info = (<Text style={{ color: 'orange', fontWeight: 'bold', alignSelf: 'center' }}>Hizmet durduruldu!</Text>);
+          onPress={() => this._cancelRequest(providerId)} />
+      );
     }
+
     let image = provider.photoURL ? { uri: provider.photoURL } : require('../../assets/images/user.png')
     return (
       <Card

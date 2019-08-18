@@ -33,7 +33,7 @@ class CaregiverList extends Component {
     }
   }
 
-  _cancelRequestConfirm = (caregiverId) => {
+  _rejectRequestConfirm = (caregiverId) => {
     Alert.alert('Onayınız gerekmekte!', 'Danışmanlık talebini iptal etmek istediğinizden emin misiniz?',
       [
         {
@@ -41,13 +41,13 @@ class CaregiverList extends Component {
           onPress: () => { },
           style: 'cancel',
         },
-        { text: 'Evet', onPress: () => this._answerCaregiverRequest(caregiverId, false) },
+        { text: 'Evet', onPress: () => this._answerCaregiverRequest(caregiverId, 'Reject') },
       ],
       { cancelable: false },
     );
   }
 
-  cancelButton = (caregiverId) => (
+  rejectButton = (caregiverId) => (
     <Button
       icon={{
         type: 'evilicon',
@@ -55,19 +55,19 @@ class CaregiverList extends Component {
       }}
       type='clear'
       title="Reddet"
-      onPress={() => this._cancelRequestConfirm(caregiverId)}
+      onPress={() => this._rejectRequestConfirm(caregiverId)}
     />
   );
 
-  pauseButton = (caregiverId) => (
+  endButton = (caregiverId) => (
     <Button
       icon={{
         type: 'feather',
         name: "pause",
       }}
       type='clear'
-      title="Durdur"
-      onPress={() => this._answerCaregiverRequest(caregiverId, 'pause')}
+      title="Sonlandır"
+      onPress={() => this._answerCaregiverRequest(caregiverId, 'End')}
     />
   );
 
@@ -79,11 +79,11 @@ class CaregiverList extends Component {
       }}
       type='clear'
       title="Onayla"
-      onPress={() => this._answerCaregiverRequest(caregiverId, true)}
+      onPress={() => this._answerCaregiverRequest(caregiverId, 'Approve')}
     />
   );
 
-  resumeButton = (caregiverId) => (
+/*   resumeButton = (caregiverId) => (
     <Button
       icon={{
         type: 'feather',
@@ -91,9 +91,9 @@ class CaregiverList extends Component {
       }}
       type='clear'
       title="Başlat"
-      onPress={() => this._answerCaregiverRequest(caregiverId, 'start')}
+      onPress={() => this._answerCaregiverRequest(caregiverId, 'Approve')}
     />
-  );
+  ); */
 
   _renderItem = ({ item }) => {
     const caregiverId = item;
@@ -101,39 +101,38 @@ class CaregiverList extends Component {
     const caregiver = this.state.caregivers[caregiverId];
     let title = caregiver.displayName || 'Adı yok!';
     let subtitle = '';
-    if (caregiver.status === 'pending') {
+
+    if (caregiver.status === 'Pending') {
       subtitle = (
         <View>
           <Text>Danışmanlık almak istiyor!</Text>
           <RowItem>
-            {this.cancelButton(caregiverId)}
+            {this.rejectButton(caregiverId)}
             {this.approveButton(caregiverId)}
           </RowItem>
         </View>
       );
-    } else if (caregiver.status === true) {
+    } else if (caregiver.status === 'Approve') {
       // If this is an ongoing consulting,
       // it shouldnt be listed here
       subtitle = (
         <RowItem>
           <Text>Danışmanlık alıyor!</Text>
-          {this.pauseButton(caregiverId)}
+          {this.endButton(caregiverId)}
         </RowItem>
       );
-    } else if (caregiver.status === false) {
+    } else if (caregiver.status === 'Reject') {
       // Rejected request also should be removed
       subtitle = (
         <RowItem>
           <Text>Danışmanlık reddedildi!</Text>
-          {this.resumeButton(caregiverId)}
         </RowItem>
       );
-    } else if (caregiver.status === 'pause') {
+    } else if (caregiver.status === 'End') {
       // There is no pause 
       subtitle = (
         <RowItem>
           <Text>Danışmanlık durduldu!</Text>
-          {this.resumeButton(caregiverId)}
         </RowItem>
       );
     }

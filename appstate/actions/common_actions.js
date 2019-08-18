@@ -66,14 +66,11 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
   console.log('provider profile fetching...');
   let provider = await getUserProfile(providerId);
   console.log('provider profile fetched', provider);
-  const providerRequestUrl = `providers/${providerId}/newRequests`;
-  const caregiverWalletUrl = `wallets/${uid}/`;
-  const suspendMoneyUrl = `pendingTransactions/${uid}/${providerId}/`;
 
   const request = {};
 
   const firstMessage = {
-    status: 'pending',
+    status: 'Pending',
     firstTime: true,
     lastMessage: {
       createdAt: firebase.database.ServerValue.TIMESTAMP,
@@ -86,18 +83,20 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
     }
   }
 
-  request[`caregivers/${uid}/chats/${providerId}/`] = {...firstMessage, title: provider.displayName, avatar: provider.photoURL };
-  request[`providers/${providerId}/chats/${uid}/`] = {...firstMessage, title: displayName, avatar: photoURL };
+  request[`caregivers/${uid}/chats/${providerId}/`] = { ...firstMessage, title: provider.displayName, avatar: provider.photoURL };
+  request[`providers/${providerId}/chats/${uid}/`] = { ...firstMessage, title: displayName, avatar: photoURL };
+  request[`pendingTransactions/${uid}/${providerId}/`] = { providerFee, status: 'Pending' };
 
+  const caregiverWalletUrl = `wallets/${uid}/`;
   await firebase.database().ref(caregiverWalletUrl).once('value', async (walletSnap) => {
-    var wallet = 0;
-    wallet = walletSnap.val() ? walletSnap.val() : 0;
+    let wallet = walletSnap.val() ? walletSnap.val() : 0;
     console.log('2 send_provider_request wallet balance=>', wallet);
+
     if (wallet >= providerFee) {
       try {
         console.log('3 send_provider_request wallet is enough');
+        const providerRequestUrl = `providers/${providerId}/newRequests`;
         await firebase.database().ref(providerRequestUrl).transaction((value) => { return (value || 0) + 1; });
-        await firebase.database().ref(suspendMoneyUrl).set({ providerFee });
         await firebase.database().ref().update(request);
         console.log('4 send_provider_request providerFee is transfered to pendingTransactions');
         callback("success");
@@ -114,18 +113,18 @@ export const send_provider_request = (providerId, providerFee, callback) => asyn
 export const cancel_pending_request = (providerId) => async (dispatch) => {
   console.log('cancel_pending_request is called with providerId', providerId);
   const uid = firebase.auth().currentUser.uid;
-  
-  const request = {};
-  request[`caregivers/${uid}/chats/${providerId}/`] = null;
-  request[`providers/${providerId}/chats/${uid}/`] = null;
 
-  const pendingTransactionUrl = `pendingTransactions/${uid}/${providerId}/`;
+  const request = {};
+  request[`caregivers/${uid}/chats/${providerId}/status`] = 'Cancel';
+  request[`providers/${providerId}/chats/${uid}/status`] = 'Cancel';
+  request[`pendingTransactions/${uid}/${providerId}/status`] = 'Cancel';
+
+  //const pendingTransactionUrl = `pendingTransactions/${uid}/${providerId}/`;
   const providerRequestUrl = `providers/${providerId}/newRequests`;
 
   try {
     // Cancel the pending request to Provider
     await firebase.database().ref().update(request);
-    await firebase.database().ref(pendingTransactionUrl).set(null);
     await firebase.database().ref(providerRequestUrl).transaction((value) => { return value - 1; })
   } catch (error) {
     console.error('Error while canceling request', error.message);
@@ -139,28 +138,28 @@ export const cancel_pending_request = (providerId) => async (dispatch) => {
 export const respond_caregiver_request = (caregiverId, answer) => async (dispatch) => {
   /**
    * answer can be 
-   * true for approving request
-   * false for rejecting request
-   * 'pause' for pausing 
+   * Approve: for approving request
+   * Reject: for rejecting request
+   * End: ending session 
    */
-  var tmpAnswer = answer;
-  if (answer == 'start')
-    answer = true
-  console.log('approve_caregiver_request is called with caregiverId', caregiverId);
+
+  console.log('respond_caregiver_request is called with caregiverId and answer', caregiverId, answer);
+
   const { _user } = firebase.auth().currentUser;
-  const caregiverurl = `caregivers/${caregiverId}/chats/${_user.uid}/status`;
-  const providerurl = `providers/${_user.uid}/chats/${caregiverId}/status`;
-  const providerRequestUrl = `providers/${_user.uid}/newRequests`;
+
+  request = {};
+
+  request[`caregivers/${caregiverId}/chats/${_user.uid}/status`] = answer;
+  request[`providers/${_user.uid}/chats/${caregiverId}/status`] = answer;
+  request[`pendingTransactions/${caregiverId}/${_user.uid}/status`] = answer;
 
   try {
     // Confirm the pending request to Provider
-    await firebase.database().ref(caregiverurl).set(answer);
-    await firebase.database().ref(providerurl).set(answer);
-    if (tmpAnswer !== 'pause' && tmpAnswer !== 'start') {
-      await firebase.database().ref(providerRequestUrl).transaction(function (value) {
-        return value - 1;
-      })
-    }
+    await firebase.database().ref().update(request);
+    var providerRequestUrl = `providers/${_user.uid}/newRequests`;
+    await firebase.database().ref(providerRequestUrl).transaction(function (value) {
+      if (value > 0) return value - 1;
+    });
   } catch (error) {
     console.error('Error while approving caregiver', error.message);
   }
@@ -206,7 +205,17 @@ export const getIBAN = (callback) => async (dispatch) => {
 const getUserProfile = async (uid) => {
   return new Promise((resolve, reject) => {
     firebase.database().ref(`users/${uid}/profile`).once('value', snap => {
-      snap.val() ? resolve(snap.val()): reject('No such user or profile');
+      snap.val() ? resolve(snap.val()) : reject('No such user or profile');
+    })
+  })
+}
+
+const readFromFirebase = (url) => {
+  return new Promise((resolve, reject) => {
+    firebase.database().ref(url).on('value', snap => {
+      resolve(snap.val());
+    }, error => {
+      reject('readFromFirebase Error:' + error.message)
     })
   })
 }
