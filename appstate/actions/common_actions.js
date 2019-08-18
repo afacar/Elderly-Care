@@ -223,7 +223,7 @@ const readFromFirebase = (url) => {
 
 export const getBalance = (callback) => async (dispatch) => {
   const { _user } = firebase.auth().currentUser;
-  const url = `users/${_user.uid}/wallet`;
+  const url = `wallets/${_user.uid}/`;
   firebase.database().ref(url).once('value', (snapshot) => {
     var balance = 0;
     if (snapshot)
