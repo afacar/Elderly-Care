@@ -157,8 +157,15 @@ class _ProfileForm extends Component {
       this.setState({ paymentLoading: true, conversationId, threedsPaymentLoading: true });
       this.props.start_payment(card.values, conversationId, price)
         .then(paymentResult => {
-          console.log("Base 64", Base64.atob(paymentResult.data.htmlContent));
-          this.setState({ paymentResult, paymentLoading: false, threedsPaymentLoading: false, showthreeds: true });
+          if (paymentResult.data.status == 'success') {
+            console.log("Base 64", Base64.atob(paymentResult.data.htmlContent));
+            this.setState({ paymentResult, paymentLoading: false, threedsPaymentLoading: false, showthreeds: true });
+          } else {
+            console.log("Make payment error", IyziPaymentErrors.IyziPaymentErrors[paymentResult.data.errorCode]);
+            console.log("Make payment error cont.", paymentResult);
+            this.setState({ paymentErrorMessage: IyziPaymentErrors.IyziPaymentErrors[paymentResult.data.errorCode], paymentLoading: false, threedsPaymentLoading: false, showFinalResult: true, paymentResult: false })
+            setTimeout(this.resetState, timeout);
+          }
         })
         .catch((paymentError) => {
           console.log('paymentError', paymentError)
@@ -213,10 +220,12 @@ class _ProfileForm extends Component {
 
         <Overlay
           //backdropOpacity={1}
+          fullScreen={true}
           isVisible={this.state.isCardVisible}
+          onRequestClose={() => { }}
           containerStyle={{ marginHorizontal: 1 }}
           animationType='slide'
-          onBackdropPress={() => this.setState({ isCardVisible: false, paymentResult: '', isPriceSet: false })} >
+          onBackdropPress={() => { }} >
           <>
             {
               !this.state.isPriceSet && (
@@ -224,7 +233,7 @@ class _ProfileForm extends Component {
                   <CardItem style={{ alignitems: 'center', justifyContent: 'center' }}>
                     <NumericInput
                       //onFocus={() => this.setState({ price: '' })}
-                      label='Yuklemek Istediginiz Tutar'
+                      label='Yüklemek İstediğiniz Tutar'
                       style={{ flex: 1, marginHorizontal: 15 }}
                       rightIcon={{
                         type: 'material-community',
@@ -264,6 +273,19 @@ class _ProfileForm extends Component {
             {
               (this.state.isPriceSet && this.state.paymentResult === '') && (
                 <View style={{ borderWidth: 1, justifyContent: 'center' }}>
+                  <TouchableOpacity >
+                    <Button
+                      type='outline'
+                      disabled={this.state.disabled}
+                      title={"Geri"}
+                      onPress={() => {
+                        if (this._isMounted) {
+                          this.setState({
+                            isPriceSet: false,
+                          })
+                        }
+                      }} />
+                  </TouchableOpacity>
                   <CreditCardInput
                     requiresName
                     requiresCVC
@@ -274,6 +296,11 @@ class _ProfileForm extends Component {
                     type='outline'
                     disabled={this.state.paymentLoading}
                     title={this.state.paymentLoading ? 'Odeme Sonucu Bekleniyor...' : `${parseInt(this.state.price)} TRY ONAYLA`} onPress={this._confirmPayment} />
+                  <Button
+                    type='outline'
+                    disabled={this.state.disabled}
+                    title={"İptal et"}
+                    onPress={this.resetState} />
                 </View>
               )
             }
@@ -291,15 +318,15 @@ class _ProfileForm extends Component {
             }
             {
               (this.state.isPriceSet && this.state.paymentResult !== '' && this.state.showFinalResult) && (
-                <View style={{ alignSelf: 'center', alignContent: 'center' }}>
+                <View style={{ alignSelf: 'center', alignContent: 'center', justifyContent: 'center', flex: 1 }}>
                   <Icon
                     name={this.state.paymentSuccesfull == true ? 'check' : 'close'}
                     type='antdesign'
                     color={this.state.paymentSuccesfull == true ? 'green' : 'red'}
                     size={33}
                   />
-                  <Text h4>{this.state.paymentSuccesfull == true ? "Ödeme Başarılı" : "Hata oluştu"} </Text>
-                  <Text h4>{this.state.paymentErrorMessage ? this.state.paymentErrorMessage : ""}</Text>
+                  <Text style={{ fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>{this.state.paymentSuccesfull == true ? "Ödeme Başarılı" : "Hata oluştu"} </Text>
+                  <Text style={{ fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>{this.state.paymentErrorMessage ? this.state.paymentErrorMessage : ""}</Text>
                 </View>
               )
             }
@@ -383,6 +410,7 @@ class _ProfileForm extends Component {
   resetState = () => {
     if (this._isMounted) {
       this.setState({
+        card: null,
         conversationId: '',
         loading: false,
         error: '',
@@ -421,22 +449,38 @@ class _ProfileForm extends Component {
             })
             this.props.finalize_payment(paymentObject)
               .then((paymentResult) => {
-                console.log("finalize payment no error")
-                this.setState({
-                  profile: { ...this.state.profile, wallet: parseInt(this.state.profile.wallet) + parseInt(this.state.price) },
-                  showFinalResult: true,
-                  showthreeds: false,
-                  paymentSuccesfull: true,
-                  threedsPaymentLoading: false,
-                })
-                setTimeout(this.resetState, timeout)
+                console.log("finalize payment no error", paymentResult.data);
+                if (paymentResult.data.status == 'success') {
+                  this.setState({
+                    profile: { ...this.state.profile, wallet: parseInt(this.state.profile.wallet) + parseInt(this.state.price) },
+                    showFinalResult: true,
+                    showthreeds: false,
+                    paymentSuccesfull: true,
+                    threedsPaymentLoading: false,
+                  })
+                  setTimeout(this.resetState, timeout)
+                }
+                else {
+                  console.log("finalize payment error", paymentResult)
+                  for (var i in paymentResult) {
+                    console.log("vari: ", i)
+                    for (var j in i) {
+                      console.log("varj ", j);
+                    }
+                  }
+                  this.setState({
+                    showFinalResult: true,
+                    showthreeds: false,
+                    paymentErrorMessage: IyziPaymentErrors.IyziPaymentErrors[paymentResult.data.errorCode],
+                    paymentSuccesfull: false
+                  })
+                  setTimeout(this.resetState, timeout)
+                }
               })
               .catch((paymentError) => {
-                console.log("finalize payment error", paymentError)
                 this.setState({
                   showFinalResult: true,
                   showthreeds: false,
-                  paymentErrorMessage: paymentError,
                   paymentSuccesfull: false
                 })
                 setTimeout(this.resetState, timeout)
