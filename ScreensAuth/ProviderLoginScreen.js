@@ -10,7 +10,9 @@ import { TextInput, CardItem } from '../components/common/';
 const successImageUri = 'https://cdn.pixabay.com/photo/2015/06/09/16/12/icon-803718_1280.png';
 
 const registerTitle = 'Yeni Kullanıcı';
+const registerButton = 'Kayıt ol'
 const signInTitle = 'Giriş yap'
+const cancelTitle = 'İptal'
 class ProviderLogin extends Component {
   constructor(props) {
     super(props);
@@ -57,7 +59,7 @@ class ProviderLogin extends Component {
           console.error(`setUserRole() has error:`, error.message);
         }
 
-        if (isNewUser) {
+        if (isNewUser, this.state.confirmResult ) {
           try {
             await this.props.createNewUserProfile(userRole, this.state.displayName);
             console.log(`!createNewUserProfile() is successful for new user:`);
@@ -115,7 +117,7 @@ class ProviderLogin extends Component {
         await firebase.database().ref(`phoneNumbers/${phoneNumber}`).once('value', snapshot => {
           this.setState({ disabled: false })
           if (snapshot.exists()) {
-            this.setState({ message: "Kayıtlı numara girdiniz. Giriş yapmayı deneyin", newUser: false })
+            this.setState({ message: "Kayıtlı numara girdiniz. Giriş yapmayı deneyin" })
           } else {
             this.setState({ message: 'Kod SMS ile yollanıyor ...' });
             firebase.auth().signInWithPhoneNumber(phoneNumber)
@@ -204,10 +206,10 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-            <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
+            <Button title={cancelTitle} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
           </View>
           <View style={styles.buttonStyle}>
-            <Button title='Kayıt ol' color="green" onPress={this.signIn} />
+            <Button title={registerButton} color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
         </Card>
       );
