@@ -21,8 +21,9 @@ class CaregiverList extends Component {
 
   _renderEmptyItem = () => {
     return (
-      <Text>Kayıtlı hasta bulunamadı!</Text>
-    );
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Text style={{ fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>Kayıtlı hasta bulunamadı!</Text>
+      </View>);
   }
 
   _answerCaregiverRequest = async (caregiverId, answer) => {
@@ -83,17 +84,17 @@ class CaregiverList extends Component {
     />
   );
 
-/*   resumeButton = (caregiverId) => (
-    <Button
-      icon={{
-        type: 'feather',
-        name: "play",
-      }}
-      type='clear'
-      title="Başlat"
-      onPress={() => this._answerCaregiverRequest(caregiverId, 'Approve')}
-    />
-  ); */
+  /*   resumeButton = (caregiverId) => (
+      <Button
+        icon={{
+          type: 'feather',
+          name: "play",
+        }}
+        type='clear'
+        title="Başlat"
+        onPress={() => this._answerCaregiverRequest(caregiverId, 'Approve')}
+      />
+    ); */
 
   _renderItem = ({ item }) => {
     const caregiverId = item;
