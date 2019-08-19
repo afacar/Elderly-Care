@@ -90,8 +90,8 @@ class ChatScreen extends React.Component {
   }
 
   _onPressItem = (chatdata) => {
-    console.log("Data", data);
     const data = { ...chatdata, userRole: 'c' };
+    console.log("Data", data);
     this.props.navigation.navigate('CaregiverMessageScreen', data);
   }
 

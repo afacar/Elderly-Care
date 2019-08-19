@@ -82,22 +82,25 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
   var audioUrl = '';
   var audioDownloadUrl = '';
   let messagesURL = '';
+  let theMessage = {};
 
   for (let i = 0; i < messages.length; i++) {
     let message = messages[i];
     if (chatId === 'commonchat') {
       url = 'commonchat/';
       messagesURL = url + 'messages/' + message._id;
+
       if (message.image) {
         uploadUrl = "chatFiles/commonchat/image";
       } else if (message.audio) {
         audioUrl = 'chatFiles/commonchat/audio';
       }
-    }
-    else if (userRole === 'c') {
+
+    } else if (userRole === 'c') {
       url = `providerchat/${chatId}/${uid}/`;
       unreadURL = `providers/${chatId}/chats/${uid}/unread`;
       messagesURL = url + 'messages/' + message._id;
+
       if (message.image) {
         uploadUrl = `chatFiles/${chatId}/${uid}/image`;
       } else if (message.audio) {
@@ -142,30 +145,32 @@ export const sendMessage = (userRole, messages, chatId) => async (dispatch) => {
       audio: audioDownloadUrl
     };
 
-    const lastMessage = {};
 
     if (chatId !== 'commonchat') {
       console.log('unread fetching...');
       let unread = await readFromFirebase(unreadURL);
       console.log('unread fetched', unread);
-      lastMessage[unreadURL] = (unread || 0) + 1;
+      theMessage[unreadURL] = (unread || 0) + 1;
     }
 
-    lastMessage[messagesURL] = messageData;
+    theMessage[messagesURL] = messageData;
 
-    if (userRole === 'c') {
-      lastMessage[`providers/${chatId}/chats/${uid}/lastMessage`] = messageData;
-      lastMessage[`caregivers/${uid}/chats/${chatId}/lastMessage`] = messageData;
+    if (chatId === 'commonchat') {
+      theMessage[`commonchat/lastMessage`] = messageData;
+    } else if (userRole === 'c') {
+      theMessage[`providers/${chatId}/chats/${uid}/lastMessage`] = messageData;
+      theMessage[`caregivers/${uid}/chats/${chatId}/lastMessage`] = messageData;
     }
     else if (userRole === 'p') {
-      lastMessage[`providers/${uid}/chats/${chatId}/lastMessage`] = messageData;
-      lastMessage[`caregivers/${chatId}/chats/${uid}/lastMessage`] = messageData;
+      theMessage[`providers/${uid}/chats/${chatId}/lastMessage`] = messageData;
+      theMessage[`caregivers/${chatId}/chats/${uid}/lastMessage`] = messageData;
     }
 
+    console.log('theMessage before update =>', theMessage);
     //messagesRef.set(messageData);
-    // Multiple update for lastMessage
+    // Multiple update for the message
     let ref = firebase.database().ref();
-    ref.update(lastMessage, error => { console.log('lastMessage set error', error) });
+    ref.update(theMessage, error => { console.log('lastMessage set error', error) });
   }
 }
 
@@ -208,23 +213,25 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
       const chatId = snap.key;
       let { status, unread, firstTime, lastMessage, title, avatar } = snap.val();
       console.log(`loadCaregiverChats snapshot => `, snapshot.val());
-      
-      if(chatId !== 'commonchat' && !avatar && uid !== lastMessage.user._id) {
-        avatar = lastMessage.user.avatar;
+
+      if (chatId && chatId !== 'commonchat') {
+        title = title || 'isim yok';
+        avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
+        callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
+      } else if (chatId === 'commonchat') {
+        await firebase.database().ref(`commonchat/lastMessage/`).on('value', async (commonsnap) => {
+          lastMessage = commonsnap.val();
+          if (lastMessage) {
+            title = title || 'Alzheimer grubu';
+            avatar = await require('../../assets/images/groupchat.png');
+            callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
+          }
+        });
       }
 
-      if (chatId) {
-        if (chatId === 'commonchat') {
-          title = title || 'Alzheimer grubu';
-          avatar = await require('../../assets/images/groupchat.png');
-        } else {
-          title = title || 'İsimsiz';
-          avatar = avatar ? { uri: avatar } : await require('../../assets/images/user.png');
-        }
-        callback({ chatId, title, lastMessage, status, avatar, unread, firstTime });
-      }
     });
   });
+
 }
 
 // load chat rooms for the current Provider
@@ -235,21 +242,26 @@ export const loadProviderChats = (callback) => async (dispatch) => {
     console.log('loadProviderChats snapshot', snapshot.val());
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
-      let { status, unread, isArchived, lastMessage, title, avatar } = snap.val();
+      let { status, unread, firstTime, isArchived, lastMessage, title, avatar } = snap.val();
 
-      if (chatId) {
-        if (chatId !== 'commonchat') {
-          title = title || 'isim yok';
-          avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
-        } else {
-          title = 'Alzheimer grubu';
-          avatar = await require('../../assets/images/groupchat.png');
-        }
-        callback({ chatId, title, lastMessage, status, unread, avatar });
+      if (chatId && chatId !== 'commonchat') {
+        title = title || 'isim yok';
+        avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
+        callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
+      } else if (chatId === 'commonchat') {
+        await firebase.database().ref(`commonchat/lastMessage/`).on('value', async (commonsnap) => {
+          lastMessage = commonsnap.val();
+          if (lastMessage) {
+            title = title || 'Alzheimer grubu';
+            avatar = await require('../../assets/images/groupchat.png');
+            callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
+          }
+        });
       }
 
     });
   });
+
 }
 
 export const loadProviderArchives = (callback) => async (dispatch) => {
@@ -266,7 +278,7 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
       let title = 'Alzheimer grubu';
       let avatar = require('../../assets/images/groupchat.png');
 
-      if (chatId && status !== 'pending') {
+      if (chatId) {
         if (chatId !== 'commonchat') {
           url = `providerchat/${uid}/${chatId}/lastMessage`;
           try {
