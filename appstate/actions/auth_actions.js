@@ -111,7 +111,12 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
   }
   try {
     // Add user to common chat 
-    await firebase.database().ref(`${urlPrefix}/${uid}/chats/commonchat/`).set(true);
+    const commonchat = {
+      status: 'Approve',
+      title: 'Alzheimer Sohbet Grubu',
+    }
+
+    await firebase.database().ref(`${urlPrefix}/${uid}/chats/commonchat/`).set(commonchat);
     await firebase.database().ref(`commonchat/members/${uid}/`).set(true);
     console.log("commonchat membership is set to true for new user");
   } catch (error) {

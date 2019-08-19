@@ -209,17 +209,17 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
       let { status, unread, firstTime, lastMessage, title, avatar } = snap.val();
       console.log(`loadCaregiverChats snapshot => `, snapshot.val());
       
-      if(!avatar && uid !== lastMessage.user._id) {
+      if(chatId !== 'commonchat' && !avatar && uid !== lastMessage.user._id) {
         avatar = lastMessage.user.avatar;
       }
 
-      if (chatId && status !== 'pending') {
-        if (chatId !== 'commonchat') {
-          title = title || 'isim yok';
-          avatar = avatar ? { uri: avatar } : await require('../../assets/images/user.png');
-        } else {
-          title = 'Alzheimer grubu';
+      if (chatId) {
+        if (chatId === 'commonchat') {
+          title = title || 'Alzheimer grubu';
           avatar = await require('../../assets/images/groupchat.png');
+        } else {
+          title = title || 'İsimsiz';
+          avatar = avatar ? { uri: avatar } : await require('../../assets/images/user.png');
         }
         callback({ chatId, title, lastMessage, status, avatar, unread, firstTime });
       }

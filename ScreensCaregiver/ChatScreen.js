@@ -104,7 +104,7 @@ class ChatScreen extends React.Component {
 
     if (isApproved === 'Pending' && theChat.lastMessage.text && theChat.lastMessage.image && theChat.lastMessage.audio) return;
     if (isApproved === 'Reject' && theChat.lastMessage.text && theChat.lastMessage.image && theChat.lastMessage.audio) return;
-    if (isApproved === undefined && theChat.lastMessage.text && theChat.lastMessage.image && theChat.lastMessage.audio) return;
+    if (isApproved === undefined) return;
 
     return (
       <ChatItem

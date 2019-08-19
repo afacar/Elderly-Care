@@ -59,24 +59,29 @@ export class ChatItem extends Component {
     } else if (isApproved === 'Pending') {
       subtitle = (
         <CardItem>
-          <Text>Yeni danismanlik talebi onay bekliyor!</Text>
+          <Text>Onay bekliyor!</Text>
         </CardItem>
       )
-    } else if (lastMessage) {
-      if (chatId === 'commonchat') {
-        userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : lastMessage.user.name + ': ';
-      } else {
-        userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : '';
-      }
-      if (theChat.unread > 0) badge = { value: theChat.unread, status: 'primary', textStyle: { fontSize: 15 } }
-      if (lastMessage.text)
-        subtitle = userName + lastMessage.text;
-      else if (lastMessage.image)
-        subtitle = userName + '📷 Resim';
-      else if (lastMessage.audio)
-        subtitle = userName + '🎤 Sesli mesaj';
     } else {
-      subtitle = "Mesaj yok! İlk mesajı siz yazın.";
+      // isApproved can be Approve or Reject, Cancel with lastMessage
+      if (lastMessage) {
+        if (chatId === 'commonchat') {
+          console.log('Muhtemel error yeri lastMessage=>', lastMessage);
+          userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : lastMessage.user.name + ': ';
+        } else {
+          userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : '';
+        }
+        if (theChat.unread > 0) 
+          badge = { value: theChat.unread, status: 'primary', textStyle: { fontSize: 15 } }
+        if (lastMessage.text)
+          subtitle = userName + lastMessage.text;
+        else if (lastMessage.image)
+          subtitle = userName + '📷 Resim';
+        else if (lastMessage.audio)
+          subtitle = userName + '🎤 Sesli mesaj';
+      } else {
+        subtitle = "Mesaj yok! İlk mesajı siz yazın.";
+      }
     }
 
     return (
