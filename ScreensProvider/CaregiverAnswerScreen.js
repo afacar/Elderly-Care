@@ -183,8 +183,6 @@ class CaregiverAnswerScreen extends Component {
 
     save_answers = async () => {
         const { caregiverID, questionArray, answerArray, noQuestion, exists, userId } = this.state;
-        console.log("No question 2", noQuestion);
-        console.log("No question 3", noQuestion.toString());
         // There is duplication problem in question array. This is a temporary solution.
         var questionArray1 = [];
         for ( var i = 0; i < questionArray.length / 2; i++){

@@ -14,7 +14,8 @@ export default class App extends React.Component {
       'Setting a timer',
       'Remote debugger',
       'Require cycle:', 'Async Storage has been extracted from react-native core and will be removed in a future release.',
-      'NetInfo has been extracted from react-native core and will be removed in a future release.'
+      'NetInfo has been extracted from react-native core and will be removed in a future release.',
+      "WebView has been extracted from react-native core and will be removed in a future release."
     ]);
 
   }
