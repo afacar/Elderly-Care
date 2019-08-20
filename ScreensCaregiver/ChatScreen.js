@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-navigation';
 
 class ChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-    title: `İletişim`,
+    title: `Destek`,
     //headerTitleStyle: { textAlign: 'center' },
     headerStyle: {
       backgroundColor: 'white',

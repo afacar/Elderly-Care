@@ -11,11 +11,12 @@ export default SettingsStack = createStackNavigator({
   });
   
   SettingsStack.navigationOptions = {
-    tabBarLabel: 'Ayarlar',
+    //tabBarLabel: 'Ayarlar',
     tabBarIcon: ({ focused }) => (
       <TabBarIcon
         focused={focused}
         name={'settings'}
+        color='orange'
       />
     ),
   };

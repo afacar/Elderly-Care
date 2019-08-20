@@ -9,9 +9,10 @@ export default class TabBarIcon extends React.Component {
       <Icon
         type={this.props.type || "ionicons"} 
         name={this.props.name}
-        size={31}
-        style={{ marginBottom: -3 }}
-        color={this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
+        size={this.props.focused ? 35: 29}
+        style={{ margin: 0, padding: 0 }}
+        containerStyle={{ margin: 0, padding: 0 }}
+        color={this.props.focused ? this.props.color : Colors.tabIconDefault}
       />
     );
   }

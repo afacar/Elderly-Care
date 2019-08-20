@@ -4,7 +4,7 @@ export default {
 
         // 3d payment oluşturulurken dönen kodlar
         6001: "Ödeme bilgileri güvenlik denetimini geçemedi",
-        5099: "3dsecure işlemi oluşturulurken hata yarandı",
+        5099: "3D Secure işlemi oluşturulurken hata oluştu",
         // 3d secure hataları
         0: "3-D Secure imzası geçersiz",
         1: "Hatalı kod girildi",

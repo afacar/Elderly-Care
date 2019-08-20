@@ -18,11 +18,11 @@ const HomeStack = createStackNavigator({
 });
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Ajanda',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
       name={'home'}
+      color='blue'
     />
   ),
 };
@@ -34,12 +34,13 @@ const PatientStack = createStackNavigator({
 });
 
 PatientStack.navigationOptions = {
-  tabBarLabel: 'Takip',
+  //tabBarLabel: 'Takip',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
       type='font-awesome'
       name={'line-chart'}
+      color='red'
     />
   ),
 };
@@ -57,12 +58,13 @@ const SupportStack = createStackNavigator(
 );
 
 SupportStack.navigationOptions = {
-    tabBarLabel: 'Destek',
+    //tabBarLabel: 'Destek',
     tabBarIcon: ({ focused }) => (
       <View>
         <TabBarIcon
           focused={focused}
           name={'chat'}
+          color='green'
         />
 {/*         <Badge
           value="12"
@@ -83,8 +85,9 @@ export default createBottomTabNavigator(
   {
     lazy: true,
     tabBarOptions: {
-      activeTintColor: '#054158',
-      activeBackgroundColor: '#c2d5e3',
+      showLabel: false,
+      activeTintColor: 'transparent',
+      activeBackgroundColor: null,
       allowFontScaling: true,
       labelStyle: {
         fontSize: 18,
@@ -92,7 +95,7 @@ export default createBottomTabNavigator(
       },
       style: {
         backgroundColor: 'transparent',
-        height: 60,
+        //height: 60,
       },
     },
   }
