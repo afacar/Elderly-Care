@@ -86,9 +86,10 @@ export default createBottomTabNavigator(
     lazy: true,
     tabBarOptions: {
       showLabel: false,
-      activeTintColor: 'transparent',
-      activeBackgroundColor: null,
+      //activeTintColor: 'transparent',
+      //activeBackgroundColor: null,
       allowFontScaling: true,
+      keyboardHidesTabBar: true,
       labelStyle: {
         fontSize: 18,
         fontWeight: 'bold',

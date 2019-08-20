@@ -35,6 +35,7 @@ ProviderHomeStack.navigationOptions = {
       type={'font-awesome'}
       name="user-md"
       focused={focused}
+      color='blue'
     />
   ),
 };
@@ -65,6 +66,7 @@ ProviderSettingsStack.navigationOptions = {
     <TabBarIcon
       focused={focused}
       name={Platform.OS === 'ios' ? `settings${focused ? '' : '-outline'}` : 'settings'}
+      //color='orange'
     />
   ),
 };
@@ -75,5 +77,9 @@ export default createBottomTabNavigator(
     ProviderSettingsStack,
   }, {
     initialRouteName: 'ProviderHomeStack',
+    tabBarOptions: {
+      showLabel: false,
+      keyboardHidesTabBar: true,
+    }
   }
 );
