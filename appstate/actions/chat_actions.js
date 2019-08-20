@@ -244,7 +244,7 @@ export const loadProviderChats = (callback) => async (dispatch) => {
       const chatId = snap.key;
       let { status, unread, firstTime, isArchived, lastMessage, title, avatar } = snap.val();
 
-      if (chatId && chatId !== 'commonchat') {
+      if (chatId && chatId !== 'commonchat' && !isArchived) {
         title = title || 'isim yok';
         avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
         callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
@@ -261,7 +261,6 @@ export const loadProviderChats = (callback) => async (dispatch) => {
 
     });
   });
-
 }
 
 export const loadProviderArchives = (callback) => async (dispatch) => {
@@ -274,8 +273,8 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
       const { status, unread, isArchived } = snap.val();
       console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
 
-      let url = 'commonchat/lastMessage';
-      let title = 'Alzheimer grubu';
+      let url = '';
+      let title = '';
       let avatar = require('../../assets/images/groupchat.png');
 
       if (chatId) {
@@ -297,7 +296,7 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
         try {
           await firebase.database().ref(url).on('value', (snapshot) => {
             console.log('last common message changed', snapshot.val());
-            if (isArchived)
+            if (isArchived && chatId !== 'commonchat')
               callback({ chatId, title, avatar });
           });
         } catch (error) {
@@ -323,4 +322,14 @@ export const sendAnswers = (answers, providerID) => async (dispatch) => {
   firebase.database().ref(completedPrelimURL).child("firstTime").set(false);
   firebase.database().ref(`caregivers/${uid}/chats/${providerID}`).child("firstTime").set(false);
   firebase.database().ref(completedPrelimURL).child("answers").set(answers);
+}
+
+export const archiveChat = (chatId) => (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  firebase.database().ref(`providers/${uid}/chats/${chatId}/isArchived`).set(true);
+};
+
+export const unArchiveChat = (chatId) => (dispatch) => {
+  const uid = firebase.auth().currentUser.uid;
+  firebase.database().ref(`providers/${uid}/chats/${chatId}/isArchived`).set(false);
 }
