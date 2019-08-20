@@ -570,6 +570,8 @@ class CaregiverMessageScreen extends React.Component {
                 this.setState({
                     totalQuestions: finalQuestions.length
                 })
+            } else {
+                this.load_messages(chatId);
             }
         })
     }

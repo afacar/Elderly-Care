@@ -122,16 +122,17 @@ class ProviderHome extends React.Component {
     input parameter chatId indicates id and displayName of caregiver
   */
   showArchiveDialog = (chatData) => {
+
     Alert.alert(
-      `${chatData.title} ile olan mesajlar arşivden çıkarılsın mı?`,
-      `Ana ekranda kişinin adına basılı tutarak tekrar arşivleyebilirsiniz.`,
+      `${chatData.title} ile olan mesajlar arşivlensin mi?`,
+      `Arşivlenen çatları Ayarlar/Arşiv kısmından geri çıkarabilirsiniz.`,
       [
         {
           text: 'İptal',
           style: 'cancel',
         },
         {
-          text: 'ARŞİV',
+          text: 'ARŞİVLE',
           onPress: () => { this.archiveChat(chatData.chatId) }
         }
       ],
