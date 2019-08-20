@@ -12,6 +12,8 @@ class ProviderChatSettingsScreen extends Component {
         headerTitleStyle: { textAlign: 'center', alignSelf: 'center' },
     }
 
+    isMounted = false;
+
     state = {
         caregivers: [],
         generalFee: 0,
@@ -32,14 +34,14 @@ class ProviderChatSettingsScreen extends Component {
         }
         if (caregiversData) {
             let caregivers = await JSON.parse(caregiversData);
-            this.setState({
+            this.isMounted && this.setState({
                 caregivers: caregivers,
                 loading: false,
             })
         } else {
             await this.props.fetchGeneralFee((generalFee) => {
                 console.log("General fee", generalFee)
-                this.setState({
+                this.isMounted && this.setState({
                     generalFee: generalFee,
                 })
             })
@@ -55,11 +57,9 @@ class ProviderChatSettingsScreen extends Component {
                 })
                 if (!exists)
                     caregivers[noOfCaregivers] = caregiver;
-                this.setState({
+                this.isMounted && this.setState({
                     caregivers: caregivers,
-                    noOfCaregivers: noOfCaregivers + 1
-                })
-                this.setState({
+                    noOfCaregivers: noOfCaregivers + 1,
                     loading: false,
                 })
             })
@@ -67,6 +67,7 @@ class ProviderChatSettingsScreen extends Component {
     }
 
     componentDidMount() {
+        this.isMounted = true;
         this.fetchChatSettings();
     }
 
@@ -94,7 +95,7 @@ class ProviderChatSettingsScreen extends Component {
             caregivers[caregiverIndex].fee = newFee;
         else
             caregivers[caregiverIndex].fee = " ";
-        this.setState({
+            this.isMounted && this.setState({
             caregivers: caregivers,
             disabled: false
         })
@@ -105,27 +106,27 @@ class ProviderChatSettingsScreen extends Component {
             if (caregiver.generalFee)
                 caregiver.generalFee = newFee
         })
-        this.setState({
+        this.isMounted && this.setState({
             generalFee: newFee,
             disabled: false
         })
     }
 
     saveChatSettings = async () => {
-        this.setState({
+        this.isMounted && this.setState({
             loading: true,
             disabled: true,
             saveButtonText: 'Kaydediliyor'
         })
         await this.props.setChatSettings(this.state.caregivers)
         await this.props.setGeneralFee(this.state.generalFee);
-        this.setState({
+        this.isMounted && this.setState({
             loading: false,
             disabled: true,
             saveButtonText: 'Kaydedildi'
         })
         setTimeout(() => {
-            this.setState({
+            this.isMounted && this.setState({
                 saveButtonText: 'Kaydet'
             })
         }, 2500)
@@ -148,6 +149,10 @@ class ProviderChatSettingsScreen extends Component {
                 <Button buttonStyle={{ marginTop: 10 }} title={this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
             </ScrollView>
         );
+    }
+
+    componentWillUnmount() {
+        this.isMounted = false;
     }
 }
 
