@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { ScrollView, FlatList, TouchableOpacity, Text, View } from 'react-native';
+import { ScrollView, FlatList, TouchableOpacity, Text, View, Alert } from 'react-native';
 import { connect } from 'react-redux'
 import * as actions from '../appstate/actions';
 import { ListItem } from 'react-native-elements';
 
 class ProviderArchiveScreen extends Component {
   static navigationOptions = ({ navigation }) => ({
-    title: `Archived Chats`,
+    title: `Arşiv`,
   });
 
 
@@ -17,7 +17,7 @@ class ProviderArchiveScreen extends Component {
   _renderEmptyList = () => {
     return (
       <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Text style={{fontSize: 18, alignSelf: 'center', textAlign: 'center'}}>Arşiviniz boş! Mesajları arşivlemek için ana sayfadaki mesajın üzerine basılı tutun!</Text>
+        <Text style={{ fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>Arşiviniz boş! Mesajları arşivlemek için ana sayfadaki mesajın üzerine basılı tutun!</Text>
       </View>
     );
   }
@@ -52,30 +52,42 @@ class ProviderArchiveScreen extends Component {
         chats[chatID] = chat;
         sortable.push(chats[chatID]);
       }
-      var sortedChats = {}
-      sortable.sort(this.compareChats);
-      for (var i = 0; i < sortable.length; i++) {
-        var tmpChat = sortable[i];
-        sortedChats[tmpChat.chatId] = tmpChat;
-        delete sortedChats[tmpChat.chatId].chatId;
-      }
-      chats = sortedChats;
       return { chats }
     });
-  }
-
-  compareChats(chat1, chat2) {
-    if (chat1.lastMessage.createdAt > chat2.lastMessage.createdAt)
-      return -1;
-    if (chat1.lastMessage.createdAt < chat2.lastMessage.createdAt)
-      return 1;
-    return 0;
   }
 
   async componentDidMount() {
     this._isMounted = true;
     // Load the chatRooms with lastMessages
     await this.props.loadProviderArchives(this._fetchChatRooms);
+  }
+
+  unArchiveChat = (chatId) => {
+    const chats = this.state.chats;
+    delete chats[chatId];
+    this.setState({ chats })
+    this.props.unArchiveChat(chatId)
+  }
+  /*
+    This function shows an alert box to user to verify whether to archive the chat or not 
+    input parameter chatId indicates id and displayName of caregiver
+  */
+  showArchiveDialog = (chatData) => {
+    Alert.alert(
+      `${chatData.title} ile olan mesajlar arşivden çıkarılsın mı?`,
+      `Ana ekranda kişinin adına basılı tutarak tekrar arşivleyebilirsiniz.`,
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'ARŞİVDEN ÇIKAR',
+          onPress: () => { this.unArchiveChat(chatData.chatId) }
+        }
+      ],
+      { cancelable: true },
+    )
   }
 
   _onPressItem = (data) => {
@@ -90,7 +102,9 @@ class ProviderArchiveScreen extends Component {
     let avatar = theChat.avatar;
 
     return (
-      <TouchableOpacity onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved: false, userid: chatId, isArchived: true })}>
+      <TouchableOpacity
+        onLongPress={() => { this.showArchiveDialog({ chatId, title }) }}
+        onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved: false, userid: chatId, isArchived: true })}>
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 18 }}
