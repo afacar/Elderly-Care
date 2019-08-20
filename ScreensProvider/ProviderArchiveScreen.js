@@ -104,6 +104,7 @@ class ProviderArchiveScreen extends Component {
     return (
       <TouchableOpacity
         onLongPress={() => { this.showArchiveDialog({ chatId, title }) }}
+        delayLongPress={1500}
         onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved: false, userid: chatId, isArchived: true })}>
         <ListItem
           title={title}

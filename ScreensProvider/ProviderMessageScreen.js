@@ -196,6 +196,7 @@ class ProviderMessageScreen extends React.Component {
                 >
                     <ImageViewer
                         imageUrls={this.state.images}
+                        saveToLocalByLongPress={false}
                         onSwipeDown={() => this.setState({ showImage: false })}
                         enableSwipeDown={true}
                         index={this.state.currentIndex - 1}
