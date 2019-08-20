@@ -12,47 +12,44 @@ class ProviderWalletScreen extends Component {
         title: 'My Wallet',
     };
 
-
-    getIBAN = () => {
-        this.props.getIBAN((IBAN) => {
-            this.setState({
-                IBAN: IBAN
-            })
-        })
-    }
-
+    isMounted = false;
     state = {
         IBAN: "",
         balance: "0",
         saveButtonText: 'Kaydet',
         disabled: true
     }
-    async componentDidMount() {
+    componentDidMount() {
+        this.isMounted = true;
         this.props.getIBAN((IBAN) => {
-            console.log(IBAN);
-            this.setState({
-                IBAN: IBAN
-            })
+            console.log("IBAN", IBAN);
+            if (IBAN)
+                this.setState({
+                    IBAN: IBAN
+                })
         });
         this.props.getBalance(balance => {
-            this.setState({
-                balance: balance,
-            })
+            if (this.isMounted && balance)
+                this.setState({
+                    balance: balance,
+                })
         })
     }
 
     saveChatSettings = async () => {
-        this.setState({
-            disabled: true,
-            saveButtonText: 'Kaydediliyor',
-            loading: true
-        })
+        if (this.isMounted)
+            this.setState({
+                disabled: true,
+                saveButtonText: 'Kaydediliyor',
+                loading: true
+            })
 
-        await this.props.setIBAN(this.state.IBAN) ;
-        this.setState({
-            saveButtonText: 'Kaydedildi',
-            loading: false
-        })
+        await this.props.setIBAN(this.state.IBAN);
+        if (this.isMounted)
+            this.setState({
+                saveButtonText: 'Kaydedildi',
+                loading: false
+            })
     }
     render() {
         return (
@@ -93,6 +90,7 @@ class ProviderWalletScreen extends Component {
     }
 
     async componentWillUnmount() {
+        this.isMounted = false;
         this.props.setIBAN(this.state.IBAN);
     }
 }
