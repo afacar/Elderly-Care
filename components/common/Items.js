@@ -85,7 +85,9 @@ export class ChatItem extends Component {
     }
 
     return (
-      <TouchableOpacity onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}>
+      <TouchableOpacity onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}
+      onLongPress={() => this.props.onLongPress({chatId, title})}
+      >
         <ListItem
           title={title}
           titleStyle={{ fontWeight: 'bold', fontSize: 17 }}

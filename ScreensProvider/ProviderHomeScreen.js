@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, FlatList, TouchableOpacity, View, Text, Alert } from 'react-native';
 import { ListItem, Badge } from 'react-native-elements';
 import { connect } from 'react-redux';
 import * as actions from '../appstate/actions';
@@ -14,7 +14,7 @@ class ProviderHome extends React.Component {
     },
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('CaregiverList')}>
-        <View style={{ flexDirection:'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Text style={{ fontWeight: 'bold' }}>Yeni Talepler  </Text>
           <Badge status="primary" value={navigation.getParam('newRequests', 0)} />
         </View>
@@ -111,6 +111,34 @@ class ProviderHome extends React.Component {
     }
   }
 
+  archiveChat = (chatId) => {
+    const chats = this.state.chats;
+    delete chats[chatId];
+    this.setState({ chats })
+    this.props.archiveChat(chatId)
+  }
+  /*
+    This function shows an alert box to user to verify whether to archive the chat or not 
+    input parameter chatId indicates id and displayName of caregiver
+  */
+  showArchiveDialog = (chatData) => {
+    Alert.alert(
+      `${chatData.title} ile olan mesajlar arşivden çıkarılsın mı?`,
+      `Ana ekranda kişinin adına basılı tutarak tekrar arşivleyebilirsiniz.`,
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'ARŞİV',
+          onPress: () => { this.archiveChat(chatData.chatId) }
+        }
+      ],
+      { cancelable: true },
+    )
+  }
+
   _renderItem = ({ item }) => {
     const chatId = item;
     const theChat = this.state.chats[chatId];
@@ -121,6 +149,7 @@ class ProviderHome extends React.Component {
     return (
       <ChatItem
         onPress={this._onPressItem}
+        onLongPress={this.showArchiveDialog}
         key={chatId}
         handleRequest={this._handleRequest}
         chatId={chatId}
