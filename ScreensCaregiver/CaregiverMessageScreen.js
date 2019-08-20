@@ -109,6 +109,7 @@ class CaregiverMessageScreen extends React.Component {
     }
     render() {
         const { chatId, userRole, messages, isApproved } = this.state;
+        const renderInputToolbar = (isApproved === 'Pending' || isApproved === 'Reject' || isApproved === 'End') ? () => null : undefined
         return (
             <View style={{ flex: 1 }}>
                 <GiftedChat
@@ -120,7 +121,7 @@ class CaregiverMessageScreen extends React.Component {
                     }}
                     onInputTextChanged={(text) => { this.changeTypeState(text) }}
                     style={{ width: '100%', alignItems: 'center' }}
-                    renderInputToolbar={isApproved === 'pause' ? () => null : undefined}
+                    renderInputToolbar={renderInputToolbar}
                     showUserAvatar={false}
                     user={{
                         _id: this.props.getUid(),

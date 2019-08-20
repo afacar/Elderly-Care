@@ -177,7 +177,8 @@ export const fetch_caregivers = (callback) => async (dispatch) => {
         if (caregiverId && caregiverId !== 'commonchat') {
           firebase.database().ref(`users/${caregiverId}/profile/`).on('value', async (profileSnap) => {
             const caregiver = profileSnap.val();
-            callback({ ...caregiver, caregiverId, status });
+            if (status === 'Pending' || status === 'Approve')
+              callback({ ...caregiver, caregiverId, status });
           });
         }
       });

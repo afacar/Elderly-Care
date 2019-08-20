@@ -21,8 +21,8 @@ class CaregiverList extends Component {
 
   _renderEmptyItem = () => {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Text style={{ fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>Kayıtlı hasta bulunamadı!</Text>
+      <View style={{ flex: 1, justifyContent: 'center', paddingTop: 15 }}>
+        <Text style={{ fontWeight: 'bold', fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>Aktif bir danışmanlık talebi yok!</Text>
       </View>);
   }
 
