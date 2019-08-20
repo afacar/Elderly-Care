@@ -29,7 +29,7 @@ class ProviderWalletScreen extends Component {
                 })
         });
         this.props.getBalance(balance => {
-            if (this.isMounted && balance)
+            if ( balance)
                 this.setState({
                     balance: balance,
                 })
