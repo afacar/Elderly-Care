@@ -42,7 +42,7 @@ class ProviderConsultancySettingsScreen extends Component {
                         containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                {/* <TouchableOpacity>
                     <ListItem
                         key='appointments'
                         title='Appointments'
@@ -51,7 +51,7 @@ class ProviderConsultancySettingsScreen extends Component {
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
                         containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </ScrollView >
         )
     }
