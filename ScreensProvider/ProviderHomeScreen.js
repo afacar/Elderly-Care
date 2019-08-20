@@ -132,7 +132,7 @@ class ProviderHome extends React.Component {
           style: 'cancel',
         },
         {
-          text: 'Arşivle',
+          text: 'ARŞİVLE',
           onPress: () => { this.archiveChat(chatData.chatId) }
         }
       ],

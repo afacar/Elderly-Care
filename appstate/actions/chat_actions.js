@@ -243,22 +243,22 @@ export const loadProviderChats = (callback) => async (dispatch) => {
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
       let { status, unread, firstTime, isArchived, lastMessage, title, avatar } = snap.val();
-
-      if (chatId && chatId !== 'commonchat' && !isArchived) {
-        title = title || 'isim yok';
-        avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
-        callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
-      } else if (chatId === 'commonchat') {
-        await firebase.database().ref(`commonchat/lastMessage/`).on('value', async (commonsnap) => {
-          lastMessage = commonsnap.val();
-          if (lastMessage) {
-            title = title || 'Alzheimer grubu';
-            avatar = await require('../../assets/images/groupchat.png');
-            callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
-          }
-        });
+      if (!isArchived) {
+        if (chatId && chatId !== 'commonchat') {
+          title = title || 'isim yok';
+          avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
+          callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
+        } else if (chatId === 'commonchat') {
+          await firebase.database().ref(`commonchat/lastMessage/`).on('value', async (commonsnap) => {
+            lastMessage = commonsnap.val();
+            if (lastMessage) {
+              title = title || 'Alzheimer grubu';
+              avatar = await require('../../assets/images/groupchat.png');
+              callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
+            }
+          });
+        }
       }
-
     });
   });
 }
@@ -270,16 +270,14 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
     console.log('loadProviderChats snapshot', snapshot.val());
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
-      const { status, unread, isArchived } = snap.val();
+      const { status, isArchived } = snap.val();
       console.log(`chatId:${chatId}'s status: ${status} for provider: ${uid} `);
 
-      let url = '';
-      let title = '';
+      let title = 'Alzheimer Grubu';
       let avatar = require('../../assets/images/groupchat.png');
 
       if (chatId) {
         if (chatId !== 'commonchat') {
-          url = `providerchat/${uid}/${chatId}/lastMessage`;
           try {
             // chatId is a caregiver id, so fetch the displayName as title
             await firebase.database().ref(`users/${chatId}/profile/`).once('value', snapshot => {
@@ -292,19 +290,9 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
             console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
           }
         }
-
-        try {
-          await firebase.database().ref(url).on('value', (snapshot) => {
-            console.log('last common message changed', snapshot.val());
-            if (isArchived && chatId !== 'commonchat')
-              callback({ chatId, title, avatar });
-          });
-        } catch (error) {
-          console.error('Chat son mesajı okunurken hata oldu', error.message);
-        }
-
+        if (isArchived)
+          callback({ chatId, title, avatar });
       }
-
     });
   });
 }
