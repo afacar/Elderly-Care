@@ -14,7 +14,7 @@ class AudioCard extends Component {
 
     state = {
         // sound 
-        seconds: -1,
+        seconds: 0,
         minutes: 0,
         currentDuration: 0,
         loading: true,
@@ -45,7 +45,7 @@ class AudioCard extends Component {
                     this.setState({
                         sound: sound,
                         createdAt: dateh + ':' + datem,
-                        duration: duration + 1,
+                        duration: duration,
                         loading: false
                     })
                 }
@@ -164,7 +164,7 @@ class AudioCard extends Component {
         console.log("Here");
         if (this.props.currentAudio) {
             if (this.props.currentAudio.id === this.props.id) {
-                return <PauseButton onPress={this.stopPlaying} />
+                return <PauseButton onPress={this.pausePlaying} />
             } else {
                 const sound = this.state.sound;
                 if (sound) {
@@ -185,7 +185,8 @@ class AudioCard extends Component {
         this.props.setAudio(this.props.id);
         if (this.is_mounted) {
             this.setState({
-                playing: true
+                playing: true,
+                currentDuration: 1
             })
         }
         const sound = this.state.sound;
@@ -193,14 +194,16 @@ class AudioCard extends Component {
             this.timer = setInterval(this.incrementTimer, 1000);
             sound.play(success = () => {
                 clearInterval(this.timer);
-                this.setState({
-                    seconds: 0,
-                    minutes: 0,
-                    paused: false,
-                    playing: false,
-                    currentDuration: 0
-                })
-                this.props.setAudio("");
+                if (this.is_mounted) {
+                    this.setState({
+                        seconds: 0,
+                        minutes: 0,
+                        paused: false,
+                        playing: false,
+                        currentDuration: 0
+                    })
+                    this.props.setAudio("");
+                }
             })
         }
     }
@@ -215,18 +218,21 @@ class AudioCard extends Component {
         if (seconds < 10) {
             tmpSeconds = '0' + seconds;
         }
-        this.setState({
-            currentDuration: this.state.currentDuration + 1,
-            seconds: seconds,
-            minutes: minutes
-        })
+        if (this.is_mounted) {
+            this.setState({
+                currentDuration: this.state.currentDuration + 1,
+                seconds: seconds,
+                minutes: minutes
+            })
+        }
     }
 
-    stopPlaying = () => {
-        this.setState({
-            pause: true,
-            playing: false
-        })
+    pausePlaying = () => {
+        if (this.is_mounted)
+            this.setState({
+                pause: true,
+                playing: false
+            })
         this.props.setAudio("");
         const sound = this.state.sound;
         if (sound) {
@@ -234,6 +240,15 @@ class AudioCard extends Component {
             if (this.timer)
                 clearInterval(this.timer);
         }
+    }
+    stopPlaying = () => {
+        const sound = this.state.sound;
+        if (sound)
+            sound.stop();
+    }
+    componentWillUnmount() {
+        this.is_mounted = false;
+        this.stopPlaying();
     }
     styles = {
         containerStyle: {
