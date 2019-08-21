@@ -135,27 +135,34 @@ class CaregiverMessageScreen extends React.Component {
                     onPressAvatar={this.onPressAvatar}
                     renderMessageImage={this.renderMessageImage}
                 />
-                <View style={{ flex: 1, backgroundColor: 'black' }}>
-                    <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
-                        <Icon type='font-awesome' name='times' size={32} color='white' />
-                    </TouchableOpacity>
-                    <ImageViewer
-                        style={{ backgroundColor: 'transparent', marginBottom: 10 }}
-                        imageUrls={this.state.images}
-                        onSwipeDown={() => { this.setState({ showImage: false }) }}
-                        enableSwipeDown={true}
-                        enablePreload={true}
-                        saveToLocalByLongPress={false}
-                        index={this.state.currentIndex - 1}
-                        renderImage={(index) => {
-                            return (
-                                <View style={{ flex: 1, height: '100%' }}>
-                                    <Image source={{ uri: index.source.uri }} style={{ flex: 1 }} />
-                                </View>
-                            )
-                        }}
-                    />
-                </View>
+                <Modal
+                    visible={this.state.showImage}
+                    transparent={true}
+                    animationType='fade'
+                    onRequestClose={() => { this.setState({ showImage: false }) }}
+                >
+                    <View style={{ flex: 1, backgroundColor: 'black' }}>
+                        <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
+                            <Icon type='font-awesome' name='times' size={32} color='white' />
+                        </TouchableOpacity>
+                        <ImageViewer
+                            style={{ backgroundColor: 'transparent', marginBottom: 10 }}
+                            imageUrls={this.state.images}
+                            onSwipeDown={() => { this.setState({ showImage: false }) }}
+                            enableSwipeDown={true}
+                            enablePreload={true}
+                            saveToLocalByLongPress={false}
+                            index={this.state.currentIndex - 1}
+                            renderImage={(index) => {
+                                return (
+                                    <View style={{ flex: 1, height: '100%' }}>
+                                        <Image source={{ uri: index.source.uri }} style={{ flex: 1 }} />
+                                    </View>
+                                )
+                            }}
+                        />
+                    </View>
+                </Modal>
             </View>
         );
     }
