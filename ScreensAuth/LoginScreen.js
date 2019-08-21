@@ -113,14 +113,11 @@ class LoginScreen extends Component {
   }
 
   _checkConnection = async (isConnected) => {
-    if (this._isMounted)
-      this.setState({ isConnected });
+    this.setState({ isConnected });
     if (!isConnected) {
-      if (this._isMounted)
-        this.setState({ errorMessage: "Giriş yapabilmek için internet bağlantınızın olması gerekmektedir!" });
+      this.setState({ errorMessage: "Giriş yapabilmek için internet bağlantınızın olması gerekmektedir!" });
     } else {
-      if (this._isMounted)
-        this.setState({ errorMessage: '' });
+      this.setState({ errorMessage: '' });
     }
   }
 
