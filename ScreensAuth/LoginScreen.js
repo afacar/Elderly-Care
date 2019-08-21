@@ -59,8 +59,8 @@ class LoginScreen extends Component {
     }
     const { navigate } = this.props.navigation;
     return (
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ marginTop: '20%', alignItems: "center", flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
+      <ScrollView style={{ flex: 1, }} contentContainerStyle={{alignItems:'center',alignContent: 'center', flexGrow: 1,justifyContent: 'center'}}> 
+        <View style={{ alignSelf:'center', alignItems: "center", backgroundColor: 'white', justifyContent: 'center' }}>
           <SafeAreaView>
             <CardItem style={[styles.cardItemStyle, { marginTop: 15 }]}>
               <Image
