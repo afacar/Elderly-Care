@@ -242,6 +242,7 @@ class AudioCard extends Component {
         }
     }
     stopPlaying = () => {
+        this.props.setAudio("");
         const sound = this.state.sound;
         if (sound)
             sound.stop();
