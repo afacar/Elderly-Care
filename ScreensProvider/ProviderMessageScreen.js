@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal, BackHandler } from 'react-native';
+import {Dimensions, AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal, BackHandler } from 'react-native';
 import { Icon, Button } from 'react-native-elements';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
@@ -210,12 +210,13 @@ class ProviderMessageScreen extends React.Component {
                     animationType='fade'
                     onRequestClose={()=>{this.setState({showImage: false})}}
                 >
-                    <View style={{ flex: 1, backgroundColor: 'black' }}>
-                        <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
-                            <Icon type='font-awesome' name='times' size={32} color='white' />
+                    <View style={{ flex:1, backgroundColor: 'black' }}>
+                    <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
+                            <Icon type='font-awesome' name='times' iconStyle ={{position: 'relative', marginRight: Math.round(Dimensions.get('window').width)/1.1}} size={32} color='white' />
                         </TouchableOpacity>
                         <ImageViewer
-                            style={{ backgroundColor: 'transparent', marginBottom: 10 }}
+                        
+                            style={{ backgroundColor: 'transparent', paddingTop: -10 }}
                             imageUrls={this.state.images}
                             onSwipeDown={() => { this.setState({ showImage: false }) }}
                             enableSwipeDown={true}
@@ -224,8 +225,9 @@ class ProviderMessageScreen extends React.Component {
                             index={this.state.currentIndex - 1}
                             renderImage={(index) => {
                                 return (
-                                    <View style={{ flex: 1, height: '100%' }}>
-                                        <Image source={{ uri: index.source.uri }} style={{ flex: 1 }} />
+                                    <View style={ styles.containerStyle}>
+                                        <Image source={{ uri: index.source.uri }} style={{ width: Math.round(Dimensions.get('window').width), height: Math.round(Dimensions.get('window').height), marginTop: 0 }} />
+                                        
                                     </View>
                                 )
                             }}
@@ -750,11 +752,13 @@ class ProviderMessageScreen extends React.Component {
 }
 const styles = {
     image: {
+
         width: 200,
         height: 200,
         borderRadius: 13,
         margin: 3,
         resizeMode: 'cover',
+
     },
 };
 /* function mapStateToProps({ chat, common }) {
