@@ -159,6 +159,20 @@ class ProviderMessageScreen extends React.Component {
         );
     }
 
+    renderSingleImage = (index) => {
+        console.log("Index", index)
+        return (
+            <Image source={{ uri: index.source.uri }} style={{ flex: 1 }} />
+        )
+    }
+
+    closeImage = () => {
+        console.log("Close image")
+        this.setState({ showImage: false })
+    }
+
+
+
     render() {
         const { chatId, userRole, messages, isApproved } = this.state;
         return (
@@ -193,14 +207,30 @@ class ProviderMessageScreen extends React.Component {
                 <Modal
                     visible={this.state.showImage}
                     transparent={true}
+                    animationType='fade'
+                    onRequestClose={()=>{this.setState({showImage: false})}}
                 >
-                    <ImageViewer
-                        imageUrls={this.state.images}
-                        saveToLocalByLongPress={false}
-                        onSwipeDown={() => this.setState({ showImage: false })}
-                        enableSwipeDown={true}
-                        index={this.state.currentIndex - 1}
-                    />
+                    <View style={{ flex: 1, backgroundColor: 'black' }}>
+                        <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
+                            <Icon type='font-awesome' name='times' size={32} color='white' />
+                        </TouchableOpacity>
+                        <ImageViewer
+                            style={{ backgroundColor: 'transparent', marginBottom: 10 }}
+                            imageUrls={this.state.images}
+                            onSwipeDown={() => { this.setState({ showImage: false }) }}
+                            enableSwipeDown={true}
+                            enablePreload={true}
+                            saveToLocalByLongPress={false}
+                            index={this.state.currentIndex - 1}
+                            renderImage={(index) => {
+                                return (
+                                    <View style={{ flex: 1, height: '100%' }}>
+                                        <Image source={{ uri: index.source.uri }} style={{ flex: 1 }} />
+                                    </View>
+                                )
+                            }}
+                        />
+                    </View>
                 </Modal>
                 <Modal
                     visible={this.state.showAnswers}
@@ -505,7 +535,10 @@ class ProviderMessageScreen extends React.Component {
 
 
     async componentDidMount() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            console.log("Back")
+            this.handleBackPress
+        });
         this._isMounted = true;
         const userRole = this.props.navigation.getParam('userRole', '');
         const chatId = this.props.navigation.getParam('chatId', '');
@@ -686,8 +719,11 @@ class ProviderMessageScreen extends React.Component {
     }
 
     handleBackPress = () => {
+        console.log("Back1")
         if (this.state.showImage) {
-            this.closeImages();
+            this.setState({
+                showImage: false
+            })
         } else {
             this.props.navigation.goBack();
         }
