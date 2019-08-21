@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, Text, NetInfo, ActivityIndicator, Image, View } from 'react-native';
+import { ScrollView, Text, NetInfo, ActivityIndicator, Image, View, StyleSheet } from 'react-native';
 import { Card, Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { SafeAreaView } from 'react-navigation';
@@ -37,15 +37,30 @@ class LoginScreen extends Component {
   render() {
     if (!this.state.isConnected) {
       return (
-        <Card style={styles.loginContainer} >
+        <View style={styles.container}>
           <Text style={styles.labelStyle}>{this.state.errorMessage}</Text>
-        </Card>
+          <Image
+            source={require('../assets/images/akilli_ajanda_logo.png')}
+            style={{ width: '100%', height: '20%', resizeMode: 'contain' }}
+          />
+          <Text
+            style={{
+              fontSize: 32,
+              fontStyle: 'italic',
+              color: 'black',
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontFamily: 'Impact'
+            }}>
+            Evde Bakım Desteği
+        </Text>
+        </View>
       );
     }
     const { navigate } = this.props.navigation;
     return (
-      <ScrollView style={{ flex:1 }}>
-        <View style={{ marginTop: '20%', alignItems: "center", flex:1, backgroundColor: 'white', justifyContent: 'center' }}>
+      <ScrollView style={{ flex: 1 }}>
+        <View style={{ marginTop: '20%', alignItems: "center", flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
           <SafeAreaView>
             <CardItem style={[styles.cardItemStyle, { marginTop: 15 }]}>
               <Image
@@ -100,7 +115,7 @@ class LoginScreen extends Component {
   _checkConnection = async (isConnected) => {
     this.setState({ isConnected });
     if (!isConnected) {
-      this.setState({ errorMessage: "İnternet bağlantısı yok!" });
+      this.setState({ errorMessage: "Uygulamayı kullanabilmek için internet bağlantınızın olması gerekmektedir!" });
     } else {
       this.setState({ errorMessage: '' });
     }
@@ -112,7 +127,7 @@ class LoginScreen extends Component {
   }
 }
 
-const styles = {
+const styles = StyleSheet.create({
   loginContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -130,15 +145,23 @@ const styles = {
   },
   labelStyle: {
     color: 'red',
-    fontSize: 18,
+    fontSize: 24,
     justifyContent: 'center',
+    textAlign: 'center',
+    alignSelf: 'center'
   },
   stretch: {
     paddingTop: 30,
     width: 200,
     height: 50,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   }
-};
+});
 
 /* function mapStateToProps({ auth, common }) {
   return { user: auth.user, common };
