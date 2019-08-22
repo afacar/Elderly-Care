@@ -47,6 +47,7 @@ class ProviderMessageScreen extends React.Component {
         // </View>
         // )
         headerRight: (
+            navigation.getParam('chatId') !== 'commonchat' &&
             <Button
                 onPress={() => navigation.navigate('CaregiverAnswerScreen', {
                     chatId: navigation.getParam('chatId')
@@ -56,7 +57,7 @@ class ProviderMessageScreen extends React.Component {
                 color='transparent'
                 buttonStyle={{ backgroundColor: 'transparent' }}
                 icon={<Icon name='info' type='material' size={30} color='#51A0D5' />} />
-        ),
+        )
     });
 
     renderArchive = (isArchived) => {
