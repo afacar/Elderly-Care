@@ -86,7 +86,7 @@ export class ChatItem extends Component {
 
     return (
       <TouchableOpacity onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}
-      onLongPress={() => this.props.onLongPress({chatId, title})}
+      onLongPress={() => {this.props.onLongPress ? this.props.onLongPress({chatId, title}) : {} }}
       delayLongPress={1500}
       >
         <ListItem
