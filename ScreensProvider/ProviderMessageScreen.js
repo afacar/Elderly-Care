@@ -1,5 +1,5 @@
 import React from 'react';
-import {Dimensions, AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal, BackHandler } from 'react-native';
+import { Dimensions, AsyncStorage, TouchableOpacity, Text, View, Image, Platform, Modal, BackHandler } from 'react-native';
 import { Icon, Button } from 'react-native-elements';
 import { Composer, GiftedChat, Send, Bubble } from 'react-native-gifted-chat';
 import { connect } from 'react-redux';
@@ -24,8 +24,9 @@ var RNFS = require('react-native-fs');
 class ProviderMessageScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: `${navigation.getParam('title', '')}`,
-        headerTitleStyle: { textAlign: 'center', alignSelf: 'center' },
+        headerTitleStyle: { textAlign: 'center', fontSize: 17 },
         headerStyle: {
+            //borderWidth: 1,
             backgroundColor: 'white',
         },
         // headerRight: (
@@ -48,15 +49,26 @@ class ProviderMessageScreen extends React.Component {
         // )
         headerRight: (
             navigation.getParam('chatId') !== 'commonchat' &&
-            <Button
-                onPress={() => navigation.navigate('CaregiverAnswerScreen', {
-                    chatId: navigation.getParam('chatId')
-                })}
-                title="Hasta Yanıtları"
-                titleStyle={{ color: 'black', fontSize: 12 }}
-                color='transparent'
-                buttonStyle={{ backgroundColor: 'transparent' }}
-                icon={<Icon name='info' type='material' size={30} color='#51A0D5' />} />
+            <View style={{ flexDirection: 'row' }}>
+                <Button
+                    onPress={() => navigation.navigate('CaregiverAnswerScreen', {
+                        chatId: navigation.getParam('chatId')
+                    })}
+                    title=""
+                    titleStyle={{ color: 'black', fontSize: 12 }}
+                    color='transparent'
+                    buttonStyle={{ backgroundColor: 'transparent' }}
+                    icon={<Icon name='info' type='material' size={30} color='#51A0D5' />} />
+                <Button
+                    onPress={() => navigation.navigate('PatientScreen', {
+                        userid: navigation.getParam('chatId')
+                    })}
+                    title=""
+                    titleStyle={{ color: 'black', fontSize: 12 }}
+                    color='transparent'
+                    buttonStyle={{ backgroundColor: 'transparent' }}
+                    icon={<Icon name='activity' type='feather' size={30} color='red' />} />
+            </View>
         )
     });
 
@@ -209,14 +221,14 @@ class ProviderMessageScreen extends React.Component {
                     visible={this.state.showImage}
                     transparent={true}
                     animationType='fade'
-                    onRequestClose={()=>{this.setState({showImage: false})}}
+                    onRequestClose={() => { this.setState({ showImage: false }) }}
                 >
-                    <View style={{ flex:1, backgroundColor: 'black' }}>
-                    <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
-                            <Icon type='font-awesome' name='times' iconStyle ={{position: 'relative', marginRight: Math.round(Dimensions.get('window').width)/1.1}} size={32} color='white' />
+                    <View style={{ flex: 1, backgroundColor: 'black' }}>
+                        <TouchableOpacity onPress={() => { this.setState({ showImage: false }) }}>
+                            <Icon type='font-awesome' name='times' iconStyle={{ position: 'relative', marginRight: Math.round(Dimensions.get('window').width) / 1.1 }} size={32} color='white' />
                         </TouchableOpacity>
                         <ImageViewer
-                        
+
                             style={{ backgroundColor: 'transparent', paddingTop: -10 }}
                             imageUrls={this.state.images}
                             onSwipeDown={() => { this.setState({ showImage: false }) }}
@@ -226,9 +238,9 @@ class ProviderMessageScreen extends React.Component {
                             index={this.state.currentIndex - 1}
                             renderImage={(index) => {
                                 return (
-                                    <View style={ styles.containerStyle}>
+                                    <View style={styles.containerStyle}>
                                         <Image source={{ uri: index.source.uri }} style={{ width: Math.round(Dimensions.get('window').width), height: Math.round(Dimensions.get('window').height), marginTop: 0 }} />
-                                        
+
                                     </View>
                                 )
                             }}
