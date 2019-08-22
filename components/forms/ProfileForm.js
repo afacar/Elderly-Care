@@ -208,7 +208,7 @@ class _ProfileForm extends Component {
                 size: 20,
                 color: "white"
               }}
-              title="Change"
+              title=""
               type='clear'
               titleStyle={{ color: 'white' }}
               buttonStyle={{ backgroundColor: 'rgba(52, 52, 52, 0.5)' }}
