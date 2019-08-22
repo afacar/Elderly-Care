@@ -220,7 +220,7 @@ const styles = StyleSheet.create(
             backgroundColor: 'transparent',
             justifyContent: 'center',
             alignItems: 'center',
-            margin: 40
+            margin: 18
         },
 
         text:

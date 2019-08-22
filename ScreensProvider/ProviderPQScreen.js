@@ -10,7 +10,7 @@ import firebase from 'react-native-firebase';
 class ProviderPQScreen extends Component {
 
     static navigationOptions = {
-        title: 'Preliminary Questions'
+        title: 'Ön sorular'
     }
 
 
@@ -183,7 +183,9 @@ class ProviderPQScreen extends Component {
                             onChangeText={(text) => this.addQuestion(item.index, text)}
                         />
                         <View style={{ flexDirection: 'column', justifyContent: 'space-evenly', height: '100%' }}>
-                            <Button buttonStyle={{ backgroundColor: '#B00D23', padding: 10 }} onPress={() => this.removeQuestion(item.index)} title="Sil" />
+                        <TouchableOpacity onPress={() => this.removeQuestion(item.index)}>
+                            <Icon type='font-awesome' name='plus-circle' style={styles.btn} size={36} color='red' />
+                        </TouchableOpacity>
                             {/* <Button buttonStyle={{backgroundColor: '#51A0D5', padding: 10}} title="Düzenle" /> */}
                         </View>
                     </Animated.View>
@@ -200,7 +202,10 @@ class ProviderPQScreen extends Component {
                             onChangeText={(text) => this.addQuestion(item.index, text)}
                         />
                         <View style={{ flexDirection: 'column', justifyContent: 'space-evenly', height: '100%' }}>
-                            <Button buttonStyle={{ backgroundColor: '#B00D23', padding: 10 }} onPress={() => this.removeQuestion(item.index)} title="Sil" />
+                        <TouchableOpacity onPress={() => this.removeQuestion(item.index)}>
+                            <Icon type='font-awesome' name='minus-circle' style={styles.btn} size={30} color='red' />
+                        </TouchableOpacity>
+                
                             {/* <Button buttonStyle={{ backgroundColor: '#51A0D5', padding: 10}} title="Düzenle"/> */}
                         </View>
                     </View>
@@ -216,10 +221,12 @@ class ProviderPQScreen extends Component {
                         {
                             newArray
                         }
-                    </View>
+                         
+                    </View>                   
                 </ScrollView>
-
-                <Button onPress={this.addView} title="Soru ekle" style={styles.btn} disabled={this.state.disabled} />
+                <TouchableOpacity onPress={this.addView}>
+                            <Icon type='font-awesome' name='plus-circle' style={styles.btn} size={45} color='red' />
+                        </TouchableOpacity>
             </View>
         );
     }
@@ -231,7 +238,7 @@ const styles = StyleSheet.create(
         container:
         {
             flex: 1,
-            backgroundColor: '#eee',
+            backgroundColor: '#f7f7f7',
             justifyContent: 'center',
             paddingTop: (Platform.OS == 'ios') ? 20 : 0
         },
@@ -243,13 +250,13 @@ const styles = StyleSheet.create(
             backgroundColor: 'transparent',
             justifyContent: 'center',
             alignItems: 'center',
-            margin: 40
+            margin: 18
         },
 
         text:
         {
             color: 'white',
-            fontSize: 25
+            fontSize: 20
         },
 
         btn:
@@ -258,7 +265,8 @@ const styles = StyleSheet.create(
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#51A0D5',
-            padding: 15
+            padding: 25,
+
         },
 
         btnImage:
