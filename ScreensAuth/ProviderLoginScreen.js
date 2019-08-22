@@ -59,7 +59,7 @@ class ProviderLogin extends Component {
           console.error(`setUserRole() has error:`, error.message);
         }
 
-        if (isNewUser, this.state.confirmResult ) {
+        if (this.state.newUser && this.state.confirmResult) {
           try {
             await this.props.createNewUserProfile(userRole, this.state.displayName);
             console.log(`!createNewUserProfile() is successful for new user:`);
@@ -181,8 +181,8 @@ class ProviderLogin extends Component {
               key='displayname'
               label='Ad Soyad'
               leftIcon={{
-                name:'account',
-                type:'material-community'
+                name: 'account',
+                type: 'material-community'
               }}
               placeholder='Ör. Ahmet Yılmaz'
               onChangeText={value => this.setState({ displayName: value })}
@@ -195,8 +195,8 @@ class ProviderLogin extends Component {
               label="Telefon numarası"
               keyboardType='phone-pad'
               leftIcon={{
-                name:'phone',
-                type:'material-community'
+                name: 'phone',
+                type: 'material-community'
               }}
               style={{ height: 40, marginTop: 15, marginBottom: 15 }}
               onChangeText={value => this.setState({ phoneNumber: value })}
@@ -206,10 +206,10 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-            <Button title={cancelTitle} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
+            <Button title={registerButton} color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
           <View style={styles.buttonStyle}>
-            <Button title={registerButton} color="green" onPress={this.signIn} disabled={this.state.disabled} />
+            <Button title={cancelTitle} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
           </View>
         </Card>
       );
@@ -220,8 +220,8 @@ class ProviderLogin extends Component {
             <Input
               label="Telefon numarası"
               leftIcon={{
-                name:'phone',
-                type:'material-community'
+                name: 'phone',
+                type: 'material-community'
               }}
               keyboardType='phone-pad'
               style={{ height: 40, marginTop: 15, marginBottom: 15 }}
@@ -232,10 +232,11 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-            <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+          <Button title={signInTitle} color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
           <View style={styles.buttonStyle}>
-            <Button title={signInTitle} color="green" onPress={this.signIn} disabled={this.state.disabled} />
+          <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+            
           </View>
         </Card>
       );

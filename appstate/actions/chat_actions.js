@@ -212,20 +212,20 @@ export const loadCaregiverChats = (callback) => async (dispatch) => {
     snapshot.forEach(async (snap) => {
       const chatId = snap.key;
       let { status, unread, firstTime, lastMessage, title, avatar } = snap.val();
-      console.log(`loadCaregiverChats snapshot => `, snapshot.val());
+      console.log(`loadCaregiverChats snapshot =>`, snapshot.val());
 
-      if (chatId && chatId !== 'commonchat') {
+      if (!chatId) return;
+
+      if (chatId !== 'commonchat') {
         title = title || 'isim yok';
         avatar = avatar ? { uri: avatar } : require('../../assets/images/user.png');
         callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
       } else if (chatId === 'commonchat') {
         await firebase.database().ref(`commonchat/lastMessage/`).on('value', async (commonsnap) => {
           lastMessage = commonsnap.val();
-          if (lastMessage) {
-            title = title || 'Alzheimer grubu';
-            avatar = await require('../../assets/images/groupchat.png');
-            callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
-          }
+          title = title || 'Alzheimer grubu';
+          avatar = await require('../../assets/images/groupchat.png');
+          callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
         });
       }
 
@@ -251,11 +251,9 @@ export const loadProviderChats = (callback) => async (dispatch) => {
         } else if (chatId === 'commonchat') {
           await firebase.database().ref(`commonchat/lastMessage/`).on('value', async (commonsnap) => {
             lastMessage = commonsnap.val();
-            if (lastMessage) {
-              title = title || 'Alzheimer grubu';
-              avatar = await require('../../assets/images/groupchat.png');
-              callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
-            }
+            title = title || 'Alzheimer grubu';
+            avatar = await require('../../assets/images/groupchat.png');
+            callback({ chatId, title, lastMessage, status, unread, avatar, firstTime });
           });
         }
       }
@@ -287,7 +285,7 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
               avatar = photoURL ? { uri: photoURL } : require('../../assets/images/user.png');
             });
           } catch (error) {
-            console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
+            console.log(`loadProviderArchives okunurken hata:`, error.message);
           }
         }
         if (isArchived)

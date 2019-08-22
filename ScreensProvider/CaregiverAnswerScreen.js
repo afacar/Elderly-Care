@@ -193,10 +193,12 @@ class CaregiverAnswerScreen extends Component {
             var questionData = await JSON.stringify(questionArray1);
             var answerData = await JSON.stringify(answerArray);
             var connectionStr = userId + "/" + caregiverID;
-            AsyncStorage.setItem(connectionStr + "/questions", questionData);
-            AsyncStorage.setItem(connectionStr + '/answers', answerData);
-            AsyncStorage.setItem(connectionStr + "/noQuestion", noQuestion.toString());
-            AsyncStorage.setItem(connectionStr + "/exists", exists.toString());
+            if(questionArray.length) {
+                AsyncStorage.setItem(connectionStr + "/questions", questionData);
+                AsyncStorage.setItem(connectionStr + '/answers', answerData);
+                AsyncStorage.setItem(connectionStr + "/noQuestion", noQuestion.toString());
+                AsyncStorage.setItem(connectionStr + "/exists", exists.toString());
+            }
         }
     }
 }
@@ -218,7 +220,7 @@ const styles = StyleSheet.create(
             backgroundColor: 'transparent',
             justifyContent: 'center',
             alignItems: 'center',
-            margin: 40
+            margin: 18
         },
 
         text:

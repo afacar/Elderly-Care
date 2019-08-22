@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Picker, Image, TouchableOpacity } from 'react-native';
+import { View, Picker, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button } from 'react-native-elements';
@@ -10,7 +10,7 @@ import { CardItem, DatePicker, SaveButton, LogoutButton, ListPicker, NoteInput, 
 
 class ProviderProfileForm extends Component {
 
-  state = { profile: {newPhoto: false}, loading: false, error: '', disabled: true };
+  state = { profile: { newPhoto: false }, loading: false, error: '', disabled: true };
 
   _isMounted = false;
 
@@ -26,7 +26,7 @@ class ProviderProfileForm extends Component {
 
   _saveProfile = async () => {
     const { profile } = this.state;
-    console.log("Profile details",profile);
+    console.log("Profile details", profile);
     this.setState({
       loading: true
     })
@@ -108,15 +108,27 @@ class ProviderProfileForm extends Component {
     console.log('ProfileForm rendered state,', this.state);
     return (
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
-        <TouchableOpacity
-          onPress={this.onImageClicked}>
-          <View>
-            <Image
-              style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
-              source={ this.state.profile.photoURL ? {uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png") }
+
+        <View>
+          <ImageBackground
+            style={{ width: 150, height: 150, alignSelf: 'center', justifyContent: 'flex-end' }}
+            //style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
+            source={this.state.profile.photoURL ? { uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png")}
+          >
+            <Button
+              icon={{
+                name: "camera",
+                size: 20,
+                color: "white"
+              }}
+              title=""
+              type='clear'
+              titleStyle={{ color: 'white' }}
+              buttonStyle={{ backgroundColor: 'rgba(52, 52, 52, 0.5)' }}
+              onPress={this.onImageClicked}
             />
-          </View>
-        </TouchableOpacity>
+          </ImageBackground>
+        </View>
 
         <CardItem>
           <TextInput
