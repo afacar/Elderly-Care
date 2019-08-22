@@ -285,7 +285,7 @@ export const loadProviderArchives = (callback) => async (dispatch) => {
               avatar = photoURL ? { uri: photoURL } : require('../../assets/images/user.png');
             });
           } catch (error) {
-            console.error(`provider displayName url (${url}) okunurken hata:`, error.message);
+            console.log(`loadProviderArchives okunurken hata:`, error.message);
           }
         }
         if (isArchived)
