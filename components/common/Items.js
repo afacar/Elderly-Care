@@ -71,10 +71,13 @@ export class ChatItem extends Component {
         } else {
           userName = (lastMessage.user._id === this.uid) ? 'Siz: ' : '';
         }
-        if (theChat.unread > 0) 
+        if (theChat.unread > 0)
           badge = { value: theChat.unread, status: 'primary', textStyle: { fontSize: 15 } }
-        if (lastMessage.text)
+        if (lastMessage.text) {
           subtitle = userName + lastMessage.text;
+          if (subtitle.length > 30)
+            subtitle = subtitle.substring(0, 30) + '...'
+        }
         else if (lastMessage.image)
           subtitle = userName + '📷 Resim';
         else if (lastMessage.audio)
@@ -86,8 +89,8 @@ export class ChatItem extends Component {
 
     return (
       <TouchableOpacity onPress={() => this.props.onPress({ chatId, title, userRole, isApproved, firstTime })}
-      onLongPress={() => {this.props.onLongPress ? this.props.onLongPress({chatId, title}) : {} }}
-      delayLongPress={1500}
+        onLongPress={() => { this.props.onLongPress ? this.props.onLongPress({ chatId, title }) : {} }}
+        delayLongPress={1500}
       >
         <ListItem
           title={title}
