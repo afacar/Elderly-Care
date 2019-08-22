@@ -42,7 +42,7 @@ export const loginWithGoogle = () => async (dispatch) => {
     //dispatch({ type: LOGIN, payload: currentUser });
   } catch (error) {
     console.log('Google Error=>', error);
-    
+
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       // user cancelled the login flow
       throw new Error("Google girişi iptal edildi!");
@@ -99,9 +99,9 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     throw new Error('Invalid userRole parameter to _createNewUserProfile: send p or c as userRole!');
   }
 
-  if ( phoneNumber) {
+  if (phoneNumber) {
     let phoneNumberUrl = `phoneNumbers/${phoneNumber}`;
-    await firebase.database().ref(`${phoneNumberUrl}`).set(phoneNumber);
+    await firebase.database().ref(phoneNumberUrl).set(phoneNumber);
   }
 
   let urlPrefix = `caregivers`;
@@ -109,22 +109,24 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     urlPrefix = 'providers';
     await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
   }
-  try {
+
+    // Prepare lastMessage
+    const lastMessage = {
+      text: `${displayName} sohbete katıldı.`,
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      system: true,
+      user: {
+        _id: uid,
+        name: displayName
+      }
+    }
+
     // Add user to common chat 
     const commonchat = {
       status: 'Approve',
       title: 'Alzheimer Sohbet Grubu',
     }
 
-    await firebase.database().ref(`${urlPrefix}/${uid}/chats/commonchat/`).set(commonchat);
-    await firebase.database().ref(`commonchat/members/${uid}/`).set(true);
-    console.log("commonchat membership is set to true for new user");
-  } catch (error) {
-    console.log("yeni kullanıcı commonchat'e eklenirken hata:", error.message);
-  }
-
-
-  try {
     // create user profile
     const profile = {
       photoURL: photoURL || '',
@@ -134,13 +136,24 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
       phoneNumber: phoneNumber || '',
       userRole: userRole
     };
-    if (userRole == 'p')
-      profile.generalFee = 0
-    await firebase.database().ref(`users/${uid}/profile/`).set(profile);
-    await firebase.database().ref(`users/${uid}/wallet`).set("0");
-    console.log("profile is created for new user");
+
+  try {
+    console.log('Getting messageId from commonchat...');
+    let messageId = await firebase.database().ref('commonchat/messages').push().key;
+    console.log('Getting messageId from commonchat=>', messageId);
+
+    const newUserProfile = {}
+
+    newUserProfile[`${urlPrefix}/${uid}/chats/commonchat`] = commonchat
+    newUserProfile[`commonchat/lastMessage`] = lastMessage
+    newUserProfile[`commonchat/messages/${messageId}`] = lastMessage
+    newUserProfile[`commonchat/members/${uid}/`] = true
+    newUserProfile[`users/${uid}/profile/`] = profile
+    newUserProfile[`users/${uid}/wallet`] = '0'
+
+    await firebase.database().ref().update(newUserProfile);
   } catch (error) {
-    console.log("yeni kullanıcı için profil oluşturulurken hata:", error.message);
+    console.log("yeni kullanıcı profili olustururken hata:", error.message);
   }
 
 };
@@ -163,7 +176,7 @@ export const fetch_profile = (callback, role = '') => async (dispatch) => {
           wallet = snap.val();
         }
         console.log("wallet", wallet);
-        callback({ ...profile, wallet});
+        callback({ ...profile, wallet });
       });
 
       //return dispatch({ type: PROFILE_FETCH, payload: profile });
