@@ -66,7 +66,7 @@ class ProviderCard extends Component {
       <Button
         icon={<RequestIcon color='#041256' />}
         type="clear"
-        title={`Danışmanlık Talep Et (${provider.generalFee} TRY)`}
+        title={`Danışmanlık Talep Et (${provider.generalFee ? provider.generalFee : 0} TRY)`}
         titleStyle={{ color: '#041256' }}
         onPress={() => this._sendProviderRequest(providerId, provider.generalFee ? provider.generalFee : 0)} />
     );

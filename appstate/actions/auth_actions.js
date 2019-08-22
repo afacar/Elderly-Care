@@ -104,12 +104,6 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     await firebase.database().ref(phoneNumberUrl).set(phoneNumber);
   }
 
-  let urlPrefix = `caregivers`;
-  if (userRole === 'p') {
-    urlPrefix = 'providers';
-    await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
-  }
-
     // Prepare lastMessage
     const lastMessage = {
       text: `${displayName} sohbete katıldı.`,
@@ -128,14 +122,21 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     }
 
     // create user profile
-    const profile = {
+    let profile = {
       photoURL: photoURL || '',
       displayName: displayName || '',
       email: email || '',
       photoURL: photoURL || '',
       phoneNumber: phoneNumber || '',
-      userRole: userRole
+      userRole: userRole,
     };
+
+    let urlPrefix = `caregivers`;
+    if (userRole === 'p') {
+      urlPrefix = 'providers';
+      await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
+      profile.generalFee = 0;
+    }
 
   try {
     console.log('Getting messageId from commonchat...');
@@ -149,8 +150,8 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     newUserProfile[`commonchat/messages/${messageId}`] = lastMessage
     newUserProfile[`commonchat/members/${uid}/`] = true
     newUserProfile[`users/${uid}/profile/`] = profile
-    newUserProfile[`users/${uid}/wallet`] = '0'
-
+    //newUserProfile[`users/${uid}/wallet`] = 0
+    
     await firebase.database().ref().update(newUserProfile);
   } catch (error) {
     console.log("yeni kullanıcı profili olustururken hata:", error.message);
