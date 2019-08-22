@@ -59,7 +59,7 @@ class ProviderLogin extends Component {
           console.error(`setUserRole() has error:`, error.message);
         }
 
-        if (isNewUser, this.state.confirmResult) {
+        if (this.state.newUser && this.state.confirmResult) {
           try {
             await this.props.createNewUserProfile(userRole, this.state.displayName);
             console.log(`!createNewUserProfile() is successful for new user:`);

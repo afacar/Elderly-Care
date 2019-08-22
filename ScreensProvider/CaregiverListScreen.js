@@ -27,6 +27,11 @@ class CaregiverList extends Component {
   }
 
   _answerCaregiverRequest = async (caregiverId, answer) => {
+    if ( answer =='Reject' || answer == 'End'){
+      const {caregivers} = this.state;
+      delete caregivers[caregiverId];
+      this.setState({caregivers});
+    }
     try {
       await this.props.respond_caregiver_request(caregiverId, answer);
     } catch (error) {
