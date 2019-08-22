@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import firebase from 'react-native-firebase';
 import { ListItem, Icon } from 'react-native-elements';
 import { respond_caregiver_request } from '../../appstate/actions';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import _ from 'lodash';
 import { ErrorLabel, Bold } from './Titles';
 import { RightButton } from './Buttons';
