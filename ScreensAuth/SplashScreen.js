@@ -38,7 +38,7 @@ class SplashScreen extends React.Component {
             color: 'black',
             textAlign: 'center',
             fontWeight: 'bold',
-            fontFamily: 'Impact'
+            //fontFamily: 'Impact'
           }}>
           Evde Bakım Desteği
         </Text>
