@@ -193,7 +193,7 @@ class CaregiverAnswerScreen extends Component {
             var questionData = await JSON.stringify(questionArray1);
             var answerData = await JSON.stringify(answerArray);
             var connectionStr = userId + "/" + caregiverID;
-            if(questionData) {
+            if(questionArray.length) {
                 AsyncStorage.setItem(connectionStr + "/questions", questionData);
                 AsyncStorage.setItem(connectionStr + '/answers', answerData);
                 AsyncStorage.setItem(connectionStr + "/noQuestion", noQuestion.toString());
