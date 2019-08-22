@@ -84,18 +84,6 @@ class CaregiverList extends Component {
     />
   );
 
-  /*   resumeButton = (caregiverId) => (
-      <Button
-        icon={{
-          type: 'feather',
-          name: "play",
-        }}
-        type='clear'
-        title="Başlat"
-        onPress={() => this._answerCaregiverRequest(caregiverId, 'Approve')}
-      />
-    ); */
-
   _renderItem = ({ item }) => {
     const caregiverId = item;
     console.log('renderCaregiverItem caregiverId', caregiverId);
