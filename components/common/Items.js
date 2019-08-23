@@ -102,7 +102,7 @@ export class ChatItem extends Component {
             size: 'medium',
           }}
           badge={badge}
-          containerStyle={{ borderBottomWidth: 0.5, borderBottomEndRadius: 50, borderBottomStartRadius: 100 }}
+          containerStyle={{  borderBottomWidth: 0.5, borderBottomEndRadius: 50, borderBottomStartRadius: 100 }}
         />
       </TouchableOpacity>
     );

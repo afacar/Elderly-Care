@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import { StyleSheet, Dimensions, View, FlatList, Alert } from 'react-native';
 import { Button, Card, Text } from 'react-native-elements';
 import { connect } from 'react-redux';
 
@@ -57,9 +57,9 @@ class ProviderCard extends Component {
     console.log('provider is =>', provider);
     const content = (
       <View>
-        <Text h3 style={{ textAlign: 'center', paddingBottom: 5 }}>{provider.displayName || 'Adı yok'}</Text>
+        <Text h3 style={{ textAlign: 'center', paddingBottom: 50 }}>{provider.displayName || 'Adı yok'}</Text>
         <RowItem label="Uzmanlık" content={provider.profession} />
-        <ColumnItem label="Biyografi" content={provider.experience} />
+        <RowItem label="Biyografi" content={provider.experience} />
       </View>
     );
     let info = (
@@ -92,17 +92,11 @@ class ProviderCard extends Component {
     let image = provider.photoURL ? { uri: provider.photoURL } : require('../../assets/images/user.png')
     return (
       <Card
-        image={image}
-        imageStyle={{ borderRadius: 50 }}
-        titleStyle={{ fontSize: 21 }}
-        containerStyle={{
-          //backgroundColor: '#e9fce9',
-          margin: 3,
-          borderWidth: 3,
-          borderColor: 'black',
-          borderRadius: 7,
-          marginBottom: 7,
-        }}
+        image={ image }
+       // imageStyle={{ flex: 1, width: Math.round(Dimensions.get('window').width) }}
+        imageStyle={styles.image }
+      //  titleStyle={{ fontSize: 21 }}
+        containerStyle={styles.container}
       >
         {content}
         {info}
@@ -111,5 +105,25 @@ class ProviderCard extends Component {
     );
   }
 }
+const styles = StyleSheet.create({
+  container: {
+    margin: 6,
+    borderWidth: 4,
+    borderColor: 'black',
+    borderRadius: 40,
+    marginBottom: 10,
+    backgroundColor: '#f7f7f7'
+  },
+  image: {
+    height: Math.round(Dimensions.get('window').height)/4, 
+    width: Math.round(Dimensions.get('window').width)/3.5 ,
+    flex: 1, 
+    alignSelf: 'center', 
+    justifyContent: 'flex-end',
+    borderWidth: 3,
+    marginTop: 10
 
+
+  },
+});
 export default connect(null, actions)(ProviderCard);

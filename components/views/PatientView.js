@@ -89,9 +89,9 @@ class PatientView extends Component {
 const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
-    //margin: 5,
-    //alignItems: 'flex-start',
+    margin: 20,
     padding: 0,
+
   },
 });
 

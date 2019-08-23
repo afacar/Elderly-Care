@@ -82,7 +82,7 @@ class _PatientForm extends Component {
             <ListPicker
               label='Cinsiyet'
               selectedValue={this.state.patient.gender}
-              onValueChange={(gender, itemIndex) => this.handleState({ gender })}
+              onValueChange={(gender) => this.handleState({ gender })}
               options={['Erkek', 'Kadın']}
             />
           </CardItem>

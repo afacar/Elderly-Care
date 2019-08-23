@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Picker, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Picker, Image, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button } from 'react-native-elements';
@@ -111,7 +111,8 @@ class ProviderProfileForm extends Component {
 
         <View>
           <ImageBackground
-            style={{ width: 150, height: 150, alignSelf: 'center', justifyContent: 'flex-end' }}
+            style={{ height: Math.round(Dimensions.get('window').height)/4, 
+            width: Math.round(Dimensions.get('window').width)/3.5 , alignSelf: 'center', justifyContent: 'flex-end' }}
             //style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
             source={this.state.profile.photoURL ? { uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png")}
           >
@@ -190,6 +191,7 @@ class ProviderProfileForm extends Component {
 const styles = {
   containerStyle: {
     margin: 5,
+    
   }
 }
 
