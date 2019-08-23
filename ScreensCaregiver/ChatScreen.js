@@ -19,7 +19,7 @@ class ChatScreen extends React.Component {
     headerForceInset: { vercical: 'never' },
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('ProviderListScreen')}>
-        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+        <View style={{flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
           <Text style={{ marginRight: 10, fontWeight: 'bold' }}>Uzman Bul</Text>
           <Icon
             type='material-community'
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   containerStyle: {
     //flex: 1,
     paddingTop: 15,
-    backgroundColor: '#fff',
+    backgroundColor:'#f7f7f7' 
   },
 });
 

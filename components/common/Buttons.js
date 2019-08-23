@@ -13,7 +13,7 @@ export class SaveButton extends Component {
         titleStyle={styles.titleStyle}
         containerStyle={styles.buttonStyle}
         icon={<SaveIcon />}
-        buttonStyle={{ backgroundColor: '#51A0D5' }}
+        buttonStyle={this.props.buttonStyle||{ backgroundColor: '#51A0D5', marginHorizontal: '20%' }}
       />
     );
   }
@@ -76,7 +76,7 @@ export class LogoutButton extends Component {
         icon={<LogoutIcon />}
         titleStyle={styles.titleStyle}
         containerStyle={styles.buttonStyle}
-        buttonStyle={{ backgroundColor: '#b70000' }}
+        buttonStyle={{ backgroundColor: '#b70000', marginHorizontal:'20%' }}
       />
     );
   }

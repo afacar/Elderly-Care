@@ -87,7 +87,8 @@ class ChartScreen extends React.Component {
   render() {
     const { glucoseData, bpData, weightData, selectedMonth, selectedYear } = this.state;
     return (
-      <ScrollView>
+      <ScrollView
+      backgroundColor= '#f7f7f7'>
         {this.renderDatePicker()}
         <GlucoseView year={selectedYear} month={selectedMonth} glucose={glucoseData.length > 1 ? glucoseData : null} />
         <BPView year={selectedYear} month={selectedMonth} bp={bpData.length > 1 ? bpData : null} />
@@ -181,6 +182,7 @@ const styles = StyleSheet.create({
     margin: 5,
     flexDirection: 'column',
     alignItems: 'stretch',
+  
   },
   buttonStyle: {
     marginTop: 15,

@@ -79,16 +79,28 @@ export const TimeIcon = (props) => {
     />
   );
 }
-
-export const LogoutIcon = (props) => {
+export const LoginIcon = (props) => {
   return (
     <Icon
-      name='logout'
-      type='simple-line-icon'
+      name='sign-in'
+      type='font-awesome'
       onPress={props.onPress || null}
       paddingRight={5}
       size={28}
-      color='white'
+      color={props.color || 'green'}  
+      containerStyle={{ paddingRight: 10 }}
+    />
+  );
+}
+export const LogoutIcon = (props) => {
+  return (
+    <Icon
+      name='sign-out'
+      type='font-awesome'
+      onPress={props.onPress || null}
+      paddingRight={5}
+      size={28}
+      color={props.color || 'white'}  
       containerStyle={{ paddingRight: 10 }}
     />
   );
@@ -115,7 +127,7 @@ export const CancelIcon = (props) => {
       onPress={props.onPress || null}
       paddingRight={1}
       size={24}
-      color={props.color || 'white'}  
+      color={props.color || 'red'}  
     //containerStyle={{ paddingRight: 10 }}
     />
   );

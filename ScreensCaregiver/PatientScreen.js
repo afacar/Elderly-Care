@@ -31,7 +31,9 @@ class PatientScreen extends React.Component {
 
   render() {
     return (
-      <ScrollView  keyboardShouldPersistTaps="handled">
+      <ScrollView 
+       keyboardShouldPersistTaps="handled"
+       backgroundColor= '#f7f7f7'>
         
         <PatientView userid={this.props.navigation.getParam('userid', '')} />
       </ScrollView>

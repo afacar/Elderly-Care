@@ -53,7 +53,7 @@ class ProviderWalletScreen extends Component {
     }
     render() {
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: '#f7f7f7' }}>
                 <Card
                     containerStyle={{ margin: 5 }}>
                     <CardItem>
