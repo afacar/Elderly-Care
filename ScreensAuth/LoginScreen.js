@@ -69,7 +69,7 @@ class LoginScreen extends Component {
               />
             </CardItem>
           </SafeAreaView>
-          <Card title="Uzmandan ikinci görüş alın" titleStyle={{ fontSize: 23 }} style={styles.loginContainer}>
+          <Card title="Evde Bakım Uygulaması" titleStyle={{ fontSize: 23 }} style={styles.loginContainer}>
             <Text style={styles.labelStyle}>{this.state.errorMessage}</Text>
             <CardItem style={styles.cardItemStyle}>
               <FacebookLoginButton
