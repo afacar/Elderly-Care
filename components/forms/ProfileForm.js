@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground, WebView, ActivityIndicator } from 'react-native';
+import { View, Picker, Image, TouchableOpacity, Platform, ImageBackground, WebView, ActivityIndicator, Dimensions } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { Input, Text, Card, Button, Icon, Overlay } from 'react-native-elements';
@@ -198,7 +198,8 @@ class _ProfileForm extends Component {
     return (
       <Card title="Bilgileriniz" containerStyle={styles.containerStyle}>
         <View style={{ paddingBottom: 25 }}>
-          <ImageBackground style={{ width: 150, height: 150, alignSelf: 'center', justifyContent: 'flex-end' }}
+          <ImageBackground style={{ height: Math.round(Dimensions.get('window').height)/4, 
+    width: Math.round(Dimensions.get('window').width)/3.5 , alignSelf: 'center', justifyContent: 'flex-end' }}
             //imageStyle={{ borderRadius:75 }}
             source={{ uri: this.state.profile.photoURL }}
           >

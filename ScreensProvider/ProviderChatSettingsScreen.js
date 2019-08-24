@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { ListItem, Button } from 'react-native-elements';
 import firebase from 'react-native-firebase';
-
+import {SaveButton} from '../components/common';
 class ProviderChatSettingsScreen extends Component {
     static navigationOptions = {
         title: 'Konsultasyon fiyat ayarları',
@@ -148,7 +148,7 @@ class ProviderChatSettingsScreen extends Component {
                     ListEmptyComponent={this.renderEmptyItem}
                     keyExtractor={(item, index) => index.toString()}
                 />
-                <Button buttonStyle={{ marginTop: 10 }} title={this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
+                <SaveButton buttonStyle={{ marginTop: 10, backgroundColor: '#51A0D5', marginHorizontal: '20%' }} title={this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
             </ScrollView>
         );
     }
@@ -160,7 +160,8 @@ class ProviderChatSettingsScreen extends Component {
 const styles = {
     containerStyle: {
         flex: 1,
-        margin: 10
+        margin: 10,
+        backgroundColor: '#f7f7f7'
     },
     chatItemStyle: {
         borderBottomColor: 'black',

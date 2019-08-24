@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { View, Image, AsyncStorage } from 'react-native';
+import { View, Image, AsyncStorage, StyleSheet } from 'react-native';
 import { Button, Text, Input, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
 
 import * as actions from '../appstate/actions';
-import { TextInput, CardItem } from '../components/common/';
+import { TextInput, CardItem, LoginIcon, CancelIcon, CheckIcon } from '../components/common/';
 
 const successImageUri = 'https://cdn.pixabay.com/photo/2015/06/09/16/12/icon-803718_1280.png';
 
@@ -79,6 +79,7 @@ class ProviderLogin extends Component {
           confirmResult: null,
           displayName: ""
         });
+
       }
     });
   }
@@ -206,10 +207,10 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-            <Button title={registerButton} color="green" onPress={this.signIn} disabled={this.state.disabled} />
+            <Button title={registerButton} icon = {<LoginIcon/>} type = 'clear' color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
           <View style={styles.buttonStyle}>
-            <Button title={cancelTitle} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
+            <Button title={cancelTitle} icon = {<CancelIcon/>} type = 'clear' color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
           </View>
         </Card>
       );
@@ -232,10 +233,10 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-          <Button title={signInTitle} color="green" onPress={this.signIn} disabled={this.state.disabled} />
+          <Button title={signInTitle} type = 'clear' icon = {<LoginIcon/>} color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
           <View style={styles.buttonStyle}>
-          <Button title="İptal" color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+          <Button title="İptal" type = 'clear' icon = {<CancelIcon/>} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
             
           </View>
         </Card>
@@ -268,7 +269,7 @@ class ProviderLogin extends Component {
           value={codeInput}
         />
         <View style={styles.buttonStyle}>
-          <Button title="Doğrula" color="#841584" onPress={this.confirmCode} />
+          <Button title="Doğrula" icon ={<CheckIcon/>} type = 'clear' color="#841584" onPress={this.confirmCode} />
         </View>
       </View>
     );
@@ -291,10 +292,11 @@ class ProviderLogin extends Component {
   }
 }
 
-const styles = {
+const styles = StyleSheet.create({
   buttonStyle: {
-    margin: 10
+    margin: 10,
+    marginHorizontal: '20%',
   }
-}
+});
 
 export default connect(null, actions)(ProviderLogin);
