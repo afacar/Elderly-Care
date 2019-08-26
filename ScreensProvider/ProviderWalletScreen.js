@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 
 class ProviderWalletScreen extends Component {
     static navigationOptions = {
-        title: 'My Wallet',
+        title: 'Cüzdan',
     };
 
     isMounted = false;
@@ -59,7 +59,7 @@ class ProviderWalletScreen extends Component {
                     <CardItem>
                         <Input
                             key='balance'
-                            label="Balance"
+                            label="Bakiye"
                             value={this.state.balance + "₺"}
                             multiline={false}
                             editable={false} />
