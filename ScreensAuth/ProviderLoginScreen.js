@@ -218,8 +218,8 @@ class ProviderLogin extends Component {
               key='profession'
               label='Uzmanlık alanı'
               leftIcon={{
-                name: 'account',
-                type: 'material-community'
+                name: 'work',
+                type: 'material-icons'
               }}
               placeholder='Ör. Nörolog'
               onChangeText={value => this.setState({ profession: value })}
@@ -232,8 +232,8 @@ class ProviderLogin extends Component {
               key='experience'
               label='Biografi'
               leftIcon={{
-                name: 'account',
-                type: 'material-community'
+                name: 'timeline',
+                type: 'material-icons'
               }}
               placeholder='Ör. 7 yıllık tecrübe'
               onChangeText={value => this.setState({ experience: value })}

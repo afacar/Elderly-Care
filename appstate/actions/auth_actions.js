@@ -130,15 +130,15 @@ export const createNewUserProfile = (userRole, userName, profession, experience)
       email: email || '',
       photoURL: photoURL || '',
       phoneNumber: phoneNumber || '',
-      userRole: userRole,
+      userRole: userRole
     };
 
     let urlPrefix = `caregivers`;
     if (userRole === 'p') {
-      userRole.status == 'Pending'
       urlPrefix = 'providers';
       await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
       profile.generalFee = 0;
+      profile.status = 'Pending'
     }
 
   try {
