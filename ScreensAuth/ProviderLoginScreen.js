@@ -22,9 +22,11 @@ class ProviderLogin extends Component {
       message: '',
       codeInput: '',
       phoneNumber: '',
+      displayName: '',
+      profession: '',
+      experience: '', 
       confirmResult: null,
       newUser: true,
-      displayName: '',
       disabled: false
     };
   }
@@ -61,7 +63,7 @@ class ProviderLogin extends Component {
 
         if (this.state.newUser && this.state.confirmResult) {
           try {
-            await this.props.createNewUserProfile(userRole, this.state.displayName);
+            await this.props.createNewUserProfile(userRole, this.state.displayName, this.state.profession, this.state.experience);
             console.log(`!createNewUserProfile() is successful for new user:`);
           } catch (error) {
             console.error(`createNewUserProfile() gives error:`, error.message);
@@ -77,7 +79,9 @@ class ProviderLogin extends Component {
           codeInput: '',
           phoneNumber: '',
           confirmResult: null,
-          displayName: ""
+          displayName: "",
+          profession: "",
+          experience: ""
         });
 
       }
@@ -91,12 +95,16 @@ class ProviderLogin extends Component {
   }
 
   signIn = async () => {
-    const { phoneNumber, displayName } = this.state;
+    const { phoneNumber, displayName, profession, experience, } = this.state;
     if (phoneNumber.length < 10) {
       this.setState({ message: 'Geçerli bir numara giriniz...' });
     }
-    else if (this.state.newUser && (displayName.length < 6 || !displayName))
+   else if (this.state.newUser && (displayName.length < 6 || !displayName))
       this.setState({ message: 'Geçerli bir isim giriniz...' });
+    else if (this.state.newUser && (profession.length < 2|| !profession))
+      this.setState({ message: 'Geçerli bir uzmanlık alanı giriniz...' });
+    else if (this.state.newUser && (experience.length < 1|| !experience))
+      this.setState({ message: 'Geçerli bir biografi giriniz...' });
     else {
       if (!this.state.newUser) {
         this.setState({ disabled: true })
@@ -131,7 +139,7 @@ class ProviderLogin extends Component {
       }
     }
   };
-
+  
   confirmCode = async () => {
     const { codeInput, confirmResult } = this.state;
 
@@ -173,7 +181,7 @@ class ProviderLogin extends Component {
   }
 
   renderPhoneNumberInput() {
-    const { phoneNumber, displayName, newUser } = this.state;
+    const { phoneNumber, displayName, profession, experience, newUser } = this.state;
     if (newUser) {
       return (
         <Card style={{ padding: 25 }}>
@@ -205,7 +213,34 @@ class ProviderLogin extends Component {
               value={phoneNumber}
             />
           </CardItem>
-
+          <CardItem>
+            <Input
+              key='profession'
+              label='Uzmanlık alanı'
+              leftIcon={{
+                name: 'account',
+                type: 'material-community'
+              }}
+              placeholder='Ör. Nörolog'
+              onChangeText={value => this.setState({ profession: value })}
+              value={profession}
+            />
+          </CardItem>
+  
+          <CardItem>
+            <Input
+              key='experience'
+              label='Biografi'
+              leftIcon={{
+                name: 'account',
+                type: 'material-community'
+              }}
+              placeholder='Ör. 7 yıllık tecrübe'
+              onChangeText={value => this.setState({ experience: value })}
+              value={experience}
+            />
+          </CardItem>
+           
           <View style={styles.buttonStyle}>
             <Button title={registerButton} icon = {<LoginIcon/>} type = 'clear' color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>

@@ -55,7 +55,7 @@ export const loginWithGoogle = () => async (dispatch) => {
       throw new Error("Play services NA");
     } else {
       // some other error happened
-      console.error("GogleSingin Some unkown error:", error.code, error.message);
+      console.error("GoogleSingin Some unkown error:", error.code, error.message);
       throw new Error("Some unkown error!");
     }
   }
@@ -85,7 +85,7 @@ export const loginWithFacebook = (data) => async (dispatch) => {
 
 };
 
-export const createNewUserProfile = (userRole, userName) => async (dispatch) => {
+export const createNewUserProfile = (userRole, userName, profession, experience) => async (dispatch) => {
   // check newUSer
   if (userRole === 'p') {
     await firebase.auth().currentUser.updateProfile({ displayName: userName });
@@ -125,6 +125,8 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
     let profile = {
       photoURL: photoURL || '',
       displayName: displayName || '',
+      profession: profession || '',
+      experience: experience || '',
       email: email || '',
       photoURL: photoURL || '',
       phoneNumber: phoneNumber || '',
@@ -133,6 +135,7 @@ export const createNewUserProfile = (userRole, userName) => async (dispatch) => 
 
     let urlPrefix = `caregivers`;
     if (userRole === 'p') {
+      userRole.status == 'Pending'
       urlPrefix = 'providers';
       await firebase.database().ref(`${urlPrefix}/${uid}/generalFee`).set(0);
       profile.generalFee = 0;
@@ -195,7 +198,7 @@ export const save_profile = (profile) => async (dispatch) => {
   // First update displayName, email, photoURL, phoneNumber to _user
   // Then update gender, birthdate etc. to profile
   console.log('In save_profile and recieved..', profile);
-  firebase.auth().currentUser.updateProfile({ displayName });
+  firebase.auth().currentUser.updateProfile({ displayName },{profession},{experience});
   if (newPhoto) {
     console.log("New photo")
     await firebase.storage().ref().child("profilePics").child(_user.uid).putFile(path);

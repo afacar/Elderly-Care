@@ -4,6 +4,7 @@ import {
   MODAL,
 } from './types';
 import firebase from 'react-native-firebase';
+import { getUserRole } from './auth_actions';
 
 export const clear = () => async (dispatch) => {
   return dispatch({ type: CLEAR });
@@ -41,7 +42,7 @@ export const fetch_providers = (callback) => async (dispatch) => {
                 await firebase.database().ref(`users/${providerId}/profile`).on('value', async profileSnap => {
                   const provider = profileSnap.val();
                   console.log('Provider profile is fetched!', provider);
-                  if (provider) callback({ ...provider, providerId, isApproved });
+                  if (provider && provider.status !== 'Pending' ) callback({ ...provider, providerId, isApproved });
                 });
               } catch (error) {
                 console.error('error while providers profile!', error.message);
