@@ -29,7 +29,7 @@ class ProviderWalletScreen extends Component {
                 })
         });
         this.props.getBalance(balance => {
-            if ( balance)
+            if (balance)
                 this.setState({
                     balance: balance,
                 })
@@ -37,19 +37,26 @@ class ProviderWalletScreen extends Component {
     }
 
     saveChatSettings = async () => {
-        if (this.isMounted)
-            this.setState({
-                disabled: true,
-                saveButtonText: 'Kaydediliyor',
-                loading: true
-            })
+
+        this.setState({
+            loading: true,
+            disabled: true,
+            saveButtonText: 'Kaydedildi',
+        })
 
         await this.props.setIBAN(this.state.IBAN);
         if (this.isMounted)
             this.setState({
-                saveButtonText: 'Kaydedildi',
-                loading: false
+                loading: false,
+                disabled: false,
+                saveButtonText: 'Kaydet',
             })
+            setTimeout(() => {
+                if (this.isMounted)
+                    this.setState({
+                        saveButtonText: 'Kaydet'
+                    })
+            }, 2500)
     }
     render() {
         return (
@@ -60,9 +67,14 @@ class ProviderWalletScreen extends Component {
                         <Input
                             key='balance'
                             label="Bakiye"
-                            value={this.state.balance + "₺"}
+                            value={this.state.balance}
                             multiline={false}
-                            editable={false} />
+                            editable={false}
+                            rightIcon={{
+                                type:'font-awesome',
+                                name:'turkish-lira',
+                                size: 18
+                            }}/>
                     </CardItem>
 
                     <CardItem>
@@ -70,7 +82,7 @@ class ProviderWalletScreen extends Component {
                             key='iban'
                             label='IBAN'
                             value={this.state.IBAN ? this.state.IBAN : ""}
-                            placeholder={'TR012345678901234567890123456.'}
+                            placeholder={'TR012345678901234567890123456'}
                             multiline={false}
                             onChangeText={(text) => {
                                 this.setState({
@@ -79,12 +91,17 @@ class ProviderWalletScreen extends Component {
                                     IBAN: text
                                 })
                             }}
-                            editable={true} />
+                            editable={true} 
+                            rightIcon={{
+                                type:'font-awesome',
+                                name:'bank',
+                                size: 18
+                            }}/>
                     </CardItem>
                 </Card>
-                <CardItem>
-                    <SaveButton title={this.state.loading ? 'Kaydediliyor' : this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
-                </CardItem>
+                <View>
+                    <SaveButton buttonStyle={{ marginTop: 10, backgroundColor: '#51A0D5', marginHorizontal: '20%' }} title={this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
+                </View>
             </View>
         )
     }

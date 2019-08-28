@@ -11,7 +11,10 @@ export class SaveButton extends Component {
         onPress={this.props.onPress}
         disabled={this.props.disabled}
         titleStyle={styles.titleStyle}
-        containerStyle={styles.buttonStyle}
+        containerStyle={{
+          padding: 10 ,
+          justifyContent: 'center'
+        }}
         icon={<SaveIcon />}
         buttonStyle={this.props.buttonStyle||{ backgroundColor: '#51A0D5', marginHorizontal: '20%' }}
       />
