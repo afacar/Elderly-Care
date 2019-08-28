@@ -12,6 +12,7 @@ class ProviderHome extends React.Component {
     headerStyle: {
       backgroundColor: 'white',
     },
+
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('CaregiverList')}>
         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginRight: 10 }}>
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
     paddingTop: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7'
   },
 });
 
