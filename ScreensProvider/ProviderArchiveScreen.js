@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ScrollView, FlatList, TouchableOpacity, Text, View, Alert } from 'react-native';
 import { connect } from 'react-redux'
 import * as actions from '../appstate/actions';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Card } from 'react-native-elements';
 
 class ProviderArchiveScreen extends Component {
   static navigationOptions = ({ navigation }) => ({
@@ -16,9 +16,9 @@ class ProviderArchiveScreen extends Component {
 
   _renderEmptyList = () => {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <Card style={{ flex: 1, justifyContent: 'center' }}>
         <Text style={{ fontSize: 18, alignSelf: 'center', textAlign: 'center' }}>Arşiviniz boş! Mesajları arşivlemek için ana sayfadaki mesajın üzerine basılı tutun!</Text>
-      </View>
+      </Card>
     );
   }
 
@@ -97,14 +97,13 @@ class ProviderArchiveScreen extends Component {
   _renderItem = ({ item }) => {
     const chatId = item;
     const theChat = this.state.chats[chatId]
-    /** item is a chatRoom object -> chatRoom1: { lastMessage: {...} } */
     const title = theChat.title;
     let avatar = theChat.avatar;
 
     return (
       <TouchableOpacity
         onLongPress={() => { this.showArchiveDialog({ chatId, title }) }}
-        delayLongPress={1500}
+        delayLongPress={550}
         onPress={() => this._onPressItem({ chatId, title, userRole: 'p', isApproved: false, userid: chatId, isArchived: true })}>
         <ListItem
           title={title}
@@ -142,7 +141,7 @@ const styles = {
   containerStyle: {
     flex: 1,
     paddingTop: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
   },
 };
 export default connect(null, actions)(ProviderArchiveScreen);
