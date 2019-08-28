@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { ListItem, Button } from 'react-native-elements';
 import firebase from 'react-native-firebase';
-import {SaveButton} from '../components/common';
+import { SaveButton } from '../components/common';
 class ProviderChatSettingsScreen extends Component {
     static navigationOptions = {
         title: 'Konsultasyon fiyat ayarları',
@@ -96,7 +96,7 @@ class ProviderChatSettingsScreen extends Component {
             caregivers[caregiverIndex].fee = newFee;
         else
             caregivers[caregiverIndex].fee = " ";
-        this.setState({
+        this.isMounted && this.setState({
             caregivers: caregivers,
             disabled: false
         })
@@ -114,14 +114,14 @@ class ProviderChatSettingsScreen extends Component {
     }
 
     saveChatSettings = async () => {
-        this.setState({
+        this.isMounted && this.setState({
             loading: true,
             disabled: true,
             saveButtonText: 'Kaydediliyor'
         })
         await this.props.setChatSettings(this.state.caregivers)
         await this.props.setGeneralFee(this.state.generalFee);
-        this.setState({
+        this.isMounted && this.setState({
             loading: false,
             disabled: true,
             saveButtonText: 'Kaydedildi'
