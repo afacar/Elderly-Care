@@ -194,21 +194,22 @@ class ProviderPQScreen extends Component {
             else {
                 console.log("Inside Render key is not index");
                 return (
-                    <View key={key} style={styles.viewHolder}>
+                    <Card key={key} style={styles.viewHolder}>
                         <Input
                             label={`Soru ${item.index + 1}`}
                             placeholder='Sorunuzu girin...'
                             value={this.state.questionArray[item.index]}
                             onChangeText={(text) => this.addQuestion(item.index, text)}
                         />
-                        <View style={{ flexDirection: 'column', justifyContent: 'space-evenly', height: '100%' }}>
+                    
+                    
                         <TouchableOpacity onPress={() => this.removeQuestion(item.index)}>
-                            <Icon type='font-awesome' name='minus-circle' style={styles.btn} size={30} color='red' />
+                            <Icon type='font-awesome' name='minus-circle' paddingTop={15} style={styles.btn} size={30} color='red'  />
                         </TouchableOpacity>
                 
                             {/* <Button buttonStyle={{ backgroundColor: '#51A0D5', padding: 10}} title="Düzenle"/> */}
-                        </View>
-                    </View>
+                        
+                    </Card>
                 );
             }
         });
@@ -225,7 +226,7 @@ class ProviderPQScreen extends Component {
                     </View>                   
                 </ScrollView>
                 <TouchableOpacity onPress={this.addView}>
-                            <Icon type='font-awesome' name='plus-circle' style={styles.btn} size={45} color='red' />
+                            <Icon  type='font-awesome' name='plus-circle' style={styles.btn} size={45} color='red' />
                         </TouchableOpacity>
             </View>
         );

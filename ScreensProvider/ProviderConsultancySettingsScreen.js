@@ -11,7 +11,7 @@ class ProviderConsultancySettingsScreen extends Component {
 
     render() {
         return (
-            <ScrollView style={{ marginTop: 10 }}>
+            <ScrollView style={styles.containerStyle}>
                 <TouchableOpacity onPress={() => this.navigateNextScreen('wallet')}>
                     <ListItem
                         key='wallet'
@@ -19,7 +19,7 @@ class ProviderConsultancySettingsScreen extends Component {
                         //onPress={() => this.navigateNextScreen('wallet')}
                         leftIcon={{ color: '#33cc33', type: 'antdesign', name: 'wallet' }}
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
-                        containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
+                        containerStyle={styles.btn}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.navigateNextScreen('chat')}>
@@ -29,7 +29,7 @@ class ProviderConsultancySettingsScreen extends Component {
                         //onPress={() => this.navigateNextScreen('chat')}
                         leftIcon={{ type: 'material-community', name: 'message-settings' }}
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
-                        containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
+                        containerStyle={styles.btn}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.navigateNextScreen('prelim_questions')}>
@@ -39,7 +39,7 @@ class ProviderConsultancySettingsScreen extends Component {
                         //onPress={() => this.navigateNextScreen('prelim_questions')}
                         leftIcon={{ color: '#0066ff', type: 'material-community', name: 'comment-question' }}
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
-                        containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
+                        containerStyle={styles.btn}
                     />
                 </TouchableOpacity>
                 {/* <TouchableOpacity>
@@ -67,5 +67,18 @@ class ProviderConsultancySettingsScreen extends Component {
         }
     }
 }
+const styles = {
+    containerStyle: {
+      flex: 1,
+      paddingTop: 10,
+      backgroundColor: '#f7f7f7',
+    },
+    
+    btn:{
+        borderBottomWidth: 1, 
+        borderBottomLeftRadius: 50 ,
+        backgroundColor: "#f1f1f1"
+    }
+  };
 
 export default ProviderConsultancySettingsScreen;

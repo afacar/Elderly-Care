@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 
 import * as actions from '../appstate/actions';
 import { TextInput, CardItem, LoginIcon, CancelIcon, CheckIcon } from '../components/common/';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const successImageUri = 'https://cdn.pixabay.com/photo/2015/06/09/16/12/icon-803718_1280.png';
 
@@ -24,7 +25,7 @@ class ProviderLogin extends Component {
       phoneNumber: '',
       displayName: '',
       profession: '',
-      experience: '', 
+      experience: '',
       confirmResult: null,
       newUser: true,
       disabled: false
@@ -101,9 +102,9 @@ class ProviderLogin extends Component {
     }
    else if (this.state.newUser && (displayName.length < 6 || !displayName))
       this.setState({ message: 'Geçerli bir isim giriniz...' });
-    else if (this.state.newUser && (profession.length < 2|| !profession))
+    else if (this.state.newUser && (profession.length < 2 || !profession))
       this.setState({ message: 'Geçerli bir uzmanlık alanı giriniz...' });
-    else if (this.state.newUser && (experience.length < 1|| !experience))
+    else if (this.state.newUser && (experience.length < 1 || !experience))
       this.setState({ message: 'Geçerli bir biografi giriniz...' });
     else {
       if (!this.state.newUser) {
@@ -185,68 +186,71 @@ class ProviderLogin extends Component {
     if (newUser) {
       return (
         <Card style={{ padding: 25 }}>
-          <CardItem>
-            <Input
-              key='displayname'
-              label='Ad Soyad'
-              leftIcon={{
-                name: 'account',
-                type: 'material-community'
-              }}
-              placeholder='Ör. Ahmet Yılmaz'
-              onChangeText={value => this.setState({ displayName: value })}
-              value={displayName}
-            />
-          </CardItem>
+          <ScrollView>
+            <CardItem>
+              <Input
+                key='displayname'
+                label='Ad Soyad'
+                leftIcon={{
+                  name: 'account',
+                  type: 'material-community'
+                }}
+                placeholder='Ör. Ahmet Yılmaz'
+                onChangeText={value => this.setState({ displayName: value })}
+                value={displayName}
+              />
+            </CardItem>
 
-          <CardItem>
-            <Input
-              label="Telefon numarası"
-              keyboardType='phone-pad'
-              leftIcon={{
-                name: 'phone',
-                type: 'material-community'
-              }}
-              style={{ height: 40, marginTop: 15, marginBottom: 15 }}
-              onChangeText={value => this.setState({ phoneNumber: value })}
-              placeholder={'+90 55... '}
-              value={phoneNumber}
-            />
-          </CardItem>
-          <CardItem>
-            <Input
-              key='profession'
-              label='Uzmanlık alanı'
-              leftIcon={{
-                name: 'account',
-                type: 'material-community'
-              }}
-              placeholder='Ör. Nörolog'
-              onChangeText={value => this.setState({ profession: value })}
-              value={profession}
-            />
-          </CardItem>
-  
-          <CardItem>
-            <Input
-              key='experience'
-              label='Biografi'
-              leftIcon={{
-                name: 'account',
-                type: 'material-community'
-              }}
-              placeholder='Ör. 7 yıllık tecrübe'
-              onChangeText={value => this.setState({ experience: value })}
-              value={experience}
-            />
-          </CardItem>
-           
-          <View style={styles.buttonStyle}>
-            <Button title={registerButton} icon = {<LoginIcon/>} type = 'clear' color="green" onPress={this.signIn} disabled={this.state.disabled} />
-          </View>
-          <View style={styles.buttonStyle}>
-            <Button title={cancelTitle} icon = {<CancelIcon/>} type = 'clear' color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
-          </View>
+            <CardItem>
+              <Input
+                label="Telefon numarası"
+                keyboardType='phone-pad'
+                leftIcon={{
+                  name: 'phone',
+                  type: 'material-community'
+                }}
+                style={{ height: 40, marginTop: 15, marginBottom: 15 }}
+                onChangeText={value => this.setState({ phoneNumber: value })}
+                placeholder={'+90 55... '}
+                value={phoneNumber}
+              />
+            </CardItem>
+            <CardItem>
+              <Input
+                key='profession'
+                label='Uzmanlık alanı'
+                leftIcon={{
+                  name: 'work',
+                  type: 'material-icons'
+                }}
+                placeholder='Ör. Nörolog'
+                onChangeText={value => this.setState({ profession: value })}
+                value={profession}
+              />
+            </CardItem>
+
+            <CardItem>
+              <Input
+                key='experience'
+                label='Biografi'
+                leftIcon={{
+                  name: 'timeline',
+                  type: 'material-icons'
+                }}
+                placeholder='Ör. 7 yıllık tecrübe'
+                onChangeText={value => this.setState({ experience: value })}
+                value={experience}
+              />
+            </CardItem>
+
+            <View style={styles.buttonStyle}>
+              <Button title={registerButton} icon={<LoginIcon />} type='clear' color="green" onPress={this.signIn} disabled={this.state.disabled} />
+            </View>
+            <View style={styles.buttonStyle}>
+              <Button title={cancelTitle} icon={<CancelIcon />} type='clear' color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} disabled={this.state.disabled} />
+            </View>
+
+          </ ScrollView>
         </Card>
       );
     } else {
@@ -268,11 +272,11 @@ class ProviderLogin extends Component {
           </CardItem>
 
           <View style={styles.buttonStyle}>
-          <Button title={signInTitle} type = 'clear' icon = {<LoginIcon/>} color="green" onPress={this.signIn} disabled={this.state.disabled} />
+            <Button title={signInTitle} type='clear' icon={<LoginIcon />} color="green" onPress={this.signIn} disabled={this.state.disabled} />
           </View>
           <View style={styles.buttonStyle}>
-          <Button title="İptal" type = 'clear' icon = {<CancelIcon/>} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
-            
+            <Button title="İptal" type='clear' icon={<CancelIcon />} color="red" onPress={() => this.props.navigation.goBack()} style={styles.buttonStyle} />
+
           </View>
         </Card>
       );
@@ -304,7 +308,7 @@ class ProviderLogin extends Component {
           value={codeInput}
         />
         <View style={styles.buttonStyle}>
-          <Button title="Doğrula" icon ={<CheckIcon/>} type = 'clear' color="#841584" onPress={this.confirmCode} />
+          <Button title="Doğrula" icon={<CheckIcon />} type='clear' color="#841584" onPress={this.confirmCode} />
         </View>
       </View>
     );
