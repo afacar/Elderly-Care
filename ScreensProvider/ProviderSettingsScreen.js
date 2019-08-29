@@ -11,7 +11,7 @@ class ProviderSettingsScreen extends Component {
 
     render() {
         return (
-            <ScrollView style={{ marginTop: 10 }}>
+            <ScrollView style={ styles.containerStyle}>
                 <TouchableOpacity onPress={() => this.navigateNextScreen('profile')}>
                     <ListItem
                         key='profile'
@@ -20,7 +20,7 @@ class ProviderSettingsScreen extends Component {
                         //onPress={() => this.navigateNextScreen('profile')}
                         leftIcon={{ color: '#0066ff', type: 'font-awesome', name: 'user-md' }}
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
-                        containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
+                        containerStyle={styles.btn}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.navigateNextScreen('consultancy')}>
@@ -31,7 +31,7 @@ class ProviderSettingsScreen extends Component {
                         //onPress={() => this.navigateNextScreen('consultancy')}
                         leftIcon={{ color: '#009933', type: 'material', name: 'settings-phone' }}
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
-                        containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
+                        containerStyle={styles.btn}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.navigateNextScreen('archive')}>
@@ -42,7 +42,7 @@ class ProviderSettingsScreen extends Component {
                         //onPress={() => this.navigateNextScreen('archive')}
                         leftIcon={{ color: '#cc3300', type: 'material', name: 'archive' }}
                         rightIcon={{ type: 'material', name: 'keyboard-arrow-right', size: 33 }}
-                        containerStyle={{ borderBottomWidth: 1, borderBottomLeftRadius: 50 }}
+                        containerStyle={styles.btn}
                     />
                 </TouchableOpacity>
             </ScrollView >
@@ -62,5 +62,17 @@ class ProviderSettingsScreen extends Component {
         }
     }
 }
+const styles = {
+    containerStyle: {
+      flex: 1,
+      paddingTop: 10,
+      backgroundColor: '#f7f7f7',
+    },
+    btn:{
+        borderBottomWidth: 1, 
+        borderBottomLeftRadius: 50 ,
+        backgroundColor: "#f1f1f1"
+    }
+  };
 
 export default ProviderSettingsScreen

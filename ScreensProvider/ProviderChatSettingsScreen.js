@@ -3,9 +3,10 @@ import { ScrollView, ActivityIndicator, AsyncStorage, View } from 'react-native'
 import * as actions from '../appstate/actions';
 import { connect } from 'react-redux';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
-import { ListItem, Button } from 'react-native-elements';
+import { ListItem, Button, Input, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
-import { SaveButton } from '../components/common';
+import {SaveButton, CardItem} from '../components/common';
+
 class ProviderChatSettingsScreen extends Component {
     static navigationOptions = {
         title: 'Konsultasyon fiyat ayarları',
@@ -18,7 +19,7 @@ class ProviderChatSettingsScreen extends Component {
         noOfCaregivers: 0,
         saveButtonText: 'Kaydet',
         disabled: true,
-        loading: true
+        loading: true,
     }
 
     isMounted = false;
@@ -85,6 +86,18 @@ class ProviderChatSettingsScreen extends Component {
                     title={displayName}
                     titleStyle={styles.textStyle}
                     input={{ placeholder: 'Ücret', value: fee + "", onChangeText: (newFee) => { this.setNewFee(newFee, item) } }}
+                    rightIcon={{
+                        type: 'font-awesome',
+                        name: 'turkish-lira',
+                        size: 18
+                    }}
+                    leftAvatar={{
+                        source: caregiver.photoURL && { uri: caregiver.photoURL },
+                        title: caregiver.displayName,
+                        size: 'medium',
+                    }}
+
+
                 />
             </View>
         );
@@ -114,18 +127,20 @@ class ProviderChatSettingsScreen extends Component {
     }
 
     saveChatSettings = async () => {
-        this.isMounted && this.setState({
+
+        this.setState({
             loading: true,
             disabled: true,
-            saveButtonText: 'Kaydediliyor'
+            saveButtonText: 'Kaydedildi',
         })
-        await this.props.setChatSettings(this.state.caregivers)
-        await this.props.setGeneralFee(this.state.generalFee);
+        await this.props.setChatSettings(this.state.caregivers || 0);
+        await this.props.setGeneralFee(this.state.generalFee || 0);
         this.isMounted && this.setState({
             loading: false,
-            disabled: true,
-            saveButtonText: 'Kaydedildi'
+            disabled: false,
+            saveButtonText: 'Kaydet',
         })
+
         setTimeout(() => {
             if (this.isMounted)
                 this.setState({
@@ -137,17 +152,30 @@ class ProviderChatSettingsScreen extends Component {
     render() {
         return (
             <ScrollView style={styles.containerStyle}>
-                <ListItem
-                    title={"Genel Ücret"}
-                    titleStyle={styles.textStyle}
-                    input={{ placeholder: 'Ücret', value: this.state.generalFee + "", onChangeText: (newFee) => { this.setGeneralFee(newFee) } }}
-                />
-                <FlatList
-                    data={Object.keys(this.state.caregivers)}
-                    renderItem={this.renderChat}
-                    ListEmptyComponent={this.renderEmptyItem}
-                    keyExtractor={(item, index) => index.toString()}
-                />
+                <Card>
+                    <Input
+                        key='generalFee'
+                        label="Genel Ücret"
+                        titleStyle={styles.textStyle}
+                        placeholder={'Ücret'}
+                        value={this.state.generalFee + ""}
+                        onChangeText={(newFee) => { this.setGeneralFee(newFee) }}
+                        rightIcon={{
+                            type: 'font-awesome',
+                            name: 'turkish-lira',
+                            size: 18
+                        }}
+                    />
+                </Card>
+                <Card>
+                    <FlatList
+                        data={Object.keys(this.state.caregivers)}
+                        renderItem={this.renderChat}
+                        ListEmptyComponent={this.renderEmptyItem}
+                        keyExtractor={(item, index) => index.toString()}
+
+                    />
+                </Card>
                 <SaveButton buttonStyle={{ marginTop: 10, backgroundColor: '#51A0D5', marginHorizontal: '20%' }} title={this.state.saveButtonText} disabled={this.state.disabled} onPress={this.saveChatSettings} />
             </ScrollView>
         );
@@ -160,17 +188,17 @@ class ProviderChatSettingsScreen extends Component {
 const styles = {
     containerStyle: {
         flex: 1,
-        margin: 10,
+        margin: 1,
         backgroundColor: '#f7f7f7'
     },
     chatItemStyle: {
         borderBottomColor: 'black',
-        borderBottomWidth: 1
+        borderBottomWidth: 1.5,
     },
     textStyle: {
         fontWeight: 'bold',
         color: 'black',
-        fontSize: 18
+        fontSize: 18,
     },
 }
 

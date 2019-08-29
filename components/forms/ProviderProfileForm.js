@@ -112,7 +112,7 @@ class ProviderProfileForm extends Component {
         <View>
           <ImageBackground
             style={{ height: Math.round(Dimensions.get('window').height)/4, 
-            width: Math.round(Dimensions.get('window').width)/3.5 , alignSelf: 'center', justifyContent: 'flex-end' }}
+            width: Math.round(Dimensions.get('window').width)/2.75 , alignSelf: 'center', justifyContent: 'flex-end' }}
             //style={{ width: 150, height: 150, alignSelf: 'center', paddingBottom: 25 }}
             source={this.state.profile.photoURL ? { uri: this.state.profile.photoURL } : require("../../assets/images/doctor.png")}
           >
